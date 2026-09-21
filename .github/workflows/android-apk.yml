@@ -23,7 +23,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          cache: gradle
+          # Gradle cache is enabled only after the Android project exists.
 
       - name: Install npm dependencies
         run: npm install

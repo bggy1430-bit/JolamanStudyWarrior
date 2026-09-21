@@ -298,7 +298,7 @@
     border: 1px dashed var(--line); border-radius: 10px; font-size: 11px;
     display: none; flex-direction: column; gap: 8px; text-align: left;
   }
-  #detailStatsPanel.show { display: flex; }
+  #characterModalBg #detailStatsPanel.show { display: flex !important; }
   .stat-group { display: flex; flex-direction: column; gap: 2px; }
   .stat-group-title { font-weight: 800; color: var(--gold); font-size: 11.5px; margin-bottom: 2px; border-bottom: 1px solid var(--line); padding-bottom: 2px;}
   .stat-calc-line { display: flex; justify-content: space-between; align-items: center; color: var(--sub); }
@@ -4216,68 +4216,71 @@ function toggleDetailStats() {
 }
 
 function renderDetailStats() {
-  const omegaEl=document.getElementById('detailOmegaCharge'); if(omegaEl) omegaEl.textContent=fmt(S.zeroOmegaCharge||0);
+  const panel=document.getElementById('detailStatsPanel');
+  const btn=document.getElementById('detailStatsToggleBtn');
+  if(!panel) return;
 
-  const panel = document.getElementById('detailStatsPanel');
-  const btn = document.getElementById('detailStatsToggleBtn');
-  if(!panel || !btn) return;
-
-  if(!btn){
+  // 버튼을 눌렀을 때는 항상 현재 저장 상태를 다시 계산한다.
+  if(S.showDetailStats){
     panel.classList.add('show');
-  } else if(!S.showDetailStats){
+    panel.style.setProperty('display','flex','important');
+    if(btn) btn.textContent='📊 상세 스탯표 닫기 ▲';
+  }else{
     panel.classList.remove('show');
-    btn.textContent='📊 상세 스탯표 보기 ▼';
-    return;
-  } else {
-    panel.classList.add('show');
-    btn.textContent='📊 상세 스탯표 닫기 ▲';
+    panel.style.removeProperty('display');
+    if(btn) btn.textContent='📊 상세 스탯표 보기 ▼';
   }
 
-  const b=equippedBonus();
+  const num=v=>{const n=Number(v);return Number.isFinite(n)?n:0;};
+  const safe=(fn,fallback=0)=>{try{const v=fn();const n=Number(v);return Number.isFinite(n)?n:fallback;}catch(e){return fallback;}};
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
 
-  const baseAtk=S.player.atk+b.atk;
-  const atkResearch=S.research.atkLv*5;
-  const atkGrowth=growthBonus('atkPct');
-  const atkPet=getPetBonus('atkBonus')+getPetSynergyBonus('atkBonus');
-  const atkEquip=getEquipOptionBonus('atkPct')+getSetBonus('atkPct')+getArtifactBonus('atkPct');
-  const finalAtk=calcAtk();
+  const p=S.player||{};
+  let b={atk:0,hp:0};
+  try{b=equippedBonus()||b;}catch(e){}
+  b.atk=num(b.atk); b.hp=num(b.hp);
 
-  const baseHp=S.player.maxHp+b.hp;
-  const hpResearch=(S.research.hpLv||0)*5;
-  const hpGrowth=growthBonus('hpPct');
-  const hpPet=getPetBonus('hpBonus')+getPetSynergyBonus('hpBonus');
-  const hpEquip=getEquipOptionBonus('hpPct')+getSetBonus('hpPct')+getArtifactBonus('hpPct');
-  const finalHp=calcMaxHp();
+  const focusAtk=num(S.focusUpgrades?.atk)*10;
+  const focusHp=num(S.focusUpgrades?.hp)*25;
+  const baseAtk=num(p.atk)+b.atk+focusAtk;
+  const baseHp=num(p.maxHp)+b.hp+focusHp;
 
-  const critRate=Math.min(99,15+growthBonus('critRate')+getPetBonus('critRate')+
-    getEquipOptionBonus('critRate')+getSetBonus('critRate')+getArtifactBonus('critRate'));
-  const critDmg=185+growthBonus('critDmg')+getPetBonus('critDmg')+getPetSynergyBonus('critDmg')+
-    getEquipOptionBonus('critDmg')+getSetBonus('critDmg')+getArtifactBonus('critDmg');
-  const goldBonus=S.research.goldLv*10+growthBonus('goldPct')+getPetBonus('goldBonus')+
-    getPetSynergyBonus('goldBonus')+getEquipOptionBonus('goldBonus')+getSetBonus('goldBonus')+getArtifactBonus('goldPct');
-  const expBonus=growthBonus('expPct')+getPetBonus('expBonus')+getPetSynergyBonus('expBonus')+
-    getEquipOptionBonus('expBonus')+getSetBonus('expBonus')+getArtifactBonus('expPct');
-  const bossDmg=getPetSynergyBonus('bossDmg')+getEquipOptionBonus('bossDmg')+
-    getSetBonus('bossDmg')+getArtifactBonus('bossDmg');
+  const atkResearch=num(S.research?.atkLv)*5;
+  const atkGrowth=safe(()=>growthBonus('atkPct'));
+  const atkPet=safe(()=>getPetBonus('atkBonus'))+safe(()=>getPetSynergyBonus('atkBonus'));
+  const atkEquip=safe(()=>getEquipOptionBonus('atkPct'))+safe(()=>getSetBonus('atkPct'))+safe(()=>getArtifactBonus('atkPct'));
+  const atkMult=1+(atkResearch+atkGrowth+atkPet+atkEquip)/100;
+  const originMult=safe(()=>originCoreMultiplier(),1);
 
-  document.getElementById('detailBaseAtk').textContent=
-    `${fmt(baseAtk)}  (캐릭터 ${fmt(S.player.atk)} + 장비 ${fmt(b.atk)})`;
-  document.getElementById('detailAtkMult').textContent=
-    `연구 +${atkResearch}% · 성장 +${atkGrowth}% · 펫/유대 +${Math.round(atkPet)}% · 장비/유물 +${Math.round(atkEquip)}%`;
-  document.getElementById('detailFinalAtk').textContent=fmt(finalAtk);
+  const hpGrowth=safe(()=>growthBonus('hpPct'));
+  const hpPet=safe(()=>getPetBonus('hpBonus'))+safe(()=>getPetSynergyBonus('hpBonus'));
+  const hpEquip=safe(()=>getEquipOptionBonus('hpPct'))+safe(()=>getSetBonus('hpPct'))+safe(()=>getArtifactBonus('hpPct'));
+  const hpMult=1+(hpGrowth+hpPet+hpEquip)/100;
 
-  document.getElementById('detailBaseHp').textContent=
-    `${fmt(baseHp)}  (캐릭터 ${fmt(S.player.maxHp)} + 장비 ${fmt(b.hp)})`;
-  document.getElementById('detailHpMult').textContent=
-    `연구 +${hpResearch}% · 성장 +${hpGrowth}% · 펫/유대 +${Math.round(hpPet)}% · 장비/유물 +${Math.round(hpEquip)}%`;
-  document.getElementById('detailFinalHp').textContent=fmt(finalHp);
+  const finalAtk=safe(()=>calcAtk(),Math.round(baseAtk*atkMult*originMult));
+  const finalHp=safe(()=>calcMaxHp(),Math.round(baseHp*hpMult*originMult));
 
-  document.getElementById('detailCritRate').textContent=`${critRate.toFixed(1)}%`;
-  document.getElementById('detailCritDmg').textContent=`${critDmg.toFixed(1)}%`;
-  document.getElementById('detailGoldBonus').textContent=`+${Math.round(goldBonus)}%`;
-  document.getElementById('detailExpBonus').textContent=`+${Math.round(expBonus)}%`;
-  const bossEl=document.getElementById('detailBossDmg');
-  if(bossEl) bossEl.textContent=`+${Math.round(bossDmg)}%`;
+  const critRate=Math.min(99,15+safe(()=>growthBonus('critRate'))+safe(()=>getPetBonus('critRate'))+safe(()=>getEquipOptionBonus('critRate'))+safe(()=>getSetBonus('critRate'))+safe(()=>getArtifactBonus('critRate')));
+  const critDmg=185+safe(()=>growthBonus('critDmg'))+safe(()=>getPetBonus('critDmg'))+safe(()=>getPetSynergyBonus('critDmg'))+safe(()=>getEquipOptionBonus('critDmg'))+safe(()=>getSetBonus('critDmg'))+safe(()=>getArtifactBonus('critDmg'));
+  const goldBonus=num(S.research?.goldLv)*10+safe(()=>growthBonus('goldPct'))+safe(()=>getPetBonus('goldBonus'))+safe(()=>getPetSynergyBonus('goldBonus'))+safe(()=>getEquipOptionBonus('goldBonus'))+safe(()=>getSetBonus('goldBonus'))+safe(()=>getArtifactBonus('goldPct'));
+  const expBonus=safe(()=>growthBonus('expPct'))+safe(()=>getPetBonus('expBonus'))+safe(()=>getPetSynergyBonus('expBonus'))+safe(()=>getEquipOptionBonus('expBonus'))+safe(()=>getSetBonus('expBonus'))+safe(()=>getArtifactBonus('expPct'));
+  const bossDmg=safe(()=>getPetSynergyBonus('bossDmg'))+safe(()=>getEquipOptionBonus('bossDmg'))+safe(()=>getSetBonus('bossDmg'))+safe(()=>getArtifactBonus('bossDmg'));
+  const spousePetDmg=safe(()=>getSpousePetDamageBonus());
+  const spouseMult=safe(()=>getSpousePetDamageMult(),1);
+  const spouse=safe(()=>getEquippedSpouse(),null);
+
+  set('detailAtkChar',fmt(num(p.atk))); set('detailAtkEquipBase','+'+fmt(b.atk)); set('detailAtkFocus','+'+fmt(focusAtk)); set('detailBaseAtk',fmt(baseAtk));
+  set('detailAtkResearch','+'+atkResearch.toFixed(1)+'%'); set('detailAtkGrowth','+'+atkGrowth.toFixed(1)+'%'); set('detailAtkPet','+'+atkPet.toFixed(1)+'%'); set('detailAtkEquipPct','+'+atkEquip.toFixed(1)+'%');
+  set('detailAtkMult','×'+atkMult.toFixed(4)); set('detailAtkOrigin','×'+originMult.toFixed(4)); set('detailFinalAtk',fmt(finalAtk));
+
+  set('detailHpChar',fmt(num(p.maxHp))); set('detailHpEquipBase','+'+fmt(b.hp)); set('detailHpFocus','+'+fmt(focusHp)); set('detailBaseHp',fmt(baseHp));
+  set('detailHpGrowth','+'+hpGrowth.toFixed(1)+'%'); set('detailHpPet','+'+hpPet.toFixed(1)+'%'); set('detailHpEquipPct','+'+hpEquip.toFixed(1)+'%');
+  set('detailHpMult','×'+hpMult.toFixed(4)); set('detailHpOrigin','×'+originMult.toFixed(4)); set('detailFinalHp',fmt(finalHp));
+
+  set('detailCritRate',critRate.toFixed(1)+'%'); set('detailCritDmg',critDmg.toFixed(1)+'%');
+  set('detailGoldBonus','+'+Math.round(goldBonus)+'%'); set('detailExpBonus','+'+Math.round(expBonus)+'%'); set('detailBossDmg','+'+Math.round(bossDmg)+'%');
+  set('detailOmegaCharge',fmt(num(S.zeroOmegaCharge)));
+  set('detailSpousePetDmg','+'+Math.round(spousePetDmg)+'% · ×'+spouseMult.toFixed(2)+(spouse?' · '+spouse.name:' · 미장착'));
 }
 
 /* 펫 12마리 전투 필드 연출 */

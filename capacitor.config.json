@@ -1,0 +1,8 @@
+{
+  "appId": "com.jolaman.studywarrior",
+  "appName": "졸라맨 키우기",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -31,8 +31,13 @@ jobs:
       - name: Create Android project
         run: npx cap add android
 
-      - name: Generate Android app icon
-        run: npx @capacitor/assets generate --android --iconBackgroundColor '#39A9F5' --iconBackgroundColorDark '#39A9F5'
+      - name: Generate Android app icon when source exists
+        run: |
+          if [ -f assets/logo.png ]; then
+            npx @capacitor/assets generate --android --iconBackgroundColor '#39A9F5' --iconBackgroundColorDark '#39A9F5'
+          else
+            echo "assets/logo.png not present; using default Capacitor icon for this build."
+          fi
 
       - name: Sync web app to Android
         run: npx cap sync android

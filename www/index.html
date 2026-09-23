@@ -2265,30 +2265,30 @@ const ARTIFACT_SETS=[
 ];
 
 const ARTIFACT_COMBO_SYNERGIES=[
- ['blood_crown','void_star','적월의 쌍성','공격력 +5%'],
- ['blood_crown','crimson_sigil','적월 판결','보스 피해 +6%'],
- ['void_star','oracle_mirror','쌍성의 역거울','치명타 피해 +8%'],
- ['immortal_heart','everlasting_bone','불멸의 골격','최대 HP +7%'],
- ['guardian_shield','sanctuary_lantern','성역 봉쇄','최대 HP +8%'],
- ['golden_crown','fortune_coin','황금 순환','골드 획득량 +8%'],
- ['wisdom_codex','time_sand','역천의 시간','경험치 +8%'],
- ['eye_of_fate','oracle_mirror','예언의 눈','치명타 확률 +3%'],
- ['fate_thread','time_sand','운명의 되감기','치명타 피해 +6%'],
- ['boss_relic','abyss_core','심연 포식자','보스 피해 +12%'],
- ['null_feather','void_bell','무효의 장송','최대 HP +6%'],
- ['star_collapse','world_end_eye','붕성 종말','보스 피해 +12%'],
- ['apocalypse_mark','endless_flame','재앙의 불씨','공격력 +7%'],
- ['blood_crown','boss_relic','적월종언','보스 피해 +8%'],
- ['sanctuary_lantern','null_feather','무효 성역','최대 HP +7%'],
- ['abyss_core','apocalypse_mark','심연재앙','보스 피해 +10%'],
- ['void_bell','endless_flame','허공의 잔화','공격력 +6%'],
- ['crimson_sigil','world_end_eye','종말의 혈안','보스 피해 +8%'],
- ['star_collapse','endless_flame','붕성의 불씨','공격력 +7%'],
- ['blood_crown','void_star','crimson_sigil','적월 삼문','공격력 +10% · 보스 피해 +5%'],
- ['immortal_heart','guardian_shield','sanctuary_lantern','불멸 삼문','최대 HP +12%'],
- ['eye_of_fate','time_sand','oracle_mirror','천문 삼문','치명타 확률 +5% · 치명타 피해 +10%'],
- ['boss_relic','abyss_core','null_feather','허무 삼문','보스 피해 +15% · 최대 HP +5%'],
- ['star_collapse','apocalypse_mark','world_end_eye','종말 삼문','공격력 +12% · 보스 피해 +10%']
+ ['blood_crown','void_star','적월의 쌍성','혈월 공명 · 치명타 4회마다 다음 공격에 공격력 150% 추가 피해'],
+ ['blood_crown','crimson_sigil','적월 판결','적월 처형 · 보스 HP 30% 이하 진입 시 5초간 보스 피해 +30% (전투당 1회)'],
+ ['void_star','oracle_mirror','쌍성의 역거울','역거울 치명 · 치명타 5회마다 다음 공격을 60% 위력으로 1회 복제'],
+ ['immortal_heart','everlasting_bone','불멸의 골격','불멸 재생 · HP 25% 이하가 되면 최대 HP의 18% 회복 (전투당 1회)'],
+ ['guardian_shield','sanctuary_lantern','성역 봉쇄','성역 방벽 · 5회 피격마다 다음 1회 받는 피해 60% 감소'],
+ ['golden_crown','fortune_coin','황금 순환','황금 연쇄 · 골드 ×3 이상 보상 3회 획득 시 다음 처치 골드 ×5'],
+ ['wisdom_codex','time_sand','역천의 시간','시간 대박 · 보스 처치 시 유물 파편을 스테이지의 1배 추가 획득'],
+ ['eye_of_fate','oracle_mirror','예언의 눈','예언 적중 · 같은 적에게 5회 연속 공격 시 다음 공격 확정 치명타'],
+ ['fate_thread','time_sand','운명의 되감기','운명 저장 · 최근 5초 누적 피해의 10%를 다음 공격에 추가'],
+ ['boss_relic','abyss_core','심연 포식자','심연 포식 · 보스 공격 5회마다 보스 최대 HP의 0.2% 추가 피해'],
+ ['null_feather','void_bell','무효의 장송','무효화 · 치명적 피해를 받으면 피해 1로 감소 (전투당 1회)'],
+ ['star_collapse','world_end_eye','붕성 종말','별의 붕괴 · 공격 20회마다 공격력 700% 추가 피해'],
+ ['apocalypse_mark','endless_flame','재앙의 불씨','재앙 점화 · 공격 5회마다 재앙 스택 +1, 4스택마다 공격력 600% 폭발'],
+ ['blood_crown','boss_relic','적월종언','혈월 종언 · 보스 HP 20% 이하에서 3초간 모든 공격 +40% (전투당 1회)'],
+ ['sanctuary_lantern','null_feather','무효 성역','성역 회복 · 8회 피격마다 최대 HP의 8% 회복'],
+ ['abyss_core','apocalypse_mark','심연재앙','심연재앙 · 보스 공격 10회마다 보스 최대 HP의 0.35% 추가 피해'],
+ ['void_bell','endless_flame','허공의 잔화','허공 잔화 · 공격 7회마다 공격력 300% 추가 피해'],
+ ['crimson_sigil','world_end_eye','종말의 혈안','종말의 혈안 · 보스 HP 15% 이하에서 다음 공격 공격력 900% 추가 피해 (전투당 1회)'],
+ ['star_collapse','endless_flame','붕성의 불씨','붕성의 불씨 · 공격 10회마다 공격력 400% 추가 피해'],
+ ['blood_crown','void_star','crimson_sigil','적월 삼문','적월 강림 · 치명타 4회마다 다음 공격에 공격력 400% 추가 피해'],
+ ['immortal_heart','guardian_shield','sanctuary_lantern','불멸 삼문','불멸의 영역 · HP 20% 이하 진입 시 3초간 받는 피해 70% 감소 (전투당 1회)'],
+ ['eye_of_fate','time_sand','oracle_mirror','천문 삼문','천문 개방 · 치명타 5회마다 4초간 치명타 확률 +50%p'],
+ ['boss_relic','abyss_core','null_feather','허무 삼문','허무의 종말 · 보스 HP 15% 이하 진입 시 공격력 1200% 추가 피해 (전투당 1회)'],
+ ['star_collapse','apocalypse_mark','world_end_eye','종말 삼문','세계 붕괴 · 공격 25회마다 공격력 1000% 추가 피해']
 ];
 function hasArtifactCombo(...ids){ return ids.every(id=>getEquippedArtifactIds().includes(id)); }
 
@@ -2298,29 +2298,18 @@ function artifactLevelMultiplier(lv){ return lv<=0 ? 0 : 1 + (Math.min(10,lv)-1)
 function getEquippedArtifactIds(){ if(!Array.isArray(S.equippedArtifacts) && Array.isArray(S.artifactEquipped)) S.equippedArtifacts=S.artifactEquipped.slice(); return (S.equippedArtifacts||[]).filter(id=>getArtifactLevel(id)>0).slice(0,5); }
 function getArtifactSynergy(){
   const eq=new Set(getEquippedArtifactIds()); const abilities=[]; const names=[]; const counts={};
-  const stats={atkPct:0,hpPct:0,goldPct:0,critRate:0,expPct:0,critDmg:0,bossDmg:0};
-  const add=(key,val)=>{ if(stats[key]!==undefined) stats[key]+=val; };
-  const parse=(text)=>{
-    let m=text.match(/공격력\s*\+(\d+(?:\.\d+)?)%/); if(m)add('atkPct',Number(m[1]));
-    m=text.match(/최대 HP\s*\+(\d+(?:\.\d+)?)%/); if(m)add('hpPct',Number(m[1]));
-    m=text.match(/골드(?: 획득량)?\s*\+(\d+(?:\.\d+)?)%/); if(m)add('goldPct',Number(m[1]));
-    m=text.match(/경험치\s*\+(\d+(?:\.\d+)?)%/); if(m)add('expPct',Number(m[1]));
-    m=text.match(/치명타 확률\s*\+(\d+(?:\.\d+)?)%/); if(m)add('critRate',Number(m[1]));
-    m=text.match(/치명타 피해\s*\+(\d+(?:\.\d+)?)%/); if(m)add('critDmg',Number(m[1]));
-    m=text.match(/보스 피해\s*\+(\d+(?:\.\d+)?)%/); if(m)add('bossDmg',Number(m[1]));
-  };
   ARTIFACT_SETS.forEach(set=>{
     const count=set.pieces.filter(id=>eq.has(id)).length; counts[set.id]=count;
-    Object.entries(set.effects).forEach(([need,text])=>{
-      if(count>=Number(need)){ abilities.push({setId:set.id,setName:set.name,need:Number(need),text}); parse(text); }
-    });
     if(count>=2) names.push(set.ic+' '+set.name+' '+count+'/4');
+    Object.entries(set.effects).forEach(([need,text])=>{
+      if(count>=Number(need)) abilities.push({setId:set.id,setName:set.name,need:Number(need),text});
+    });
   });
   ARTIFACT_COMBO_SYNERGIES.forEach(x=>{
     const ids=x.slice(0,-2); const comboName=x[x.length-2]; const text=x[x.length-1];
-    if(ids.every(id=>eq.has(id))){ abilities.push({setId:'combo',setName:comboName,need:ids.length,text}); names.push('✦ '+comboName); parse(text); }
+    if(ids.every(id=>eq.has(id))) { abilities.push({setId:'combo',setName:comboName,need:ids.length,text}); names.push('✦ '+comboName); }
   });
-  return {stats,names,abilities,counts};
+  return {stats:{atkPct:0,hpPct:0,goldPct:0,critRate:0,expPct:0,critDmg:0,bossDmg:0},names,abilities,counts};
 }
 function hasArtifactSynergy(setId, need=2){ return (getArtifactSynergy().counts?.[setId]||0) >= need; }
 function artifactSynergyHasText(setId, need){ return hasArtifactSynergy(setId,need); }
@@ -2346,7 +2335,7 @@ function getArtifactBonus(stat){
     const a=getArtifactDef(id), lv=getArtifactLevel(id);
     if(a && lv>0 && a.stat===stat) total += a.base * artifactLevelMultiplier(lv);
   });
-  const syn=getArtifactSynergy().stats; return total + (syn[stat]||0);
+  return total;
 }
 function addArtifactShards(n, reason=''){
   n=Math.max(0,Math.floor(n||0)); if(!n) return;
@@ -2992,7 +2981,7 @@ function expNeeded(level){ return Math.round(25 * Math.pow(level, 1.35)); }
 
 /* MONSTER SPANNER */
 function spawnMonster(effect=true){
-  S.combatHits = 0; S.errorHitCount = 0; S.enemyAttackCount = 0; S.originMirrorReflect=0; S.pendingMirrorDamage=0; S.zeroComboDisplay = 0; S.zero999LastStandUsed = false; S.zeroOmegaCharge = 0; S.originVoidUsed = false; S.zero999TimeStop = false; S.gearShieldUsed=false; S.gearOriginUsed=false; S.rewindUsed = false; S.secondChanceUsed = false; S.damageHistory = []; S.phaseBoost = 0; S.absCritCharge = 0; S.absCritDamage = 0; S.absVoidEcho = 0; S.absVoidEchoBase = 0; S.absDestroyCharge = 0; S.absSlaughterStacks = 0; S.absSlaughterBurstReady = false; S.originVoidCharge = 0; S.originSoulStacks = 0; S.originTimeCooldownUntil = 0; S.zeroOneStored = 0; S.zeroResetUsed = false; S.zeroResetStartHp = calcMaxHp(); S.artifactBloodMark=false; S.artifactFateCharge=0; S.goldCoinStacks=0; S.goldJackpotReady=false; S.goldVaultReady=false; S.artifactImmortalUsed=false; S.artifactCalamityMark=0;
+  S.combatHits = 0; S.errorHitCount = 0; S.enemyAttackCount = 0; S.originMirrorReflect=0; S.pendingMirrorDamage=0; S.zeroComboDisplay = 0; S.zero999LastStandUsed = false; S.zeroOmegaCharge = 0; S.originVoidUsed = false; S.zero999TimeStop = false; S.gearShieldUsed=false; S.gearOriginUsed=false; S.rewindUsed = false; S.secondChanceUsed = false; S.damageHistory = []; S.phaseBoost = 0; S.absCritCharge = 0; S.absCritDamage = 0; S.absVoidEcho = 0; S.absVoidEchoBase = 0; S.absDestroyCharge = 0; S.absSlaughterStacks = 0; S.absSlaughterBurstReady = false; S.originVoidCharge = 0; S.originSoulStacks = 0; S.originTimeCooldownUntil = 0; S.zeroOneStored = 0; S.zeroResetUsed = false; S.zeroResetStartHp = calcMaxHp(); S.artifactBloodMark=false; S.artifactFateCharge=0; S.artifactCritHits=0; S.artifactEnemyHits=0; S.artifactTreasureCycle=0; S.artifactVoidExecuteUsed=false; S.artifactWorldEndUsed=false; S.artifactCelestialUsed=false; S.goldCoinStacks=0; S.goldJackpotReady=false; S.goldVaultReady=false; S.artifactImmortalUsed=false; S.artifactCalamityMark=0;
   let mobIndex = (S.stage-1) % MONSTERS.length;
 
   const mt = MONSTERS[mobIndex];
@@ -3076,7 +3065,7 @@ function challengeBoss(){
 function nextStage(){
   S.bossRetryAvailable = false;
   S.zeroOmegaCharge = 0; S.originVoidUsed = false;
-  S.combatHits = 0; S.absDestroyCharge = 0; S.absSlaughterStacks = 0; S.absSlaughterBurstReady = false; S.originVoidCharge = 0; S.originSoulStacks = 0; S.originTimeCooldownUntil = 0; S.artifactBloodMark=false; S.artifactFateCharge=0; S.artifactImmortalUsed=false; S.artifactCalamityMark=0;
+  S.combatHits = 0; S.absDestroyCharge = 0; S.absSlaughterStacks = 0; S.absSlaughterBurstReady = false; S.originVoidCharge = 0; S.originSoulStacks = 0; S.originTimeCooldownUntil = 0; S.artifactBloodMark=false; S.artifactFateCharge=0; S.artifactCritHits=0; S.artifactEnemyHits=0; S.artifactVoidExecuteUsed=false; S.artifactWorldEndUsed=false; S.artifactCelestialUsed=false; S.artifactImmortalUsed=false; S.artifactCalamityMark=0;
   S.damageHistory = [];
   S.secondChanceUsed = false;
   S.rewindUsed = false;
@@ -3528,6 +3517,7 @@ function combatTick(){
 
   const critChance = Math.min(0.99, 0.15 + (growthBonus('critRate') + getPetBonus('critRate') + getPetSynergyBonus('critRate') + getPetEffectValue('crit') + getEquipOptionBonus('critRate') + getSetBonus('critRate') + getArtifactBonus('critRate')) / 100);
   let crit = Math.random() < critChance;
+  if(crit) S.artifactCritHits=(S.artifactCritHits||0)+1;
   if(hasArtifactSynergy('fate',2) && (S.artifactFateCharge||0)>=6){ crit=true; S.artifactFateCharge=0; spawnDmgText('monsterWrap','FATE FORESEEN!','dmgText crit'); }
   else if(hasArtifactSynergy('fate',2)){ S.artifactFateCharge=(S.artifactFateCharge||0)+1; }
   let attackBase = calcAtk();
@@ -3541,15 +3531,55 @@ function combatTick(){
   let dmg = Math.max(1, Math.round(attackBase * rand(0.85,1.15)));
   const artifactBaseDamage=dmg;
   const artifactPetBaseTotal=Object.values((S.damageStats&&S.damageStats.pets)||{}).reduce((x,v)=>x+Number(v||0),0);
-  // 유물 시너지 — 개별 능력치가 아니라 조건부 특수능력으로만 작동
+  // 유물 시너지 — 확률형 발동 없이 전투 행동/횟수/HP 조건으로만 작동
   const artifactHit = (S.combatHits || 0) + 1;
-  if(hasArtifactSynergy('bloodmoon',2) && S.artifactBloodMark){ dmg=Math.round(dmg*1.50); S.artifactBloodMark=false; spawnDmgText('monsterWrap','BLOOD MARK!','dmgText crit'); }
-  if(hasArtifactSynergy('bloodmoon',3) && artifactHit%5===0){ dmg=Math.round(dmg*1.35); spawnDmgText('monsterWrap','MOON TRACE!','dmgText extraDmg'); }
-  if(hasArtifactSynergy('bloodmoon',4) && S.monster.hp/S.monster.maxHp<=0.30){ dmg=Math.round(dmg*1.50); spawnDmgText('monsterWrap','RED MOON END!','dmgText crit'); }
-  if(hasArtifactSynergy('void',2) && Math.random()<0.15){ const extra=Math.max(1,Math.round(dmg*0.80)); dmg+=extra; spawnDmgText('monsterWrap','VOID RIFT!','dmgText crit'); }
-  if(hasArtifactSynergy('void',3) && S.monster.isBoss && Math.random()<0.12){ const cut=Math.max(1,Math.round(S.monster.maxHp*0.02)); dmg+=cut; spawnDmgText('monsterWrap','ABYSS EAT!','dmgText crit'); }
-  if(hasArtifactSynergy('void',4) && S.monster.isBoss && S.monster.hp/S.monster.maxHp<=0.20 && Math.random()<0.35){ dmg=Math.max(dmg,S.monster.hp+1); spawnDmgText('monsterWrap','NULL EXECUTION!','dmgText crit'); }
-  if(hasArtifactSynergy('apocalypse',2) && artifactHit%4===0){ const extra=Math.max(1,Math.round(dmg*1.20)); dmg+=extra; spawnDmgText('monsterWrap','STARFALL!','dmgText crit'); }
+  const artifactCritHits = Number(S.artifactCritHits||0);
+  const artifactEnemyHits = Number(S.artifactEnemyHits||0);
+
+  if(hasArtifactSynergy('bloodmoon',2) && artifactCritHits>0 && artifactCritHits%4===0){
+    dmg=Math.round(dmg*2.50); spawnDmgText('monsterWrap','BLOOD MOON!','dmgText crit');
+  }
+  if(hasArtifactSynergy('bloodmoon',3) && artifactHit%5===0){
+    dmg=Math.round(dmg*1.35); spawnDmgText('monsterWrap','MOON TRACE!','dmgText extraDmg');
+  }
+  if(hasArtifactSynergy('bloodmoon',4) && S.monster.hp/S.monster.maxHp<=0.30){
+    dmg=Math.round(dmg*1.50); spawnDmgText('monsterWrap','RED MOON END!','dmgText crit');
+  }
+
+  if(hasArtifactSynergy('void',2) && artifactHit%5===0){
+    const extra=Math.max(1,Math.round(dmg*0.80)); dmg+=extra; spawnDmgText('monsterWrap','VOID RIFT!','dmgText crit');
+  }
+  if(hasArtifactSynergy('void',3) && S.monster.isBoss && artifactHit%5===0){
+    const cut=Math.max(1,Math.round(S.monster.maxHp*0.002)); dmg+=cut; spawnDmgText('monsterWrap','ABYSS EAT!','dmgText crit');
+  }
+  if(hasArtifactSynergy('void',4) && S.monster.isBoss && S.monster.hp/S.monster.maxHp<=0.20 && !S.artifactVoidExecuteUsed){
+    S.artifactVoidExecuteUsed=true; dmg=Math.max(dmg,S.monster.hp+1); spawnDmgText('monsterWrap','NULL EXECUTION!','dmgText crit');
+  }
+
+  if(hasArtifactSynergy('apocalypse',2) && artifactHit%4===0){
+    const extra=Math.max(1,Math.round(dmg*1.20)); dmg+=extra; spawnDmgText('monsterWrap','STARFALL!','dmgText crit');
+  }
+  if(hasArtifactSynergy('apocalypse',3) && S.monster.isBoss && artifactHit%5===0){
+    S.artifactCalamityMark=(S.artifactCalamityMark||0)+1; spawnDmgText('monsterWrap','CALAMITY '+S.artifactCalamityMark,'dmgText crit');
+  }
+  if(hasArtifactSynergy('apocalypse',4) && S.monster.isBoss && S.monster.hp/S.monster.maxHp<=0.25 && !S.artifactWorldEndUsed){
+    S.artifactWorldEndUsed=true; dmg+=Math.max(1,Math.round(dmg*2.0)); spawnDmgText('monsterWrap','WORLD END!','dmgText crit');
+  }
+
+  if(hasArtifactSynergy('fate',2) && (S.artifactFateCharge||0)>=5){
+    crit=true; S.artifactFateCharge=0; spawnDmgText('monsterWrap','FATE FORESEEN!','dmgText crit');
+  } else if(hasArtifactSynergy('fate',2)){ S.artifactFateCharge=(S.artifactFateCharge||0)+1; }
+
+  if(hasArtifactSynergy('fate',3) && artifactCritHits>0 && artifactCritHits%5===0){
+    const extra=Math.max(1,Math.round(dmg*0.60)); dmg+=extra; spawnDmgText('monsterWrap','FATE ECHO!','dmgText extraDmg');
+  }
+  if(hasArtifactSynergy('fate',4) && S.monster.isBoss && S.monster.hp/S.monster.maxHp<=0.25 && !S.artifactCelestialUsed){
+    S.artifactCelestialUsed=true; dmg=Math.round(dmg*1.80); spawnDmgText('monsterWrap','CELESTIAL VERDICT!','dmgText crit');
+  }
+
+  if(hasArtifactSynergy('immortal',3) && S.player.hp/calcMaxHp()<=0.30 && mdmg>0){
+    mdmg=Math.max(1,Math.round(mdmg*0.70));
+  }
   if(gearPower.time>0 && Math.random() < Math.min(.30, gearPower.time*.06)){ dmg += Math.max(1,Math.round(dmg*.90)); spawnDmgText('monsterWrap','TIME ECHO!','dmgText extraDmg'); }
   if(gearPower.absolute>0 && Math.random() < Math.min(.20, gearPower.absolute*.04)){ dmg += Math.max(1,Math.round(dmg*2.5)); spawnDmgText('monsterWrap','ABSOLUTE AUTHORITY!','dmgText crit'); }
   // ===== 신화: 능력치 제공 전용 =====
@@ -3567,7 +3597,6 @@ function combatTick(){
   if((S.combatHits || 0) === 0){ dmg = Math.round(dmg * (1 + getPetEffectValue('firstStrike')/100)); }
   if(S.monster.isBoss){ dmg = Math.round(dmg * (1 + (getPetEffectValue('bossHunter') + getPetSynergyBonus('bossDmg') + getArtifactBonus('bossDmg') + originCoreBossBonus())/100)); }
   
-  if(crit && hasArtifactSynergy('bloodmoon',2) && Math.random()<0.25){ S.artifactBloodMark=true; spawnDmgText('monsterWrap','BLOOD SEAL!','dmgText extraDmg'); }
   // ===== 개별 유물 조합 시너지 =====
   if(S.artifactGuardUntil && Date.now()<S.artifactGuardUntil) dmg=Math.round(dmg*0.65);
   if(crit || S.forceArtifactCrit){ S.forceArtifactCrit=false;
@@ -3942,6 +3971,7 @@ function combatTick(){
     if(hasPetSynergy('origin_chaos_star') && enemyHit%5===0 && mdmg>0){ mdmg=Math.round(mdmg*0.10); triggerPetEffectVisual('origin_chaos_star'); }
     if(has('originMirror') && enemyHit%5===0){ const ref=Math.max(1,Math.round(mdmg*0.40)); mdmg=Math.round(mdmg*0.60); S.originMirrorReflect=(S.originMirrorReflect||0)+ref; }
     if(S.originMirrorReflect>0){ const rd=S.originMirrorReflect; S.originMirrorReflect=0; S.pendingMirrorDamage=rd; }
+    S.artifactEnemyHits=(S.artifactEnemyHits||0)+1;
     if(hasArtifactSynergy('immortal',3) && S.player.hp/calcMaxHp()<=0.30 && mdmg>0){ mdmg=Math.max(1,Math.round(mdmg*0.70)); }
 
     // ZERO∞ — 적에게 받은 실제 피해의 60%를 흡수해 저장하고, 실제 HP 피해를 40%로 줄인다.
@@ -4022,6 +4052,7 @@ function getJunkSellValue(item) {
 }
 
 function onMonsterKilled(){
+  S.artifactTreasureCycle=(S.artifactTreasureCycle||0)+1;
   const stage = S.stage;
   const isBoss = S.monster.isBoss;
   
@@ -4080,9 +4111,9 @@ function onMonsterKilled(){
     finalGoldGain *= (isBoss ? 6 : 3);
     S.goldVaultReady=false;
   }
-  if(hasArtifactSynergy('treasure',2) && Math.random()<0.20) finalGoldGain*=3;
-  if(hasArtifactSynergy('treasure',4) && !isBoss && Math.random()<0.10) finalGoldGain*=5;
-  if(hasArtifactSynergy('treasure',3) && isBoss) addArtifactShards(Math.max(5,Math.floor(stage*0.5)),'역천의 금고');
+  if(hasArtifactSynergy('treasure',2) && (S.artifactTreasureCycle||0)>0 && (S.artifactTreasureCycle%3===0)) finalGoldGain*=3;
+  if(hasArtifactSynergy('treasure',4) && !isBoss && (S.artifactTreasureCycle||0)>0 && (S.artifactTreasureCycle%10===0)) finalGoldGain*=5;
+  if(hasArtifactSynergy('treasure',3) && isBoss) addArtifactShards(Math.max(5,Math.floor(stage*1)),'역천의 금고');
   const treasureChance = Math.min(0.40, getPetEffectValue('treasure') / 100);
   if(treasureChance > 0 && Math.random() < treasureChance){ finalGoldGain *= 3; toast('🪙 보물 펫 발동! 골드 3배!'); }
   const essenceBonus = getPetEffectValue('essence');

@@ -4019,13 +4019,35 @@ function onMonsterKilled(){
   
   // 몬스터 기본 골드 지급량: 기존 수치 유지
   let baseGold = isBoss ? rand(1200, 1900) : rand(20, 45);
-  const earlyGold=0.80;
-  // 초반 골드는 낮게 시작하고, 1000~2000 스테이지 구간에서 기존 목표 성장량에 맞게 가속
-  const stageRamp=0.80 + 1.64*Math.pow(Math.max(1,stage)/1000,0.60);
-  const lateGold=Math.pow(Math.max(1,stage),1.7);
-  const goldStageMult=earlyGold*(stageRamp/0.80)*lateGold;
+  // 몬스터 골드 목표치: 1스테이지 약 25, 100 약 1만, 500 약 100만,
+  // 1000 약 1천만, 2000 약 3천만 수준으로 부드럽게 성장
+  // 기준 스케일은 1스테이지 25골드이며, 구간별 지수 보간으로 목표값을 맞춘다.
+  const goldStage=Math.max(1,stage);
+  const goldAnchors=[
+    [1,25],
+    [100,10000],
+    [500,1000000],
+    [1000,10000000],
+    [2000,30000000]
+  ];
+  let baseStageGold=25;
+  if(goldStage<=1){
+    baseStageGold=25;
+  }else{
+    let a=goldAnchors[goldAnchors.length-2], b=goldAnchors[goldAnchors.length-1];
+    for(let i=0;i<goldAnchors.length-1;i++){
+      if(goldStage>=goldAnchors[i][0] && goldStage<=goldAnchors[i+1][0]){
+        a=goldAnchors[i]; b=goldAnchors[i+1]; break;
+      }
+    }
+    const t=Math.max(0,Math.min(1,
+      (Math.log(goldStage)-Math.log(a[0]))/(Math.log(b[0])-Math.log(a[0]))
+    ));
+    baseStageGold=Math.exp(Math.log(a[1])+(Math.log(b[1])-Math.log(a[1]))*t);
+  }
+  const stageVariance=rand(0.94,1.06);
   const rareGoldMult=S.monster.isRare?5:1;
-  const goldGain=Math.floor(baseGold*goldStageMult*rareGoldMult*goldBonus);
+  const goldGain=Math.floor(baseStageGold*stageVariance*rareGoldMult*goldBonus);
   const sellBoost = getPetEffectValue('sellBoost');
   let expGain = Math.floor((18 + stage*3.3) * rand(0.9,1.1) * expBonus);
   if(S.monster.isRare) expGain*=2;

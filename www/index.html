@@ -3518,6 +3518,10 @@ function triggerZero999LastStand(){
 
 function combatTick(){
   if(!S.studying) return;
+  // 황금 재물룰렛이 표시되는 동안에는 전투 공격을 시작하지 않는다.
+  // 룰렛이 완전히 사라진 뒤 다음 전투 틱부터 공격이 진행된다.
+  const rouletteOverlay=document.getElementById('goldRouletteOverlay');
+  if(rouletteOverlay && rouletteOverlay.classList.contains('show')) return;
   if(S.zero999TimeStop) return;
   if(!S.monster) spawnMonster(false);
   if(S.player.hp <= 0) return;

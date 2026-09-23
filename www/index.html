@@ -2175,7 +2175,11 @@ const PET_PRESETS = [
   ,{id:'alpha_zero',grade:8,name:'알파제로',ic:'🔷',effect:'zeroReset',val:1,desc:'치명적인 피해를 처음 받을 때 공격을 완전히 무효화하고 전투 시작 시점의 HP로 복구. 디버프 제거. 전투당 1회'},
 {id:'zero999',grade:8,name:'ZERO999',ic:'⚡',effect:'limitBreak',val:9,desc:'치명상 시 9연격. 매 타격마다 최대 HP의 1% + 공격력 10%의 피해를 가하며, 9번째 타격은 최대 HP의 5% + 공격력 300%의 필살 일격을 가한다.'},
 {id:'zeroOmega',grade:8,name:'ZERO∞',ic:'♾️',effect:'zeroOmega',val:40,stat:'hpBonus',statVal:80,levelScale:0,desc:'받는 피해의 40%를 확정 흡수해 저장. 다음 일반 공격 시 축적 피해의 200%를 고정 반사. 피해 흡수율은 레벨에 따라 증가하지 않는다.'},
-{id:'error',grade:8,name:'ERROR',ic:'❌',effect:'errorFixed',val:300,desc:'플레이어의 일반 공격마다 최종 플레이어 공격력의 300% 고정 피해를 추가한다. 3번째 일반 공격마다 추가로 공격력 1000%의 폭주 피해를 입힌다. 치명타를 무시하며 ZERO999 9연격에는 반응하지 않음'}
+{id:'error',grade:8,name:'ERROR',ic:'❌',effect:'errorFixed',val:300,desc:'플레이어의 일반 공격마다 최종 플레이어 공격력의 300% 고정 피해를 추가한다. 3번째 일반 공격마다 추가로 공격력 1000%의 폭주 피해를 입힌다. 치명타를 무시하며 ZERO999 9연격에는 반응하지 않음'},
+{id:'gold_slime',grade:9,name:'골드 슬라임',ic:'🟡',effect:'goldCoin',val:220,desc:'3번째 공격마다 공격력의 220% 금화 충격파. 발동할 때 금화 1개를 모아 처치 시 금화 보너스가 쌓인다.'},
+{id:'gold_goblin',grade:9,name:'황금 고블린',ic:'👺',effect:'goldPickpocket',val:320,desc:'4번째 공격마다 공격력의 320% 강탈 공격. 적에게서 스테이지 × 5골드를 즉시 훔친다.'},
+{id:'gold_mimic',grade:9,name:'황금 미믹',ic:'📦',effect:'goldJackpot',val:450,desc:'5번째 공격마다 공격력의 450% 보물 공격. 20% 확률로 잭팟을 열어 이번 몬스터 처치 보상을 4배로 만든다.'},
+{id:'gold_dragon',grade:9,name:'황금 재물룡',ic:'🐉',effect:'goldVault',val:600,desc:'5번째 공격마다 공격력의 600% 황금 브레스. 처치 시 황금 금고가 열려 일반 몬스터는 3배, 보스는 6배의 골드를 지급한다.'}
 ];
 
 const MONSTER_TITLES = [
@@ -2904,7 +2908,7 @@ function expNeeded(level){ return Math.round(25 * Math.pow(level, 1.35)); }
 
 /* MONSTER SPANNER */
 function spawnMonster(effect=true){
-  S.combatHits = 0; S.errorHitCount = 0; S.enemyAttackCount = 0; S.originMirrorReflect=0; S.pendingMirrorDamage=0; S.zeroComboDisplay = 0; S.zero999LastStandUsed = false; S.zeroOmegaCharge = 0; S.originVoidUsed = false; S.zero999TimeStop = false; S.gearShieldUsed=false; S.gearOriginUsed=false; S.rewindUsed = false; S.secondChanceUsed = false; S.damageHistory = []; S.phaseBoost = 0; S.absCritCharge = 0; S.absCritDamage = 0; S.absVoidEcho = 0; S.absVoidEchoBase = 0; S.absDestroyCharge = 0; S.absSlaughterStacks = 0; S.absSlaughterBurstReady = false; S.originVoidCharge = 0; S.originSoulStacks = 0; S.originTimeCooldownUntil = 0; S.zeroOneStored = 0; S.zeroResetUsed = false; S.zeroResetStartHp = calcMaxHp(); S.artifactBloodMark=false; S.artifactFateCharge=0; S.artifactImmortalUsed=false; S.artifactCalamityMark=0;
+  S.combatHits = 0; S.errorHitCount = 0; S.enemyAttackCount = 0; S.originMirrorReflect=0; S.pendingMirrorDamage=0; S.zeroComboDisplay = 0; S.zero999LastStandUsed = false; S.zeroOmegaCharge = 0; S.originVoidUsed = false; S.zero999TimeStop = false; S.gearShieldUsed=false; S.gearOriginUsed=false; S.rewindUsed = false; S.secondChanceUsed = false; S.damageHistory = []; S.phaseBoost = 0; S.absCritCharge = 0; S.absCritDamage = 0; S.absVoidEcho = 0; S.absVoidEchoBase = 0; S.absDestroyCharge = 0; S.absSlaughterStacks = 0; S.absSlaughterBurstReady = false; S.originVoidCharge = 0; S.originSoulStacks = 0; S.originTimeCooldownUntil = 0; S.zeroOneStored = 0; S.zeroResetUsed = false; S.zeroResetStartHp = calcMaxHp(); S.artifactBloodMark=false; S.artifactFateCharge=0; S.goldCoinStacks=0; S.goldJackpotReady=false; S.goldVaultReady=false; S.artifactImmortalUsed=false; S.artifactCalamityMark=0;
   let mobIndex = (S.stage-1) % MONSTERS.length;
 
   const mt = MONSTERS[mobIndex];
@@ -3505,6 +3509,39 @@ function combatTick(){
   // 여기까지의 dmg는 '플레이어의 직접 공격 피해'다. ZERO1은 이 값만 복제한다.
   const zeroOnePlayerDamage = Math.max(1, Math.round(dmg));
 
+  // ===== GOLD: 전투형 경제 특수효과 =====
+  const goldHit = (S.combatHits || 0) + 1;
+  if(getPetEffectValue('goldCoin') > 0 && goldHit % 3 === 0){
+    const gd=Math.max(1,Math.round(attackBase * getPetEffectValue('goldCoin') / 100));
+    dmg += gd; recordPetDamage('gold_slime',gd);
+    S.goldCoinStacks=Math.min(10,(S.goldCoinStacks||0)+1);
+    spawnDmgText('monsterWrap','금화 충격 +'+gd.toLocaleString(),'dmgText extraDmg');
+    triggerPetEffectVisual('goldCoin');
+  }
+  if(getPetEffectValue('goldPickpocket') > 0 && goldHit % 4 === 0){
+    const gd=Math.max(1,Math.round(attackBase * getPetEffectValue('goldPickpocket') / 100));
+    dmg += gd; recordPetDamage('gold_goblin',gd);
+    const stolen=Math.max(1,Math.floor(S.stage*5));
+    S.gold += stolen;
+    spawnDmgText('monsterWrap','강탈 +'+gd.toLocaleString(),'dmgText extraDmg');
+    spawnDmgText('playerWrap','💰 훔침 +'+stolen.toLocaleString(),'dmgText extraDmg');
+    triggerPetEffectVisual('goldPickpocket');
+  }
+  if(getPetEffectValue('goldJackpot') > 0 && goldHit % 5 === 0){
+    const gd=Math.max(1,Math.round(attackBase * getPetEffectValue('goldJackpot') / 100));
+    dmg += gd; recordPetDamage('gold_mimic',gd);
+    if(Math.random()<0.20){ S.goldJackpotReady=true; spawnDmgText('monsterWrap','JACKPOT!','dmgText crit'); }
+    else spawnDmgText('monsterWrap','보물 공격 +'+gd.toLocaleString(),'dmgText extraDmg');
+    triggerPetEffectVisual('goldJackpot');
+  }
+  if(getPetEffectValue('goldVault') > 0 && goldHit % 5 === 0){
+    const gd=Math.max(1,Math.round(attackBase * getPetEffectValue('goldVault') / 100));
+    dmg += gd; recordPetDamage('gold_dragon',gd);
+    S.goldVaultReady=true;
+    spawnDmgText('monsterWrap','황금 브레스 +'+gd.toLocaleString(),'dmgText crit');
+    triggerPetEffectVisual('goldVault');
+  }
+
   // ===== 절대극 직접 추가 피해 =====
   // 각 절대극은 이제 플레이어 피해를 변조하지 않고 자기 이름으로 직접 피해를 기록한다.
   if(getPetEffectValue('absPierce') > 0){
@@ -3934,6 +3971,18 @@ function onMonsterKilled(){
   S.essence += essenceGain;
 
   let finalGoldGain = goldGain;
+  // GOLD 펫 전용 보상: 단순 골드 % 스탯이 아니라 전투에서 만든 상태로 보상을 변화시킨다.
+  if((S.goldCoinStacks||0)>0){
+    finalGoldGain += Math.floor(S.goldCoinStacks * Math.max(1, stage * 20));
+  }
+  if(S.goldJackpotReady){
+    finalGoldGain *= 4;
+    S.goldJackpotReady=false;
+  }
+  if(S.goldVaultReady){
+    finalGoldGain *= (isBoss ? 6 : 3);
+    S.goldVaultReady=false;
+  }
   if(hasArtifactSynergy('treasure',2) && Math.random()<0.20) finalGoldGain*=3;
   if(hasArtifactSynergy('treasure',4) && !isBoss && Math.random()<0.10) finalGoldGain*=5;
   if(hasArtifactSynergy('treasure',3) && isBoss) addArtifactShards(Math.max(5,Math.floor(stage*0.5)),'역천의 금고');

@@ -2054,13 +2054,13 @@ const EQUIP_SETS = [
   {id:'iron', name:'강철의 맹세', grades:[0,3], effects:{2:{hpPct:8},4:{hpPct:12},5:{hpPct:18}}},
   {id:'inferno', name:'불꽃의 지배자', grades:[4,7], effects:{2:{atkPct:10},4:{critDmg:20},5:{atkPct:18}}},
   {id:'celestial', name:'천상의 성좌', grades:[8,11], effects:{2:{hpPct:15},4:{critRate:8},5:{hpPct:25}}},
-  {id:'genesis', name:'창세의 유산', grades:[12,15], effects:{2:{atkPct:15},4:{critDmg:30},5:{atkPct:25}}},
-  {id:'void', name:'허공의 군주', grades:[16,18], effects:{2:{critRate:10},4:{atkPct:20},5:{goldBonus:20}}},
-  {id:'absolute', name:'절대자의 종언', grades:[19,21], effects:{2:{atkPct:20},4:{critDmg:40},5:{atkPct:35,critRate:8}}},
+  {id:'genesis', name:'창세의 유산', grades:[12,14], effects:{2:{atkPct:15},4:{critDmg:30},5:{atkPct:25}}},
   {id:'divine', name:'신성의 심판', grades:[15,16], effects:{2:{critRate:8},4:{bossDmg:28},5:{critDmg:35}}},
-  {id:'dimension', name:'차원의 파쇄', grades:[17,18], effects:{2:{atkPct:22},4:{critDmg:28},5:{bossDmg:35}}},
-  {id:'time', name:'시공의 윤회', grades:[18,20], effects:{2:{expBonus:15},4:{atkPct:25},5:{critRate:10,critDmg:25}}},
-  {id:'origin_end', name:'태초극의 종언', grades:[20,21], effects:{2:{bossDmg:25},4:{atkPct:30},5:{critDmg:45,bossDmg:30}}}
+  {id:'void', name:'허공의 군주', grades:[17,17], effects:{2:{critRate:10},4:{atkPct:20},5:{goldBonus:20}}},
+  {id:'dimension', name:'차원의 파쇄', grades:[18,18], effects:{2:{atkPct:22},4:{critDmg:28},5:{bossDmg:35}}},
+  {id:'time', name:'시공의 윤회', grades:[19,20], effects:{2:{expBonus:15},4:{atkPct:25},5:{critRate:10,critDmg:25}}},
+  {id:'origin_end', name:'태초극의 종언', grades:[21,21], effects:{2:{bossDmg:25},4:{atkPct:30},5:{critDmg:45,bossDmg:30}}},
+  {id:'absolute', name:'절대자의 종언', grades:[22,31], effects:{2:{atkPct:20},4:{critDmg:40},5:{atkPct:35,critRate:8}}}
 ];
 
 function getSetForGrade(grade){
@@ -2132,18 +2132,18 @@ const PET_PRESETS = [
   {id:'pet_chick',grade:0,name:'삐약이',ic:'🐤',effect:'essenceFind',val:20,desc:'몬스터 처치 시 20% 확률로 생명의 정수 +2'},
   {id:'pet_rabbit',grade:0,name:'아기 토끼',ic:'🐰',effect:'secondChanceFixed',val:25,desc:'전투 중 처음 체력이 20% 아래로 내려가면 HP를 최대체력의 25%까지 즉시 복구 (전투당 1회)'},
   {id:'pet_mouse',grade:0,name:'시골 쥐',ic:'🐭',effect:'junkLuck',val:22,desc:'잡템 획득 시 22% 확률로 추가 1개 획득'},
-  {id:'pet_dog',grade:1,name:'충직한 댕댕이',ic:'🐶',effect:'firstStrike',val:25,desc:'새 몬스터의 첫 공격에 추가 피해 +18%'},
-  {id:'pet_fox',grade:1,name:'사막여우',ic:'🦊',effect:'crit',val:6,desc:'치명타 확률 +4% (특수 펫 보너스)'},
+  {id:'pet_dog',grade:1,name:'충직한 댕댕이',ic:'🐶',effect:'firstStrike',val:25,desc:'새 몬스터의 첫 공격에 추가 피해 +25%'},
+  {id:'pet_fox',grade:1,name:'사막여우',ic:'🦊',effect:'crit',val:6,desc:'치명타 확률 +6%'},
   {id:'pet_sloth',grade:1,name:'나무늘보',ic:'🦥',effect:'guardFixed',val:35,desc:'적의 3번째 공격마다 받는 피해 35% 감소'},
-  {id:'pet_pig',grade:1,name:'행운의 분홍돈',ic:'🐷',effect:'sellBoost',val:18,desc:'잡템 판매가 +12%'},
-  {id:'pet_wolf',grade:2,name:'붉은 갈기 늑대',ic:'🐺',effect:'combo',val:120,desc:'3번째 공격마다 공격력의 90% 추가 피해 (스테이지마다 초기화)'},
+  {id:'pet_pig',grade:1,name:'행운의 분홍돈',ic:'🐷',effect:'sellBoost',val:18,desc:'잡템 판매가 +18%'},
+  {id:'pet_wolf',grade:2,name:'붉은 갈기 늑대',ic:'🐺',effect:'combo',val:120,desc:'3번째 공격마다 공격력의 120% 추가 피해 (스테이지마다 초기화)'},
   {id:'pet_turtle',grade:2,name:'철갑 거북',ic:'🐢',effect:'essenceFind',val:12,desc:'몬스터 처치 시 12% 확률로 생명의 정수 +3'},
-  {id:'pet_owl',grade:2,name:'지혜의 부엉이',ic:'🦉',effect:'studyExp',val:15,desc:'전투 경험치 +10%'},
-  {id:'pet_panda',grade:2,name:'대나무 판다',ic:'🐼',effect:'lifesteal',val:2,desc:'가한 피해의 1% 회복'},
-  {id:'pet_panther',grade:3,name:'벼락의 흑표범',ic:'🐆',effect:'thunder',val:24,desc:'4번째 공격마다 공격력의 220% 번개 피해 (스테이지마다 초기화)'},
-  {id:'pet_dragon_baby',grade:3,name:'화염 아기드래곤',ic:'🐲',effect:'burn',val:20,desc:'공격 시 20% 확률로 적 최대체력의 6% 추가 화상 피해'},
-  {id:'pet_lion',grade:3,name:'황금 갈기 사자',ic:'🦁',effect:'bossHunter',val:18,desc:'보스에게 주는 피해 +15%'},
-  {id:'pet_eagle',grade:3,name:'천공의 수리',ic:'🦅',effect:'airStrike',val:18,desc:'3번째 공격마다 공격력의 180% 추가 공습 (스테이지마다 초기화)'},
+  {id:'pet_owl',grade:2,name:'지혜의 부엉이',ic:'🦉',effect:'studyExp',val:15,desc:'전투 경험치 +15%'},
+  {id:'pet_panda',grade:2,name:'대나무 판다',ic:'🐼',effect:'lifesteal',val:2,desc:'가한 피해의 2% 회복'},
+  {id:'pet_panther',grade:3,name:'벼락의 흑표범',ic:'🐆',effect:'thunder',val:24,desc:'4번째 공격마다 공격력의 24% 번개 피해 (스테이지마다 초기화)'},
+  {id:'pet_dragon_baby',grade:3,name:'화염 아기드래곤',ic:'🐲',effect:'burn',val:20,desc:'공격 시 20% 확률로 적 최대체력의 4% 추가 화상 피해 (보스는 1.5%)'},
+  {id:'pet_lion',grade:3,name:'황금 갈기 사자',ic:'🦁',effect:'bossHunter',val:18,desc:'보스에게 주는 피해 +18%'},
+  {id:'pet_eagle',grade:3,name:'천공의 수리',ic:'🦅',effect:'airStrike',val:18,desc:'3번째 공격마다 공격력의 18% 추가 공습 (스테이지마다 초기화)'},
   {id:'pet_frost_mimic',grade:4,name:'빙결 미믹',ic:'🧊',effect:'essenceFind',val:14,desc:'몬스터 처치 시 14% 확률로 생명의 정수 +3'},
   {id:'pet_treasure_goblin',grade:4,name:'보물 고블린',ic:'🧌',effect:'treasure',val:18,desc:'처치 시 18% 확률로 골드 3배'},
   {id:'pet_berserk_hamster',grade:4,name:'폭주 햄스터',ic:'🐹',effect:'goldRain',val:12,desc:'몬스터 처치 시 12% 확률로 골드 2배'},
@@ -2547,7 +2547,7 @@ function defaultState(){
     equippedArtifacts: [],
     artifactPresets: [{name:'사냥',pets:[],artifacts:[],equip:{}},{name:'보스',pets:[],artifacts:[],equip:{}},{name:'파밍',pets:[],artifacts:[],equip:{}}],
     spouses:{}, equippedSpouse:null,
-    zeroOmegaCharge: 0, potions:{smallHp:0,bigHp:0,exp:0}, focusMode:false, focusEndAt:0, focusSession:{gold:0,exp:0,boxes:0,kills:0}, focusBoxes:0, focusCrystal:0, focusUpgrades:{atk:0,hp:0}, originCoreLv:0, originCorePity:0, errorHitCount:0, damageStats:{player:0,pets:{}}
+    zeroOmegaCharge: 0, focusMode:false, focusEndAt:0, focusSession:{gold:0,exp:0,boxes:0,kills:0}, focusBoxes:0, focusCrystal:0, focusUpgrades:{atk:0,hp:0}, breakProtectionTickets:0, originCoreLv:0, originCorePity:0, errorHitCount:0, damageStats:{player:0,pets:{}}
   };
 }
 
@@ -2585,6 +2585,8 @@ function loadGame(){
       if(!Number.isFinite(S.artifactShards)) S.artifactShards = 0;
       if(!Number.isFinite(S.originCoreLv)) S.originCoreLv = 0;
       if(!Number.isFinite(S.originCorePity)) S.originCorePity = 0;
+      if(!Number.isFinite(S.breakProtectionTickets)) S.breakProtectionTickets = 0;
+      S.breakProtectionTickets=Math.max(0,Math.min(20,Math.floor(S.breakProtectionTickets)));
       if(!S.artifacts || typeof S.artifacts !== 'object') S.artifacts = {};
       if(!Array.isArray(S.equippedArtifacts)) S.equippedArtifacts=[];
       S.equippedArtifacts=S.equippedArtifacts.filter(id=>S.artifacts[id] && Number(S.artifacts[id].level)>0).slice(0,5);
@@ -2729,32 +2731,35 @@ function equippedBonus(){
 }
 
 /* 장착 펫 보너스 중첩 계산 */
+const PET_SYNERGIES = [
+  {id:'gold_coin_goblin',pets:['gold_slime','gold_goblin'],name:'🟡👺 금화 강탈',effect:'골드 획득량 +25%',bonus:{goldBonus:25}},
+  {id:'gold_hunter',pets:['gold_goblin','gold_mimic'],name:'👺📦 보물 사냥꾼',effect:'골드 획득량 +20%',bonus:{goldBonus:20}},
+  {id:'gold_roulette',pets:['gold_mimic','gold_roulette'],name:'📦🎰 황금 룰렛',effect:'골드 획득량 +20%',bonus:{goldBonus:20}},
+  {id:'gold_luck',pets:['gold_slime','gold_goblin','gold_mimic'],name:'🪙 황금 행운',effect:'골드 획득량 +50%',bonus:{goldBonus:50}},
+  {id:'gold_rush',pets:['gold_slime','gold_goblin','gold_mimic','gold_roulette'],name:'👑 골드 러시',effect:'골드 획득량 +100%',bonus:{goldBonus:100}},
+  {id:'gold_destroy',pets:['gold_mimic','absolute_crit'],name:'📦🔴 황금 파괴',effect:'공격력 +20%',bonus:{atkBonus:20}},
+  {id:'gold_execute',pets:['gold_roulette','absolute_executioner'],name:'🎰⚔️ 황금 처형',effect:'보스에게 가하는 피해 +25%',bonus:{bossDmg:25}},
+  {id:'origin_meteor_chaos',pets:['origin_meteor','origin_chaos'],name:'☄️ 혼돈 방벽',effect:'최대 HP +18%',bonus:{hpBonus:18}},
+  {id:'origin_meteor_star',pets:['origin_meteor','origin_star'],name:'☄️ 성운 운석',effect:'최대 HP +15%',bonus:{hpBonus:15}},
+  {id:'origin_chaos_star',pets:['origin_chaos','origin_star'],name:'🐉 절대 생존',effect:'최대 HP +18%',bonus:{hpBonus:18}},
+  {id:'abs_slaughter_execute',pets:['absolute_void','absolute_executioner'],name:'☠️ 학살 처형',effect:'보스에게 가하는 피해 +18%',bonus:{bossDmg:18}},
+  {id:'abs_slaughter_barrage',pets:['absolute_void','absolute_barrage'],name:'🌑 연쇄 폭격',effect:'공격력 +15%',bonus:{atkBonus:15}},
+  {id:'abs_slaughter_destroy',pets:['absolute_void','absolute_crit'],name:'🔴 파괴 누적',effect:'공격력 +15%',bonus:{atkBonus:15}},
+  {id:'abs_execute_barrage',pets:['absolute_executioner','absolute_barrage'],name:'⚔️ 폭격 처형',effect:'보스에게 가하는 피해 +15%',bonus:{bossDmg:15}},
+  {id:'abs_execute_destroy',pets:['absolute_executioner','absolute_crit'],name:'⚔️ 종말의 일격',effect:'보스 피해 +20% · 치명타 피해 +20%',bonus:{bossDmg:20,critDmg:20}},
+  {id:'abs_barrage_destroy',pets:['absolute_barrage','absolute_crit'],name:'🌀 폭발 저장',effect:'공격력 +18%',bonus:{atkBonus:18}}
+];
+
 function getPetSynergy(){
-  const eq=new Set(S.equippedPets||[]),out={atkBonus:0,hpBonus:0,critRate:0,critDmg:0,goldBonus:0,expBonus:0,bossDmg:0},names=[],flags=new Set();
-  const add=(v,n,f)=>{names.push(n);Object.keys(v).forEach(k=>out[k]=(out[k]||0)+v[k]);if(f)flags.add(f)};
-  const all=ids=>ids.every(id=>eq.has(id));
-  const combos=[
-    [['origin_meteor','origin_soul'],{hpBonus:12},'☄️ 불굴의 영혼','origin_meteor_soul'],
-    [['origin_meteor','origin_chaos'],{hpBonus:18},'☄️ 혼돈 방벽','origin_meteor_chaos'],
-    [['origin_meteor','origin_star'],{hpBonus:15},'☄️ 성운 운석','origin_meteor_star'],
-    [['origin_soul','origin_chaos'],{hpBonus:12},'👻 영혼 윤회','origin_soul_chaos'],
-    [['origin_soul','origin_star'],{hpBonus:15},'👻 영혼 성운','origin_soul_star'],
-    [['origin_chaos','origin_star'],{hpBonus:18},'🐉 절대 생존','origin_chaos_star'],
-    [['absolute_void','absolute_executioner'],{bossDmg:18},'☠️ 학살 처형','abs_slaughter_execute'],
-    [['absolute_void','absolute_barrage'],{atkBonus:15},'🌑 연쇄 폭격','abs_slaughter_barrage'],
-    [['absolute_void','absolute_crit'],{atkBonus:15},'🔴 파괴 누적','abs_slaughter_destroy'],
-    [['absolute_executioner','absolute_barrage'],{bossDmg:15},'⚔️ 폭격 처형','abs_execute_barrage'],
-    [['absolute_executioner','absolute_crit'],{bossDmg:20,critDmg:20},'⚔️ 종말의 일격','abs_execute_destroy'],
-    [['absolute_barrage','absolute_crit'],{atkBonus:18},'🌀 폭발 저장','abs_barrage_destroy'],
-    [['gold_slime','gold_goblin'],{goldBonus:25},'🟡👺 금화 강탈','gold_coin_goblin'],
-    [['gold_goblin','gold_mimic'],{goldBonus:20},'👺📦 보물 사냥꾼','gold_hunter'],
-    [['gold_mimic','gold_roulette'],{goldBonus:20},'📦🎰 황금 룰렛','gold_roulette'],
-    [['gold_slime','gold_goblin','gold_mimic'],{goldBonus:50},'🪙 황금 행운','gold_luck'],
-    [['gold_slime','gold_goblin','gold_mimic','gold_roulette'],{goldBonus:100},'👑 골드 러시','gold_rush'],
-    [['gold_mimic','absolute_crit'],{atkBonus:20},'📦🔴 황금 파괴','gold_destroy'],
-    [['gold_roulette','absolute_executioner'],{bossDmg:25},'🎰⚔️ 황금 처형','gold_execute']
-  ];
-  combos.forEach(([ids,v,n,f])=>{if(all(ids))add(v,n,f)});
+  const eq=new Set(S.equippedPets||[]);
+  const out={atkBonus:0,hpBonus:0,critRate:0,critDmg:0,goldBonus:0,expBonus:0,bossDmg:0};
+  const names=[],flags=new Set();
+  PET_SYNERGIES.forEach(syn=>{
+    if(!syn.pets.every(id=>eq.has(id))) return;
+    names.push(syn.name);
+    Object.entries(syn.bonus).forEach(([k,v])=>out[k]=(out[k]||0)+v);
+    flags.add(syn.id);
+  });
   return {stats:out,names,flags};
 }
 function getPetSynergyBonus(stat){ return getPetSynergy().stats[stat]||0; }
@@ -4641,7 +4646,7 @@ function openModal(name){
   if(name==='bag') { switchBagTab(currentBagTab); renderEquipSlots(); }
   if(name==='settings'){ renderSettings(); }
   if(name==='character'){ renderCharacter(); renderDetailStats(); }
-  if(name==='shop'){ updateBoxCost(); renderWeaponShop(); renderGoldShop(); renderPotionShop(); }
+  if(name==='shop'){ updateBoxCost(); renderWeaponShop(); renderGoldShop(); }
   if(name==='damageReport'){ renderDamageReport(); }
   if(name==='pet') switchPetTab(currentPetTab);
   if(name==='spouse') renderSpouse();
@@ -4656,47 +4661,20 @@ function openModal(name){
 }
 function renderPetSynergyBook(){
   const el=document.getElementById('petSynergyBook'); if(!el) return;
-  const rows=getPetSynergyBookRows();
   const eq=new Set(S.equippedPets||[]);
   const petById=id=>PET_PRESETS.find(p=>p.id===id);
-  el.innerHTML=`
-    <div class="codexCard">
-      <div class="codexTitle">🐾 전체 펫 시너지 · ${rows.length}종</div>
-      <div class="codexEffect">현재 존재하는 펫 조합의 시너지를 전체 목록으로 확인할 수 있습니다. 장착 중인 조합은 ✦로 표시됩니다.</div>
-    </div>
-  `+rows.map(r=>{
-    const ids=r[0], name=r[1], effect=r[2];
-    const pieces=ids.map(id=>{const p=petById(id);return p?p.ic+' '+p.name:id;}).join(' + ');
-    const active=ids.every(id=>eq.has(id));
-    return `<div class="codexCard ${active?'petSynergyBookActive':''}">
-      <div class="codexTitle">${active?'✦ ':''}${name}</div>
-      <div class="codexPieces">${pieces}</div>
-      <div class="codexEffect">${effect}</div>
-    </div>`;
-  }).join('');
+  el.innerHTML=
+    '<div class="codexCard"><div class="codexTitle">🐾 전체 펫 시너지 · '+PET_SYNERGIES.length+'종</div><div class="codexEffect">현재 존재하는 펫 조합과 실제 적용 효과를 표시합니다.</div></div>'+
+    PET_SYNERGIES.map(syn=>{
+      const pieces=syn.pets.map(id=>{const p=petById(id);return p?p.ic+' '+p.name:id;}).join(' + ');
+      const active=syn.pets.every(id=>eq.has(id));
+      return '<div class="codexCard '+(active?'petSynergyBookActive':'')+'">'+
+        '<div class="codexTitle">'+(active?'✦ ':'🔒 ')+syn.name+'</div>'+
+        '<div class="codexPieces">'+pieces+'</div>'+
+        '<div class="codexEffect"><b>'+syn.effect+'</b> · '+(active?'🟢 현재 활성화':'⚪ 미활성')+'</div>'+
+      '</div>';
+    }).join('');
 }
-function getPetSynergyBookRows(){ return [
-  [['gold_slime','gold_goblin'],'🟡👺 금화 강탈','골드 슬라임 + 황금 고블린 조합 시 금화 강탈 효과'],
-  [['gold_goblin','gold_mimic'],'👺📦 보물 사냥꾼','황금 고블린 + 황금 미믹 조합 시 보물 사냥 효과'],
-  [['gold_mimic','gold_roulette'],'📦🎰 황금 룰렛','황금 미믹 + 황금 재물룰렛 조합 시 룰렛 연계 효과'],
-  [['gold_slime','gold_goblin','gold_mimic'],'🪙 황금 행운','GOLD 펫 3종 이상 장착 시 황금 행운 발동'],
-  [['gold_slime','gold_goblin','gold_mimic','gold_roulette'],'👑 골드 러시','GOLD 펫 4종 모두 장착 시 골드 러시 발동'],
-  [['gold_mimic','absolute_crit'],'📦🔴 황금 파괴','황금 미믹 + 절대극 파괴신 조합'],
-  [['gold_roulette','absolute_executioner'],'🎰⚔️ 황금 처형','황금 재물룰렛 + 절대극 처형자 조합'],
-  [['origin_meteor','origin_chaos'],'☄️ 혼돈 방벽','태초 운석핵 + 태초 혼돈룡 조합'],
-  [['origin_meteor','origin_star'],'☄️ 성운 운석','태초 운석핵 + 태초 성운왕 조합'],
-  [['origin_chaos','origin_star'],'🐉 절대 생존','태초 혼돈룡 + 태초 성운왕 조합'],
-  [['absolute_void','absolute_executioner'],'☠️ 학살 처형','절대극 학살자 + 절대극 처형자 조합'],
-  [['absolute_void','absolute_barrage'],'🌑 연쇄 폭격','절대극 학살자 + 절대극 폭격자 조합'],
-  [['absolute_void','absolute_crit'],'🔴 파괴 누적','절대극 학살자 + 절대극 파괴신 조합'],
-  [['absolute_executioner','absolute_barrage'],'⚔️ 폭격 처형','절대극 처형자 + 절대극 폭격자 조합'],
-  [['absolute_executioner','absolute_crit'],'⚔️ 종말의 일격','절대극 처형자 + 절대극 파괴신 조합'],
-  [['absolute_barrage','absolute_crit'],'🌀 폭발 저장','절대극 폭격자 + 절대극 파괴신 조합'],
-  [['pet_zero','zero1'],'0️⃣⚫ 이중연산','ZERO + ZERO1 조합'],
-  [['zero1','alpha_zero'],'⚫🔷 역산불멸','ZERO1 + ALPHA ZERO 조합'],
-  [['pet_zero','zero1','zero999'],'💠 ZERO 삼중연산','ZERO + ZERO1 + ZERO999 3종 조합']
-]; }
-
 function renderEquipSetBook(){
   const el=document.getElementById('equipSetBook'); if(!el) return;
   el.innerHTML=EQUIP_SETS.map(set=>`<div class="codexCard"><div class="codexTitle">⚔️ ${set.name}</div><div class="codexPieces">대상 등급: ${GRADES[set.grades[0]].name} ~ ${GRADES[set.grades[1]].name}</div>${Object.entries(set.effects).map(([n,e])=>`<div class="codexEffect"><b>${n}세트</b> · ${Object.entries(e).map(([k,v])=>`${k} +${v}%`).join(' · ')}</div>`).join('')}</div>`).join('');
@@ -5503,29 +5481,6 @@ function upgradeResearch(type, cost){
   toast('패시브 연구 완료!');
 }
 
-function renderPotionShop(){
-  const pane=document.getElementById('shopPotionPane');if(!pane)return;
-  const p=S.potions||{smallHp:0,bigHp:0,exp:0};
-  pane.innerHTML='<div class="shopItem"><div><div class="si-name">🧪 소형 HP 포션 · 보유 '+p.smallHp+'</div><div class="si-desc">최대 HP의 30% 즉시 회복</div></div><button onclick="buyPotion(\'smallHp\',500)">💰 500 구매</button><button onclick="usePotion(\'smallHp\')" '+(p.smallHp?'':'disabled')+'>사용</button></div>'+
-    '<div class="shopItem"><div><div class="si-name">💊 대형 HP 포션 · 보유 '+p.bigHp+'</div><div class="si-desc">최대 HP의 100% 즉시 회복</div></div><button onclick="buyPotion(\'bigHp\',2500)">💰 2,500 구매</button><button onclick="usePotion(\'bigHp\')" '+(p.bigHp?'':'disabled')+'>사용</button></div>'+
-    '<div class="shopItem"><div><div class="si-name">✨ 경험치 포션 · 보유 '+p.exp+'</div><div class="si-desc">현재 레벨 필요 EXP의 25% 획득</div></div><button onclick="buyPotion(\'exp\',1800)">💰 1,800 구매</button><button onclick="usePotion(\'exp\')" '+(p.exp?'':'disabled')+'>사용</button></div>';
-}
-function buyPotion(type,cost){
-  if(S.gold<cost){toast('💰 골드가 부족합니다!');return;}
-  if(!S.potions)S.potions={smallHp:0,bigHp:0,exp:0};
-  S.gold-=cost;S.potions[type]=(S.potions[type]||0)+1;renderPotionShop();renderAll();saveGame();toast('🧪 물약을 구매했습니다!');
-}
-function usePotion(type){
-  if(!S.potions||!(S.potions[type]>0))return;
-  if(type==='smallHp'){
-    if(S.player.hp>=calcMaxHp()){toast('❤️ 체력이 이미 가득합니다.');return;}
-    S.player.hp=Math.min(calcMaxHp(),S.player.hp+Math.round(calcMaxHp()*.30));
-  }else if(type==='bigHp'){
-    if(S.player.hp>=calcMaxHp()){toast('❤️ 체력이 이미 가득합니다.');return;}
-    S.player.hp=calcMaxHp();
-  }else if(type==='exp')gainExp(Math.max(1,Math.floor(expNeeded(S.player.level)*.25)));
-  S.potions[type]--;renderPotionShop();renderAll();saveGame();toast(type==='exp'?'✨ 경험치 포션 사용!':'❤️ HP 포션 사용!');
-}
 /* PET SYSTEM */
 function switchPetTab(tabG){
   currentPetTab = Math.max(0, Math.min(9, Number(tabG)||0));

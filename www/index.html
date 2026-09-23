@@ -1864,6 +1864,7 @@ body{touch-action:manipulation;}
         <div class="tab" id="tabPet6" onclick="switchPetTab(6)">태초</div>
         <div class="tab" id="tabPet7" onclick="switchPetTab(7)">절대극</div>
         <div class="tab" id="tabPet8" onclick="switchPetTab(8)" style="color:#00ff99;">ZERO</div>
+        <div class="tab" id="tabPet9" onclick="switchPetTab(9)" style="color:#ffd700;font-weight:1000;">GOLD</div>
       </div>
 
       <div id="petRateTableWrap" style="display:none; margin-bottom:12px;"></div>
@@ -5503,7 +5504,7 @@ function usePotion(type){
 }
 /* PET SYSTEM */
 function switchPetTab(tabG){
-  currentPetTab = tabG;
+  currentPetTab = Math.max(0, Math.min(9, Number(tabG)||0));
   for(let g=0; g<PET_GRADES.length; g++){
     const tabEl = document.getElementById(`tabPet${g}`);
     if(tabEl) tabEl.classList.toggle('active', g===tabG);
@@ -5559,7 +5560,41 @@ function renderPetList(){
   document.getElementById('petGoldVal').textContent = fmt(S.gold);
   document.getElementById('petEssenceVal').textContent = fmt(S.essence);
 
-  const ps=document.getElementById('petSynergyPanel'); if(ps){const sy=getPetSynergy(); ps.innerHTML=`<div class="artifactSynergyHead">✦ 펫 유대 <b>${(S.equippedPets||[]).length}/12</b></div><div class="artifactSynergyNames">${sy.names.length?sy.names.map(n=>`<b>✦ ${n}</b>`).join(' · '):'특정 펫 조합을 모으면 유대가 깨어납니다.'}</div>`;}
+  const ps=document.getElementById('petSynergyPanel'); if(ps){
+  const sy=getPetSynergy();
+  const eq=new Set(S.equippedPets||[]);
+  const synergyDefs=[
+    [['gold_slime','gold_goblin'],'🟡👺 금화 강탈'],
+    [['gold_goblin','gold_mimic'],'👺📦 보물 사냥꾼'],
+    [['gold_mimic','gold_roulette'],'📦🎰 황금 룰렛'],
+    [['gold_slime','gold_goblin','gold_mimic'],'🪙 황금 행운'],
+    [['gold_slime','gold_goblin','gold_mimic','gold_roulette'],'👑 골드 러시'],
+    [['gold_mimic','absolute_crit'],'📦🔴 황금 파괴'],
+    [['gold_roulette','absolute_executioner'],'🎰⚔️ 황금 처형'],
+    [['origin_meteor','origin_soul'],'☄️ 불굴의 영혼'],
+    [['origin_meteor','origin_chaos'],'☄️ 혼돈 방벽'],
+    [['origin_meteor','origin_star'],'☄️ 성운 운석'],
+    [['origin_soul','origin_chaos'],'👻 영혼 윤회'],
+    [['origin_soul','origin_star'],'👻 영혼 성운'],
+    [['origin_chaos','origin_star'],'🐉 절대 생존'],
+    [['absolute_void','absolute_executioner'],'☠️ 학살 처형'],
+    [['absolute_void','absolute_barrage'],'🌑 연쇄 폭격'],
+    [['absolute_void','absolute_crit'],'🔴 파괴 누적'],
+    [['absolute_executioner','absolute_barrage'],'⚔️ 폭격 처형'],
+    [['absolute_executioner','absolute_crit'],'⚔️ 종말의 일격'],
+    [['absolute_barrage','absolute_crit'],'🌀 폭발 저장']
+  ];
+  const active=synergyDefs.filter(([ids])=>ids.every(id=>eq.has(id)));
+  const activeHtml=active.length?active.map(([,n])=>`<span class="petSynergyChip active">✦ ${n}</span>`).join(''):'<span class="petSynergyEmpty">장착 조합이 맞으면 시너지가 활성화됩니다.</span>';
+  const lockedHtml=synergyDefs.filter(([ids])=>!ids.every(id=>eq.has(id))).slice(0,8).map(([ids,n])=>{
+    const have=ids.filter(id=>eq.has(id)).length;
+    const need=ids.map(id=>(PET_PRESETS.find(p=>p.id===id)||{name:id}).name).join(' + ');
+    return `<span class="petSynergyChip locked">🔒 ${n} <small>(${have}/${ids.length})</small></span>`;
+  }).join('');
+  ps.innerHTML=`<div class="artifactSynergyHead">✦ 펫 시너지 <b>${(S.equippedPets||[]).length}/12</b></div>
+    <div class="petSynergySection"><b>활성 시너지</b><div class="petSynergyWrap">${activeHtml}</div></div>
+    <div class="petSynergySection"><b>시너지 목록</b><div class="petSynergyWrap">${lockedHtml}</div></div>`;
+}
   const list = document.getElementById('petList');
   list.innerHTML = '';
   
@@ -5568,7 +5603,7 @@ function renderPetList(){
   presets.forEach(p => {
     const ownedLv = S.pets[p.id] || 0;
     const isEquipped = S.equippedPets && S.equippedPets.includes(p.id);
-    const gObj = PET_GRADES[p.grade];
+    const gObj = PET_GRADES[p.grade] || {name:'GOLD',color:'#ffd700'};
     
     const card = document.createElement('div');
     card.className = `petCard ${isEquipped ? 'active' : ''}`;
@@ -6456,5 +6491,14 @@ document.addEventListener('click', function(e){
 #goldRouletteOverlay.show{opacity:1}.grBox{width:min(92vw,440px);text-align:center;padding:28px 18px;border:2px solid #ffd700;border-radius:24px;background:linear-gradient(180deg,rgba(55,37,0,.96),rgba(16,13,28,.98));box-shadow:0 0 35px #ffd700,0 0 90px rgba(255,180,0,.35);transform:scale(.72)}
 #goldRouletteOverlay.show .grBox{animation:grIn 2.35s cubic-bezier(.12,.8,.18,1)}.grTitle{font-size:28px;font-weight:1000;color:#ffe66d;text-shadow:0 0 15px #ffd700;margin-bottom:22px}.grWheel{font-size:28px;letter-spacing:10px;animation:grSpin 1.75s cubic-bezier(.12,.75,.18,1)}.grSpin{margin-top:16px;color:#fff;letter-spacing:3px;font-weight:900}.grResult{margin-top:18px;font-size:42px;font-weight:1000;text-shadow:0 0 18px currentColor}.grResult small{display:block;font-size:13px;margin-top:7px;color:#fff;font-weight:800}#goldRouletteOverlay.jackpot{background:radial-gradient(circle,#fff4a8 0%,rgba(255,110,0,.72) 22%,rgba(10,0,0,.97) 68%);animation:grFlash .22s 4}#goldRouletteOverlay.jackpot .grBox{box-shadow:0 0 50px #fff,0 0 120px #ff8c00}@keyframes grSpin{0%{transform:rotate(0) scale(1)}65%{transform:rotate(720deg) scale(1.12)}100%{transform:rotate(1080deg) scale(1)}}@keyframes grIn{0%{opacity:0;transform:scale(.55)}20%{opacity:1}75%{transform:scale(1.04)}100%{transform:scale(1)}}@keyframes grFlash{50%{filter:brightness(2.8)}}
 </style>
-</body>
+<style id="pet-gold-synergy-fix">
+#tabPet9{ text-shadow:0 0 8px rgba(255,215,0,.8); }
+.petSynergySection{margin-top:8px;padding:7px 0;border-top:1px solid rgba(255,255,255,.07);font-size:10px}
+.petSynergyWrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.petSynergyChip{display:inline-block;padding:5px 7px;border-radius:8px;border:1px solid rgba(255,215,0,.3);background:rgba(255,215,0,.08);color:#ffe66d}
+.petSynergyChip.active{border-color:#ffd700;background:rgba(255,215,0,.16);box-shadow:0 0 8px rgba(255,215,0,.18)}
+.petSynergyChip.locked{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.035);color:var(--sub)}
+.petSynergyChip small{opacity:.75}
+.petSynergyEmpty{color:var(--sub)}
+</style></body>
 </html>

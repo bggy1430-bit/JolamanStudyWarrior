@@ -818,6 +818,9 @@ body.reduced-fx .gachaFxOverlay,body.reduced-fx .forgeHammerOverlay{display:none
   background:#3d4652;color:#fff;font-weight:900;
 }
 
+.damageReportSummary{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.damageReportCard .share{margin-top:3px;font-size:10px;color:#7fffe0;font-weight:900}
+.damageReportSectionTitle{margin:10px 0 6px;padding-top:8px;border-top:1px solid var(--line);font-size:11px;font-weight:1000;color:#ffe66d}
 </style>
 <style id="mobile-button-feel">
 /* MOBILE BUTTON FEEL — tactile press + ripple */
@@ -1791,29 +1794,56 @@ body{touch-action:manipulation;}
       <div id="characterEquipmentGrid" class="characterEquipmentGrid"></div>
 
       <div class="characterSectionTitle">📊 자세한 스탯</div>
-          <div id="detailStatsPanel">
-      <div class="stat-group">
-        <div class="stat-group-title">⚔️ 공격력 상세</div>
-        <div class="stat-calc-line"><span>기본 공격력 (캐릭터+장비):</span> <b id="detailBaseAtk">0</b></div>
-        <div class="stat-calc-line"><span>적용 배율 (연구+성장+펫/유대+장비/유물):</span> <b id="detailAtkMult">+0%</b></div>
-        <div class="stat-calc-line"><span>최종 공격력:</span> <b id="detailFinalAtk" style="color:var(--gold);">0</b></div>
+      <button id="detailStatsToggleBtn" class="damageReportReset" style="margin:0 0 7px;" onclick="toggleDetailStats()">📊 상세 스탯표 보기 ▼</button>
+      <div id="detailStatsPanel">
+        <div class="stat-group"><div class="stat-group-title">⚔️ 공격력 계산</div>
+          <div class="stat-calc-line"><span>캐릭터 기본 공격력:</span><b id="detailAtkChar">0</b></div>
+          <div class="stat-calc-line"><span>장비 고정 공격력:</span><b id="detailAtkEquipBase">+0</b></div>
+          <div class="stat-calc-line"><span>집중결정 증가분:</span><b id="detailAtkFocus">+0</b></div>
+          <div class="stat-calc-line"><span>적용 전 기본 공격력:</span><b id="detailBaseAtk">0</b></div>
+          <div class="stat-calc-line"><span>연구 공격력:</span><b id="detailAtkResearch">+0%</b></div>
+          <div class="stat-calc-line"><span>성장/특성 공격력:</span><b id="detailAtkGrowth">+0%</b></div>
+          <div class="stat-calc-line"><span>펫/시너지 공격력:</span><b id="detailAtkPet">+0%</b></div>
+          <div class="stat-calc-line"><span>장비 옵션/세트/유물:</span><b id="detailAtkEquipPct">+0%</b></div>
+          <div class="stat-calc-line"><span>합산 공격력 배율:</span><b id="detailAtkMult">×1.0000</b></div>
+          <div class="stat-calc-line"><span>근원 배율:</span><b id="detailAtkOrigin">×1.0000</b></div>
+          <div class="stat-calc-line"><span>최종 공격력:</span><b id="detailFinalAtk" style="color:var(--gold);">0</b></div>
+        </div>
+        <div class="stat-group"><div class="stat-group-title">❤️ 체력 계산</div>
+          <div class="stat-calc-line"><span>캐릭터 기본 최대 HP:</span><b id="detailHpChar">0</b></div>
+          <div class="stat-calc-line"><span>장비 고정 HP:</span><b id="detailHpEquipBase">+0</b></div>
+          <div class="stat-calc-line"><span>집중결정 증가분:</span><b id="detailHpFocus">+0</b></div>
+          <div class="stat-calc-line"><span>적용 전 기본 HP:</span><b id="detailBaseHp">0</b></div>
+          <div class="stat-calc-line"><span>성장 HP:</span><b id="detailHpGrowth">+0%</b></div>
+          <div class="stat-calc-line"><span>펫/시너지 HP:</span><b id="detailHpPet">+0%</b></div>
+          <div class="stat-calc-line"><span>장비 옵션/세트/유물:</span><b id="detailHpEquipPct">+0%</b></div>
+          <div class="stat-calc-line"><span>합산 HP 배율:</span><b id="detailHpMult">×1.0000</b></div>
+          <div class="stat-calc-line"><span>근원 배율:</span><b id="detailHpOrigin">×1.0000</b></div>
+          <div class="stat-calc-line"><span>최종 최대 HP:</span><b id="detailFinalHp" style="color:var(--hp);">0</b></div>
+        </div>
+        <div class="stat-group"><div class="stat-group-title">✨ 전투/성장 특수 스탯</div>
+          <div class="stat-calc-line"><span>치명타 확률:</span><b id="detailCritRate">15.0%</b></div>
+          <div class="stat-calc-line"><span>치명타 피해:</span><b id="detailCritDmg">185.0%</b></div>
+          <div class="stat-calc-line"><span>보스 피해:</span><b id="detailBossDmg">+0%</b></div>
+          <div class="stat-calc-line"><span>골드 획득:</span><b id="detailGoldBonus">+0%</b></div>
+          <div class="stat-calc-line"><span>전투 경험치:</span><b id="detailExpBonus">+0%</b></div>
+          <div class="stat-calc-line"><span>배우자 펫 피해:</span><b id="detailSpousePetDmg">미장착</b></div>
+        </div>
+        <div class="stat-group"><div class="stat-group-title">🐾 장착/강화 현황</div>
+          <div class="stat-calc-line"><span>장착 펫:</span><b id="detailPetCount">0 / 12</b></div>
+          <div class="stat-calc-line"><span>장착 유물:</span><b id="detailArtifactCount">0 / 5</b></div>
+          <div class="stat-calc-line"><span>집중결정 공격력 강화:</span><b id="detailFocusAtkLv">Lv.0 · +0%</b></div>
+          <div class="stat-calc-line"><span>집중결정 HP 강화:</span><b id="detailFocusHpLv">Lv.0 · +0%</b></div>
+          <div class="stat-calc-line"><span>파괴방지권:</span><b id="detailProtectionTickets">0 / 20</b></div>
+          <div class="stat-calc-line"><span>근원 강화:</span><b id="detailOriginLv">Lv.0 / 50</b></div>
+        </div>
+        <div class="stat-group"><div class="stat-group-title">⚔️ 현재 전투 상태</div>
+          <div class="stat-calc-line"><span>현재 스테이지:</span><b id="detailStage">1</b></div>
+          <div class="stat-calc-line"><span>현재 몬스터 HP:</span><b id="detailMonsterHp">0</b></div>
+          <div class="stat-calc-line"><span>현재 몬스터 공격력:</span><b id="detailMonsterAtk">0</b></div>
+          <div class="stat-calc-line"><span>누적 기록 피해:</span><b id="detailDamageTotal">0</b></div>
+        </div>
       </div>
-      <div class="stat-group">
-        <div class="stat-group-title">❤️ 체력 상세</div>
-        <div class="stat-calc-line"><span>기본 최대체력 (캐릭터+장비):</span> <b id="detailBaseHp">0</b></div>
-        <div class="stat-calc-line"><span>적용 배율 (성장+펫/유대+장비/유물):</span> <b id="detailHpMult">+0%</b></div>
-        <div class="stat-calc-line"><span>최종 최대체력:</span> <b id="detailFinalHp" style="color:var(--hp);">0</b></div>
-      </div>
-      <div class="stat-group">
-        <div class="stat-group-title">✨ 특수 스탯</div>
-        <div class="stat-calc-line"><span>치명타 확률:</span> <b id="detailCritRate">15.0%</b></div>
-        <div class="stat-calc-line"><span>치명타 데미지:</span> <b id="detailCritDmg">185.0%</b></div>
-        <div class="stat-calc-line"><span>골드 획득 보너스:</span> <b id="detailGoldBonus">+0%</b></div>
-        <div class="stat-calc-line"><span>경험치 획득 보너스:</span> <b id="detailExpBonus">+0%</b></div>
-        <div class="stat-calc-line"><span>보스 피해 보너스:</span> <b id="detailBossDmg">+0%</b></div>
-        <div class="stat-calc-line"><span>ZERO∞ 흡수 축적:</span> <b id="detailOmegaCharge">0</b></div>
-      </div>
-    </div>
 
       <div class="characterSectionTitle">🐾 현재 전투 구성</div>
       <div id="characterCompanionSummary" class="characterCompanionSummary"></div>
@@ -1825,11 +1855,14 @@ body{touch-action:manipulation;}
     <div class="modal">
       <div class="modalHead"><h3>📊 데미지 표</h3><button class="closeBtn" onclick="closeModal('damageReport')">✕</button></div>
       <div class="damageReportSummary">
-        <div class="damageReportCard"><div class="label">플레이어 누적 피해</div><div class="num" id="damageReportPlayer">0</div></div>
-        <div class="damageReportCard"><div class="label">펫 누적 피해</div><div class="num" id="damageReportPet">0</div></div>
+        <div class="damageReportCard"><div class="label">전체 피해</div><div class="num" id="damageReportTotal">0</div></div>
+        <div class="damageReportCard"><div class="label">플레이어</div><div class="num" id="damageReportPlayer">0</div><div class="share" id="damageReportPlayerPct">0%</div></div>
+        <div class="damageReportCard"><div class="label">펫</div><div class="num" id="damageReportPet">0</div><div class="share" id="damageReportPetPct">0%</div></div>
+        <div class="damageReportCard"><div class="label">유물 기여</div><div class="num" id="damageReportArtifact">0</div><div class="share" id="damageReportArtifactPct">0%</div></div>
       </div>
-      <div class="damageReportHint">현재 장착 중인 펫 가운데 <b>직접 피해를 발생시키는 펫</b>만 아래에 표시됩니다. 플레이어의 공격력·치명타를 올려주는 버프형 펫은 펫 피해로 따로 집계하지 않습니다.</div>
+      <div class="damageReportHint">플레이어·직접 피해형 펫·유물의 추가/증폭 기여를 전체 피해 대비 %로 표시합니다.</div>
       <div id="damageReportList"></div>
+      <div id="damageReportArtifactList"></div>
       <button class="damageReportReset" onclick="resetDamageReport()">🗑️ 누적 데미지 기록 초기화</button>
     </div>
   </div>
@@ -2173,7 +2206,7 @@ const PET_PRESETS = [
   {id:'zero1',grade:8,name:'ZERO1',ic:'⚫',effect:'zeroOne',val:100,desc:'공격 피해를 70%로 복제. 첫 복제 확률 100%에서 복제할 때마다 10%씩 감소하며, 복제 피해도 다시 복제 가능'}
   ,{id:'alpha_zero',grade:8,name:'ALPHA ZERO',ic:'🔷',effect:'zeroReset',val:1,desc:'치명적인 피해를 처음 받을 때 공격을 완전히 무효화하고 전투 시작 시점의 HP로 복구. 디버프 제거. 전투당 1회'},
 {id:'zero999',grade:8,name:'ZERO999',ic:'⚡',effect:'limitBreak',val:9,desc:'치명상 시 9연격. 매 타격마다 최대 HP의 1% + 공격력 10%의 피해를 가하며, 9번째 타격은 최대 HP의 5% + 공격력 300%의 필살 일격을 가한다.'},
-{id:'zeroOmega',grade:6,name:'태초 공허왕',ic:'♾️',effect:'zeroOmega',val:40,stat:'hpBonus',statVal:80,levelScale:0,desc:'받는 피해의 40%를 확정 흡수해 저장. 다음 일반 공격 시 축적 피해의 200%를 고정 반사. 피해 흡수율은 레벨에 따라 증가하지 않는다.'},
+{id:'zeroOmega',grade:6,name:'태초 공허왕',ic:'♾️',effect:'zeroOmega',val:40,stat:'hpBonus',statVal:80,levelScale:0,desc:'받는 피해를 일부 흡수해 다음 일반 공격에 반사한다. 반사 효과는 전투 중 자동으로 발동한다.'},
 {id:'gold_slime',grade:9,name:'골드 슬라임',ic:'🟡',effect:'goldCoin',val:220,desc:'공격할 때마다 금화 스택을 쌓는다. 최대 5중첩, 중첩마다 공격력 +12%. 3번째 공격마다 금화 충격파도 발동하며 처치 시 추가 골드를 준다.'},
 {id:'gold_goblin',grade:9,name:'황금 고블린',ic:'👺',effect:'goldPickpocket',val:250,desc:'4번째 공격마다 공격력의 250% 강탈 공격. 스테이지 × 10골드를 즉시 훔친다.'},
 {id:'gold_mimic',grade:9,name:'황금 미믹',ic:'📦',effect:'goldJackpot',val:500,desc:'매 공격마다 20% 확률로 공격력의 500% 추가 피해. 발동 공격으로 처치하면 처치 골드가 3배가 된다.'},
@@ -2547,7 +2580,7 @@ function defaultState(){
     equippedArtifacts: [],
     artifactPresets: [{name:'사냥',pets:[],artifacts:[],equip:{}},{name:'보스',pets:[],artifacts:[],equip:{}},{name:'파밍',pets:[],artifacts:[],equip:{}}],
     spouses:{}, equippedSpouse:null,
-    zeroOmegaCharge: 0, focusMode:false, focusEndAt:0, focusSession:{gold:0,exp:0,boxes:0,kills:0}, focusBoxes:0, focusCrystal:0, focusUpgrades:{atk:0,hp:0}, breakProtectionTickets:0, originCoreLv:0, originCorePity:0, errorHitCount:0, damageStats:{player:0,pets:{}}
+    zeroOmegaCharge: 0, focusMode:false, focusEndAt:0, focusSession:{gold:0,exp:0,boxes:0,kills:0}, focusBoxes:0, focusCrystal:0, focusUpgrades:{atk:0,hp:0}, breakProtectionTickets:0, originCoreLv:0, originCorePity:0, errorHitCount:0, damageStats:{player:0,pets:{},artifacts:{}}
   };
 }
 
@@ -2645,9 +2678,9 @@ function loadGame(){
       if(!Number.isFinite(S.focusBoxes)) S.focusBoxes=0; if(!Number.isFinite(S.focusCrystal)) S.focusCrystal=0;
       if(!S.focusUpgrades || typeof S.focusUpgrades !== 'object') S.focusUpgrades={atk:0,hp:0};
       S.focusMode=false; S.focusEndAt=0;
-      if(!S.damageStats || typeof S.damageStats!=='object') S.damageStats={player:0,pets:{}};
+      if(!S.damageStats || typeof S.damageStats!=='object') S.damageStats={player:0,pets:{},artifacts:{}};
       if(!Number.isFinite(S.damageStats.player)) S.damageStats.player=0;
-      if(!S.damageStats.pets || typeof S.damageStats.pets!=='object') S.damageStats.pets={};
+      if(!S.damageStats.pets || typeof S.damageStats.pets!=='object') S.damageStats.pets={}; if(!S.damageStats.artifacts || typeof S.damageStats.artifacts!=='object') S.damageStats.artifacts={};
       S.studying = false;
     }
   }catch(e){ console.error(e); }
@@ -2811,28 +2844,43 @@ function applySpousePetDamageScale(petDamageBefore){
 }
 function recordPlayerDamage(amount){
   amount=Math.max(0,Math.round(amount||0)); if(!amount) return;
-  if(!S.damageStats || typeof S.damageStats!=='object') S.damageStats={player:0,pets:{}};
+  if(!S.damageStats || typeof S.damageStats!=='object') S.damageStats={player:0,pets:{},artifacts:{}};
+  if(!S.damageStats.artifacts || typeof S.damageStats.artifacts!=='object') S.damageStats.artifacts={};
   S.damageStats.player=(S.damageStats.player||0)+amount;
 }
+function recordArtifactDamage(label, amount){
+  amount=Math.max(0,Math.round(amount||0)); if(!amount) return;
+  if(!S.damageStats || typeof S.damageStats!=='object') S.damageStats={player:0,pets:{},artifacts:{}};
+  if(!S.damageStats.artifacts || typeof S.damageStats.artifacts!=='object') S.damageStats.artifacts={};
+  S.damageStats.artifacts[label]=(S.damageStats.artifacts[label]||0)+amount;
+}
 function renderDamageReport(){
-  const ds=S.damageStats||{player:0,pets:{}};
+  const ds=S.damageStats||{player:0,pets:{},artifacts:{}};
   const player=Number(ds.player||0);
   const petEntries=(S.equippedPets||[]).map(id=>[id,Number(ds.pets?.[id]||0)]).filter(([,v])=>v>0);
-  // ZERO999가 발동한 뒤 장착 상태가 바뀌어도 기록된 ZERO999 피해는 표에서 계속 표시한다.
-  if(Number(ds.pets?.zero999||0)>0 && !petEntries.some(([id])=>id==='zero999')) petEntries.push(['zero999',Number(ds.pets.zero999)]);
-  const petTotal=petEntries.reduce((a,[,v])=>a+v,0);
-  const pe=document.getElementById('damageReportPlayer'), te=document.getElementById('damageReportPet'), list=document.getElementById('damageReportList');
-  if(pe) pe.textContent=fmt(player); if(te) te.textContent=fmt(petTotal);
-  if(!list) return;
-  const directIds=new Set(['combo','thunder','burn','airStrike','zeroCombo','zeroOne','zero999','zeroOmega','errorFixed','absSlaughter','absBoss','absBarrage','absDestroy']);
-  const equippedDirect=(S.equippedPets||[]).filter(id=>{const p=PET_PRESETS.find(x=>x.id===id); return p && (directIds.has(p.effect) || p.stat==='extraAtk');});
-  const rows=equippedDirect.map(id=>{const p=PET_PRESETS.find(x=>x.id===id); const val=Number(ds.pets?.[id]||0); return `<div class="damageReportRow"><div class="ic">${p.ic}</div><div><div class="name">${p.name}</div><div class="sub">${val>0?'누적 직접 피해':'아직 기록 없음'}</div></div><div class="dmg">${fmt(val)}</div></div>`;});
-  // 기록만 남은 ZERO999도 표에 별도로 표시한다.
-  if(Number(ds.pets?.zero999||0)>0 && !equippedDirect.includes('zero999')){ const p=PET_PRESETS.find(x=>x.id==='zero999'); const val=Number(ds.pets.zero999); if(p) rows.push(`<div class="damageReportRow"><div class="ic">${p.ic}</div><div><div class="name">${p.name}</div><div class="sub">누적 직접 피해</div></div><div class="dmg">${fmt(val)}</div></div>`); }
-  list.innerHTML=rows.length?rows.join(''):'<div class="damageReportEmpty">현재 장착 중인 직접 피해형 펫이 없습니다.</div>';
+  if(Number(ds.pets?.zero999||0)>0&&!petEntries.some(([id])=>id==='zero999')) petEntries.push(['zero999',Number(ds.pets.zero999)]);
+  const petTotal=petEntries.reduce((x,[,v])=>x+v,0);
+  const artifactEntries=Object.entries(ds.artifacts||{}).filter(([,v])=>Number(v)>0);
+  const artifactTotal=artifactEntries.reduce((x,[,v])=>x+Number(v),0);
+  const total=Math.max(0,player+petTotal+artifactTotal);
+  const pct=v=>total>0?((v/total)*100).toFixed(1)+'%':'0%';
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('damageReportTotal',fmt(total)); set('damageReportPlayer',fmt(player)); set('damageReportPlayerPct',pct(player));
+  set('damageReportPet',fmt(petTotal)); set('damageReportPetPct',pct(petTotal));
+  set('damageReportArtifact',fmt(artifactTotal)); set('damageReportArtifactPct',pct(artifactTotal));
+  const list=document.getElementById('damageReportList');
+  if(list){
+    const directIds=new Set(['combo','thunder','burn','airStrike','zeroCombo','zeroOne','zero999','zeroOmega','errorFixed','absSlaughter','absBoss','absBarrage','absDestroy','goldCoin','goldPickpocket','goldJackpot','goldVault']);
+    const direct=(S.equippedPets||[]).filter(id=>{const p=PET_PRESETS.find(x=>x.id===id);return p&&(directIds.has(p.effect)||p.stat==='extraAtk');});
+    const rows=direct.map(id=>{const p=PET_PRESETS.find(x=>x.id===id);const v=Number(ds.pets?.[id]||0);return '<div class="damageReportRow"><div class="ic">'+p.ic+'</div><div><div class="name">'+p.name+'</div><div class="sub">전체 피해의 '+pct(v)+'</div></div><div class="dmg">'+fmt(v)+'</div></div>';});
+    if(Number(ds.pets?.zero999||0)>0&&!direct.includes('zero999')){const p=PET_PRESETS.find(x=>x.id==='zero999');const v=Number(ds.pets.zero999);if(p)rows.push('<div class="damageReportRow"><div class="ic">'+p.ic+'</div><div><div class="name">'+p.name+'</div><div class="sub">전체 피해의 '+pct(v)+'</div></div><div class="dmg">'+fmt(v)+'</div></div>');}
+    list.innerHTML=rows.length?rows.join(''):'<div class="damageReportEmpty">현재 기록된 직접 피해형 펫이 없습니다.</div>';
+  }
+  const al=document.getElementById('damageReportArtifactList');
+  if(al)al.innerHTML=artifactEntries.length?'<div class="damageReportSectionTitle">🌌 유물 피해 기여</div>'+artifactEntries.map(([name,v])=>'<div class="damageReportRow"><div class="ic">🌌</div><div><div class="name">'+name+'</div><div class="sub">전체 피해의 '+pct(Number(v))+'</div></div><div class="dmg">'+fmt(v)+'</div></div>').join(''):'<div class="damageReportEmpty">이번 기록에는 별도 유물 피해 기여가 없습니다.</div>';
 }
 function resetDamageReport(){
-  S.damageStats={player:0,pets:{}}; saveGame(); renderDamageReport(); toast('📊 데미지 기록을 초기화했습니다.');
+  S.damageStats={player:0,pets:{},artifacts:{}}; saveGame(); renderDamageReport(); toast('📊 누적 데미지 기록을 초기화했습니다.');
 }
 
 function getPetExtraAtkMult(){
@@ -3461,6 +3509,8 @@ function combatTick(){
   if(gearPower.dimension>0 && Math.random() < Math.min(.35, gearPower.dimension*.08)){ spawnDmgText('monsterWrap','DIMENSION CUT!','dmgText crit'); }
   const petDamageBeforeHit=Object.assign({},(S.damageStats&&S.damageStats.pets)||{});
   let dmg = Math.max(1, Math.round(attackBase * rand(0.85,1.15)));
+  const artifactBaseDamage=dmg;
+  const artifactPetBaseTotal=Object.values((S.damageStats&&S.damageStats.pets)||{}).reduce((x,v)=>x+Number(v||0),0);
   // 유물 시너지 — 개별 능력치가 아니라 조건부 특수능력으로만 작동
   const artifactHit = (S.combatHits || 0) + 1;
   if(hasArtifactSynergy('bloodmoon',2) && S.artifactBloodMark){ dmg=Math.round(dmg*1.50); S.artifactBloodMark=false; spawnDmgText('monsterWrap','BLOOD MARK!','dmgText crit'); }
@@ -3607,6 +3657,9 @@ function combatTick(){
   if(hasArtifactSynergy('fate',4) && S.monster.isBoss && S.monster.hp/S.monster.maxHp<=0.25 && crit){ dmg=Math.round(dmg*1.80); spawnDmgText('monsterWrap','CELESTIAL VERDICT!','dmgText crit'); }
   if(hasArtifactSynergy('apocalypse',3) && S.monster.isBoss && Math.random()<0.20){ S.artifactCalamityMark=5; spawnDmgText('monsterWrap','CALAMITY MARK!','dmgText crit'); }
   if(hasArtifactSynergy('apocalypse',4) && S.monster.isBoss && S.artifactCalamityMark>0 && S.monster.hp/S.monster.maxHp<=0.25){ dmg+=Math.max(1,Math.round(dmg*2.0)); S.artifactCalamityMark=0; spawnDmgText('monsterWrap','WORLD END!','dmgText crit'); }
+  const artifactPetDelta=Object.values((S.damageStats&&S.damageStats.pets)||{}).reduce((x,v)=>x+Number(v||0),0)-artifactPetBaseTotal;
+  const artifactContribution=Math.max(0,Math.round(dmg-artifactBaseDamage-artifactPetDelta));
+  if(artifactContribution>0) recordArtifactDamage('유물 추가/증폭',artifactContribution);
   // 특수 펫: 시간/도박/처형 효과
   if(hasPetEffect('doubleNext') && (S.combatHits || 0) % 7 === 6){ dmg *= 2; spawnDmgText('monsterWrap', '+'+Math.round(dmg/2).toLocaleString(), 'dmgText extraDmg'); }
   const gamblerChance = Math.min(0.35, getPetEffectValue('gambler') / 100);
@@ -3762,7 +3815,8 @@ function combatTick(){
   const petDamageThisHit=Math.max(0,petRawTotal-petBeforeTotal);
   const spouseExtra=applySpousePetDamageScale(petDamageBeforeHit);
   dmg += spouseExtra;
-  recordPlayerDamage(Math.max(0,dmg-(petDamageThisHit+spouseExtra)));
+  const artifactDamageThisHit=Math.max(0,artifactContribution||0);
+  recordPlayerDamage(Math.max(0,dmg-(petDamageThisHit+spouseExtra+artifactDamageThisHit)));
   if(document.getElementById('damageReportModalBg')?.classList.contains('show')) renderDamageReport();
   S.monster.hp -= dmg;
   sfx(crit ? 'critHit' : 'hit');
@@ -4376,8 +4430,22 @@ function renderDetailStats() {
 
   set('detailCritRate',critRate.toFixed(1)+'%'); set('detailCritDmg',critDmg.toFixed(1)+'%');
   set('detailGoldBonus','+'+Math.round(goldBonus)+'%'); set('detailExpBonus','+'+Math.round(expBonus)+'%'); set('detailBossDmg','+'+Math.round(bossDmg)+'%');
-  set('detailOmegaCharge',fmt(num(S.zeroOmegaCharge)));
   set('detailSpousePetDmg','+'+Math.round(spousePetDmg)+'% · ×'+spouseMult.toFixed(2)+(spouse?' · '+spouse.name:' · 미장착'));
+  const focusAtkFixed=Math.max(0,Math.round(baseAtk*(focusAtkMult-1)));
+  const focusHpFixed=Math.max(0,Math.round(baseHp*(focusHpMult-1)));
+  set('detailAtkFocus','+'+fmt(focusAtkFixed));
+  set('detailHpFocus','+'+fmt(focusHpFixed));
+  set('detailPetCount',(S.equippedPets||[]).length+' / 12');
+  set('detailArtifactCount',getEquippedArtifactIds().length+' / 5');
+  set('detailFocusAtkLv','Lv.'+num(S.focusUpgrades?.atk)+' · +'+focusAtkPct+'%');
+  set('detailFocusHpLv','Lv.'+num(S.focusUpgrades?.hp)+' · +'+focusHpPct+'%');
+  set('detailProtectionTickets',num(S.breakProtectionTickets)+' / 20');
+  set('detailOriginLv','Lv.'+num(S.originCoreLv)+' / 50');
+  set('detailStage',fmt(S.stage));
+  set('detailMonsterHp',fmt(num(S.monster?.hp)));
+  set('detailMonsterAtk',fmt(num(S.monster?.atk)));
+  const dsNow=S.damageStats||{player:0,pets:{},artifacts:{}};
+  set('detailDamageTotal',fmt(num(dsNow.player)+Object.values(dsNow.pets||{}).reduce((x,v)=>x+num(v),0)+Object.values(dsNow.artifacts||{}).reduce((x,v)=>x+num(v),0)));
 }
 
 /* 펫 12마리 전투 필드 연출 */

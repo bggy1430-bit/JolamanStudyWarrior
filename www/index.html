@@ -3577,9 +3577,6 @@ function combatTick(){
     S.artifactCelestialUsed=true; dmg=Math.round(dmg*1.80); spawnDmgText('monsterWrap','CELESTIAL VERDICT!','dmgText crit');
   }
 
-  if(hasArtifactSynergy('immortal',3) && S.player.hp/calcMaxHp()<=0.30 && mdmg>0){
-    mdmg=Math.max(1,Math.round(mdmg*0.70));
-  }
   if(gearPower.time>0 && Math.random() < Math.min(.30, gearPower.time*.06)){ dmg += Math.max(1,Math.round(dmg*.90)); spawnDmgText('monsterWrap','TIME ECHO!','dmgText extraDmg'); }
   if(gearPower.absolute>0 && Math.random() < Math.min(.20, gearPower.absolute*.04)){ dmg += Math.max(1,Math.round(dmg*2.5)); spawnDmgText('monsterWrap','ABSOLUTE AUTHORITY!','dmgText crit'); }
   // ===== 신화: 능력치 제공 전용 =====
@@ -3597,8 +3594,6 @@ function combatTick(){
   if((S.combatHits || 0) === 0){ dmg = Math.round(dmg * (1 + getPetEffectValue('firstStrike')/100)); }
   if(S.monster.isBoss){ dmg = Math.round(dmg * (1 + (getPetEffectValue('bossHunter') + getPetSynergyBonus('bossDmg') + getArtifactBonus('bossDmg') + originCoreBossBonus())/100)); }
   
-  // ===== 개별 유물 조합 시너지 =====
-  if(S.artifactGuardUntil && Date.now()<S.artifactGuardUntil) dmg=Math.round(dmg*0.65);
   if(crit || S.forceArtifactCrit){ S.forceArtifactCrit=false;
     if(gearPower.infinity>0){ dmg += Math.max(1,Math.round(dmg*(.35+gearPower.infinity*.03))); spawnDmgText('monsterWrap','MUGUK IMPACT!','dmgText crit'); }
     const critDmgMult = 1.85 + (getPetBonus('critDmg') + getPetSynergyBonus('critDmg') + getEquipOptionBonus('critDmg') + getSetBonus('critDmg') + getArtifactBonus('critDmg')) / 100;

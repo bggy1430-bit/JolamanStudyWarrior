@@ -190,6 +190,12 @@
 .ultimateResult{position:absolute;top:63%;font-size:clamp(28px,9vw,58px);font-weight:1000;letter-spacing:3px;text-align:center;opacity:0;transform:scale(.4);text-shadow:0 0 12px currentColor,0 0 40px currentColor;}
 .event-success .ultimateResult{color:#ffe66d;animation:ultimateResultIn .8s .05s cubic-bezier(.1,.9,.2,1) forwards;}
 .event-fail .ultimateResult{color:#ff416c;animation:ultimateResultFail .7s .05s cubic-bezier(.3,.1,.7,1) forwards;}
+.event-collapse{background:radial-gradient(circle at 50% 45%,rgba(255,0,60,.52),rgba(35,0,8,.94) 45%,rgba(0,0,0,.99));}
+#ultimateFxOverlay.event-collapse .ultimateShock{border-color:#ff1744;box-shadow:0 0 45px #ff1744,0 0 120px #8b001b inset;animation:collapseShock .22s infinite alternate;}
+#ultimateFxOverlay.event-collapse .ultimateCore{animation:ultimateCollapseCore .85s cubic-bezier(.2,.8,.3,1) forwards;}
+.event-collapse .ultimateResult{color:#ff1744;animation:ultimateResultFail .65s .05s cubic-bezier(.3,.1,.7,1) forwards;}
+@keyframes collapseShock{from{transform:scale(.96) rotate(-1deg)}to{transform:scale(1.04) rotate(1deg)}}
+@keyframes ultimateCollapseCore{0%{opacity:0;transform:scale(.3) rotate(0)}30%{opacity:1;transform:scale(1.25) rotate(12deg)}65%{transform:scale(.82) rotate(-18deg)}100%{opacity:1;transform:scale(.35) rotate(40deg);filter:blur(2px) brightness(.5)}}
 .ultimateParticles{position:absolute;inset:0;pointer-events:none;}
 .ultimateParticle{position:absolute;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 10px currentColor;animation:ultimateParticleFly 1.1s ease-out forwards;}
 @keyframes ultimateStars{from{transform:rotate(8deg) translateY(0)}to{transform:rotate(8deg) translateY(70px)}}
@@ -250,6 +256,12 @@
   /* MONSTER */
   #monsterEmoji{font-size:46px; line-height:1; filter:drop-shadow(0 4px 8px rgba(0,0,0,.7)); transition:transform 0.2s;}
   #monsterEmoji.boss{font-size:82px !important; filter:drop-shadow(0 0 16px rgba(255,30,30,0.9));}
+#monsterEmoji.rare{filter:drop-shadow(0 0 8px #ffd166) drop-shadow(0 0 18px #ff8c00);animation:rarePulse 1.1s infinite ease-in-out;}
+@keyframes rarePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.rareMonsterTag{color:#ffd166 !important;text-shadow:0 0 8px #ff8c00;}
+#burningEventBanner{display:none;margin-top:3px;text-align:center;font-size:10px;font-weight:900;color:#ffe66d;text-shadow:0 0 8px #ff9800;letter-spacing:.3px;}
+#burningEventBanner.show{display:block;animation:burningPulse 1.2s infinite ease-in-out;}
+@keyframes burningPulse{0%,100%{opacity:.78}50%{opacity:1;transform:scale(1.015)}}
   #monsterEmoji.hurt{animation: mhurt .3s ease;}
   @keyframes mhurt{ 0%,100%{transform:scale(1)} 40%{transform:scale(.85) rotate(-5deg)} }
   #monsterEmoji.dead{animation: mdead .4s ease forwards;}
@@ -1529,6 +1541,7 @@ body{touch-action:manipulation;}
     </div>
     <div id="stageTitle">STAGE 1 · 초원</div>
     <div id="expWrap"><div id="expBar"></div></div>
+<div id="burningEventBanner">🔥 버닝 이벤트 · 17:00~21:00 경험치 2배 🔥</div>
     <div id="lvText">EXP 0 / 0</div>
   </div>
 
@@ -1664,6 +1677,7 @@ body{touch-action:manipulation;}
       <div class="tabs">
         <div class="tab active" id="tabBox" onclick="switchShopTab('box')">미스터리 박스</div>
         <div class="tab" id="tabGold" onclick="switchShopTab('gold')">영구 패시브</div>
+<div class="tab" id="tabPotion" onclick="switchShopTab('potion')">🧪 물약 상점</div>
       </div>
       <div id="shopBoxPane">
         <div style="text-align:center; font-size:11.5px; color:var(--sub); margin-bottom:8px;">
@@ -1693,7 +1707,7 @@ body{touch-action:manipulation;}
         <div id="rateTableWrap" style="display:none; margin-bottom:12px;"></div>
         <div id="boxResultWrap"></div>
       </div>
-      <div id="shopGoldPane" style="display:none;"></div>
+      <div id="shopGoldPane" style="display:none;"></div><div id="shopPotionPane" style="display:none;"></div>
     </div>
   </div>
 
@@ -1722,6 +1736,9 @@ body{touch-action:manipulation;}
         <div class="settingsRow">
           <div><b>🔨 강화·합성 연출</b><div class="desc">강화 및 합성의 망치/초월 연출을 표시합니다.</div></div>
           <button id="settingsEnhanceFxToggle" class="settingsToggle on" onclick="toggleSetting('enhanceFx')" aria-label="강화 연출 설정"></button>
+</div>
+<div class="settingsRow"><div><b>⚡ 초월 연출</b><div class="desc">초월 돌파 전용 연출을 표시합니다.</div></div><button id="settingsTranscendFxToggle" class="settingsToggle on" onclick="toggleSetting('transcendFx')" aria-label="초월 연출 설정"></button></div>
+<div class="settingsRow"><div><b>🔥 극의 연출</b><div class="desc">극의 성공·실패·붕괴 연출을 표시합니다.</div></div><button id="settingsUltimateFxToggle" class="settingsToggle on" onclick="toggleSetting('ultimateFx')" aria-label="극의 연출 설정"></button>
         </div>
         <div id="audioUnlockHint">🔊 모바일에서는 화면을 한 번 터치하면 오디오가 활성화됩니다.</div>
       </div>
@@ -2527,13 +2544,13 @@ function defaultState(){
     equippedArtifacts: [],
     artifactPresets: [{name:'사냥',pets:[],artifacts:[],equip:{}},{name:'보스',pets:[],artifacts:[],equip:{}},{name:'파밍',pets:[],artifacts:[],equip:{}}],
     spouses:{}, equippedSpouse:null,
-    zeroOmegaCharge: 0, focusMode:false, focusEndAt:0, focusSession:{gold:0,exp:0,boxes:0,kills:0}, focusBoxes:0, focusCrystal:0, focusUpgrades:{atk:0,hp:0}, originCoreLv:0, originCorePity:0, errorHitCount:0, damageStats:{player:0,pets:{}}
+    zeroOmegaCharge: 0, potions:{smallHp:0,bigHp:0,exp:0}, focusMode:false, focusEndAt:0, focusSession:{gold:0,exp:0,boxes:0,kills:0}, focusBoxes:0, focusCrystal:0, focusUpgrades:{atk:0,hp:0}, originCoreLv:0, originCorePity:0, errorHitCount:0, damageStats:{player:0,pets:{}}
   };
 }
 
 let S = defaultState();
 let currentBagTab = 'junk';
-let appSettings = { reducedFx:false, vibration:false, bgm:false, sfx:true, gachaFx:true, enhanceFx:true, masterVolume:0.72 };
+let appSettings = { reducedFx:false, vibration:false, bgm:false, sfx:true, gachaFx:true, enhanceFx:true, transcendFx:true, ultimateFx:true, masterVolume:0.72 };
 try{
   const savedSettings = JSON.parse(localStorage.getItem('zolaman_study_settings') || 'null');
   if(savedSettings && typeof savedSettings === 'object') appSettings = {...appSettings, ...savedSettings};
@@ -2565,6 +2582,8 @@ function loadGame(){
       if(!Number.isFinite(S.artifactShards)) S.artifactShards = 0;
       if(!Number.isFinite(S.originCoreLv)) S.originCoreLv = 0;
       if(!Number.isFinite(S.originCorePity)) S.originCorePity = 0;
+      if(!S.potions || typeof S.potions!=='object') S.potions={smallHp:0,bigHp:0,exp:0};
+      ['smallHp','bigHp','exp'].forEach(k=>{if(!Number.isFinite(Number(S.potions[k])))S.potions[k]=0;});
       if(!S.artifacts || typeof S.artifacts !== 'object') S.artifacts = {};
       if(!Array.isArray(S.equippedArtifacts)) S.equippedArtifacts=[];
       S.equippedArtifacts=S.equippedArtifacts.filter(id=>S.artifacts[id] && Number(S.artifacts[id].level)>0).slice(0,5);
@@ -2888,6 +2907,8 @@ function spawnMonster(effect=true){
   let mobIndex = (S.stage-1) % MONSTERS.length;
 
   const mt = MONSTERS[mobIndex];
+  const isRare=!mt.isBoss&&Math.random()<0.03;
+  const rareMultHp=isRare?4:1, rareMultAtk=isRare?1.5:1;
   // Normal monster growth: front-loaded difficulty, then strong late-game damping.
   // Each segment compounds from the previous segment so there are no stat resets at breakpoints.
   function piecewiseScale(stage, rates){
@@ -2918,12 +2939,12 @@ function spawnMonster(effect=true){
     let t = pick(MONSTER_TITLES);
     if(!chosenTitles.includes(t)) chosenTitles.push(t);
   }
-  let fullMonsterName = mt.isBoss ? `[BOSS] ${chosenTitles.join(' ')} ${mt.name}` : `[${chosenTitles.join(' ')}] ${mt.name}`;
+  let fullMonsterName = mt.isBoss ? `[BOSS] ${chosenTitles.join(' ')} ${mt.name}` : (isRare ? `[RARE] ${chosenTitles.join(' ')} ${mt.name}` : `[${chosenTitles.join(' ')}] ${mt.name}`);
 
-  const hp = Math.max(15, Math.round(25 * (mt.isBoss ? bossHpScale : mt.hpM * hpScale) * 2));
-  const atk = Math.max(2, Math.round(5.0 * mt.atkM * (mt.isBoss ? bossAtkScale : atkScale)));
+  const hp = Math.max(15, Math.round(25 * (mt.isBoss ? bossHpScale : mt.hpM * hpScale) * 2 * rareMultHp));
+  const atk = Math.max(2, Math.round(5.0 * mt.atkM * (mt.isBoss ? bossAtkScale : atkScale) * rareMultAtk));
 
-  S.monster = { name:fullMonsterName, baseName:mt.name, ic:mt.ic, hp, maxHp:hp, atk, isBoss:mt.isBoss };
+  S.monster = { name:fullMonsterName, baseName:mt.name, ic:mt.ic, hp, maxHp:hp, atk, isBoss:mt.isBoss, isRare };
   
   const scene = document.getElementById('scene');
   const bossOverlay = document.getElementById('bossHpOverlay');
@@ -2941,10 +2962,11 @@ function spawnMonster(effect=true){
   const bgIdxName = BACKGROUNDS[(S.stage-1) % BACKGROUNDS.length].name;
   document.getElementById('stageTitle').textContent = `STAGE ${S.stage} · ${bgIdxName}`;
   document.getElementById('monsterName').textContent = fullMonsterName;
+  document.getElementById('monsterName').classList.toggle('rareMonsterTag', isRare);
   
   const me = document.getElementById('monsterEmoji');
   me.textContent = mt.ic; 
-  me.className = mt.isBoss ? 'boss' : '';
+  me.className = mt.isBoss ? 'boss' : (isRare ? 'rare' : '');
 
   const bBtn = document.getElementById('bossChallengeBtn');
   if(bBtn) bBtn.style.display = (!mt.isBoss && S.stage % 10 === 9 && S.bossRetryAvailable) ? 'block' : 'none';
@@ -3884,7 +3906,8 @@ function getJunkSellValue(item) {
   const baseGold = 250;
   const stageBonus = item.stage * 3;
   const sellBoost = 1 + ((getPetEffectValue('sellBoost') || 0) / 100);
-  return Math.max(20, Math.round((20 + grade * baseGold) * stageBonus * sellBoost));
+  const lateExponent=Math.pow(1.18,Math.max(0,Number(item.stage||0))/100);
+  return Math.max(20,Math.round((20+grade*baseGold)*stageBonus*lateExponent*sellBoost));
 }
 
 function onMonsterKilled(){
@@ -3896,9 +3919,14 @@ function onMonsterKilled(){
   
   // 몬스터 기본 골드 지급량: 기존 수치 유지
   let baseGold = isBoss ? rand(1200, 1900) : rand(20, 45);
-  const goldGain = Math.floor(baseGold * (1 + stage * 0.018) * goldBonus);
+  const earlyGold=0.70+0.30*Math.min(stage,50)/50;
+  const lateGold=1+0.003*Math.pow(Math.max(0,stage-50),1.5);
+  const goldStageMult=earlyGold*lateGold;
+  const rareGoldMult=S.monster.isRare?5:1;
+  const goldGain=Math.floor(baseGold*goldStageMult*rareGoldMult*goldBonus);
   const sellBoost = getPetEffectValue('sellBoost');
   let expGain = Math.floor((18 + stage*3.3) * rand(0.9,1.1) * expBonus);
+  if(S.monster.isRare) expGain*=2;
   
   // 생명의 정수(펫 소환 재화): 일반 몬스터는 1~5개, 보스는 현재 스테이지 × 2.5개
   const essenceGain = isBoss ? Math.max(1, Math.floor(stage * 2.5)) : Math.floor(rand(1, 6));
@@ -3962,7 +3990,9 @@ function onPlayerDefeated(){
 }
 
 function gainExp(amount){
-  amount = Math.max(1, Math.round(amount * (1 + growthBonus('expPct')/100)));
+  const h=new Date().getHours(), burning=h>=17&&h<21;
+  const banner=document.getElementById('burningEventBanner');if(banner)banner.classList.toggle('show',burning);
+  amount=Math.max(1,Math.round((Number(amount)||0)*(burning?2:1)*(1+growthBonus('expPct')/100)));
   S.player.exp += amount;
   let leveled=false;
   while(S.player.exp >= expNeeded(S.player.level)){
@@ -4026,12 +4056,15 @@ function renderSettings(){
   const sfx=document.getElementById('settingsSfxToggle');
   const gf=document.getElementById('settingsGachaFxToggle');
   const ef=document.getElementById('settingsEnhanceFxToggle');
+  const tf=document.getElementById('settingsTranscendFxToggle'), uf=document.getElementById('settingsUltimateFxToggle');
   if(fx) fx.classList.toggle('on', !appSettings.reducedFx);
   if(vib) vib.classList.toggle('on', !!appSettings.vibration);
   if(bgm) bgm.classList.toggle('on', !!appSettings.bgm);
   if(sfx) sfx.classList.toggle('on', !!appSettings.sfx);
   if(gf) gf.classList.toggle('on', !!appSettings.gachaFx);
   if(ef) ef.classList.toggle('on', !!appSettings.enhanceFx);
+  if(tf) tf.classList.toggle('on', !!appSettings.transcendFx);
+  if(uf) uf.classList.toggle('on', !!appSettings.ultimateFx);
 }
 function toggleSetting(key){
   appSettings[key]=!appSettings[key];
@@ -4047,7 +4080,9 @@ function toggleSetting(key){
     bgm:appSettings.bgm?'🎵 잔잔한 BGM 켬':'🎵 BGM 끔',
     sfx:appSettings.sfx?'🔊 효과음 켬':'🔇 효과음 끔',
     gachaFx:appSettings.gachaFx?'✨ 뽑기 연출 켬':'✨ 뽑기 연출 끔',
-    enhanceFx:appSettings.enhanceFx?'🔨 강화·합성 연출 켬':'🔨 강화·합성 연출 끔'
+    enhanceFx:appSettings.enhanceFx?'🔨 강화·합성 연출 켬':'🔨 강화·합성 연출 끔',
+    transcendFx:appSettings.transcendFx?'⚡ 초월 연출 켬':'⚡ 초월 연출 끔',
+    ultimateFx:appSettings.ultimateFx?'🔥 극의 연출 켬':'🔥 극의 연출 끔'
   }[key] || '설정 변경';
   toast(msg);
 }
@@ -4433,6 +4468,7 @@ function renderTopStats(){
   document.getElementById('hpVal').textContent = `${Math.max(0,Math.floor(S.player.hp))}/${fmt(calcMaxHp())}`;
   const need = expNeeded(S.player.level);
   document.getElementById('expBar').style.width = Math.min(100, (S.player.exp/need)*100)+'%';
+  const burningEl=document.getElementById('burningEventBanner');if(burningEl){const h=new Date().getHours();burningEl.classList.toggle('show',h>=17&&h<21);}
   document.getElementById('lvText').textContent = `EXP ${Math.floor(S.player.exp)} / ${fmt(need)}`;
   const stick = document.getElementById('stickmanSvg');
   if(S.player.hp<=0) stick.classList.add('down'); else stick.classList.remove('down');
@@ -4552,7 +4588,7 @@ function openModal(name){
   if(name==='bag') { switchBagTab(currentBagTab); renderEquipSlots(); }
   if(name==='settings'){ renderSettings(); }
   if(name==='character'){ renderCharacter(); renderDetailStats(); }
-  if(name==='shop'){ updateBoxCost(); renderWeaponShop(); renderGoldShop(); }
+  if(name==='shop'){ updateBoxCost(); renderWeaponShop(); renderGoldShop(); renderPotionShop(); }
   if(name==='damageReport'){ renderDamageReport(); }
   if(name==='pet') switchPetTab(currentPetTab);
   if(name==='spouse') renderSpouse();
@@ -4596,10 +4632,11 @@ function closeModal(name){ document.getElementById(name+'ModalBg').classList.rem
 function switchShopTab(tab){
   document.getElementById('tabBox').classList.toggle('active', tab==='box');
   document.getElementById('tabGold').classList.toggle('active', tab==='gold');
+  document.getElementById('tabPotion').classList.toggle('active', tab==='potion');
   document.getElementById('shopBoxPane').style.display = tab==='box'?'block':'none';
   document.getElementById('shopGoldPane').style.display = tab==='gold'?'block':'none';
-  if(tab==='gold') renderGoldShop();
-  else updateBoxCost();
+  document.getElementById('shopPotionPane').style.display = tab==='potion'?'block':'none';
+  if(tab==='gold') renderGoldShop(); else if(tab==='potion') renderPotionShop(); else updateBoxCost();
 }
 
 /* BATCH ACTIONS */
@@ -5339,6 +5376,7 @@ function renderWeaponShop(){
       </div>`;
   }
   pane.innerHTML = html;
+  pane.insertAdjacentHTML('afterbegin','<button class="enhBtn" style="width:100%;margin-bottom:8px;background:linear-gradient(135deg,#00bcd4,#536dfe)" onclick="doEnhanceContinuousAll()">⚡ 연속 강화 · 장착 장비를 초월 전까지 자동 강화</button>');
 }
 
 function buyFixedWeapon(grade, cost){
@@ -5391,6 +5429,29 @@ function upgradeResearch(type, cost){
   toast('패시브 연구 완료!');
 }
 
+function renderPotionShop(){
+  const pane=document.getElementById('shopPotionPane');if(!pane)return;
+  const p=S.potions||{smallHp:0,bigHp:0,exp:0};
+  pane.innerHTML='<div class="shopItem"><div><div class="si-name">🧪 소형 HP 포션 · 보유 '+p.smallHp+'</div><div class="si-desc">최대 HP의 30% 즉시 회복</div></div><button onclick="buyPotion(\'smallHp\',500)">💰 500 구매</button><button onclick="usePotion(\'smallHp\')" '+(p.smallHp?'':'disabled')+'>사용</button></div>'+
+    '<div class="shopItem"><div><div class="si-name">💊 대형 HP 포션 · 보유 '+p.bigHp+'</div><div class="si-desc">최대 HP의 100% 즉시 회복</div></div><button onclick="buyPotion(\'bigHp\',2500)">💰 2,500 구매</button><button onclick="usePotion(\'bigHp\')" '+(p.bigHp?'':'disabled')+'>사용</button></div>'+
+    '<div class="shopItem"><div><div class="si-name">✨ 경험치 포션 · 보유 '+p.exp+'</div><div class="si-desc">현재 레벨 필요 EXP의 25% 획득</div></div><button onclick="buyPotion(\'exp\',1800)">💰 1,800 구매</button><button onclick="usePotion(\'exp\')" '+(p.exp?'':'disabled')+'>사용</button></div>';
+}
+function buyPotion(type,cost){
+  if(S.gold<cost){toast('💰 골드가 부족합니다!');return;}
+  if(!S.potions)S.potions={smallHp:0,bigHp:0,exp:0};
+  S.gold-=cost;S.potions[type]=(S.potions[type]||0)+1;renderPotionShop();renderAll();saveGame();toast('🧪 물약을 구매했습니다!');
+}
+function usePotion(type){
+  if(!S.potions||!(S.potions[type]>0))return;
+  if(type==='smallHp'){
+    if(S.player.hp>=calcMaxHp()){toast('❤️ 체력이 이미 가득합니다.');return;}
+    S.player.hp=Math.min(calcMaxHp(),S.player.hp+Math.round(calcMaxHp()*.30));
+  }else if(type==='bigHp'){
+    if(S.player.hp>=calcMaxHp()){toast('❤️ 체력이 이미 가득합니다.');return;}
+    S.player.hp=calcMaxHp();
+  }else if(type==='exp')gainExp(Math.max(1,Math.floor(expNeeded(S.player.level)*.25)));
+  S.potions[type]--;renderPotionShop();renderAll();saveGame();toast(type==='exp'?'✨ 경험치 포션 사용!':'❤️ HP 포션 사용!');
+}
 /* PET SYSTEM */
 function switchPetTab(tabG){
   currentPetTab = tabG;
@@ -5764,7 +5825,7 @@ function doSynthesisInPanel(type, cost){
   setTimeout(()=>{
     target.synthLv = oldSynth + 1;
 
-    if(overlay) overlay.classList.remove('show');
+    if(overlay) if(useTransFx)overlay.classList.remove('show');
     isEnhancing = false;
 
     renderSynthesis();
@@ -5884,6 +5945,21 @@ function doEnhance(slotKey, cost){
   isEnhancing=true;
 }
 
+function doEnhanceContinuousAll(){
+  if(isEnhancing)return;
+  let total=0,done=0;
+  ['weapon','helmet','armor','gloves','accessory'].forEach(slotKey=>{
+    const it=S.equip[slotKey];if(!it||it.enhance>=20)return;
+    while(it.enhance<20){
+      const cost=Math.floor((10+Math.pow(it.enhance,1.45)*6)/2);
+      if(S.soulStones<cost)break;
+      S.soulStones-=cost;total+=cost;it.enhance++;done++;
+    }
+  });
+  if(done===0){toast('💎 연속 강화에 필요한 영혼석이 부족합니다.');return;}
+  renderEnhance();renderAll();saveGame();toast('⚡ 연속 강화 완료! '+done+'회 · 💎-'+fmt(total));
+}
+
 function doTranscend(slotKey, cost){
   if(isEnhancing) return;
   const it = S.equip[slotKey];
@@ -5894,7 +5970,8 @@ function doTranscend(slotKey, cost){
   S.soulStones -= cost;
   
   const overlay = document.getElementById('enhAnimOverlay');
-  overlay.classList.add('show');
+  const useTransFx=appSettings.transcendFx!==false&&appSettings.enhanceFx!==false;
+  if(useTransFx)overlay.classList.add('show');
 
   setTimeout(() => {
     const t = it.transcend || 0;
@@ -5940,18 +6017,18 @@ function doUltimate(slotKey, cost){
   if(S.soulStones<cost){toast(`💎 영혼석이 부족합니다! 극의 강화 필요: ${fmt(cost)}`);return;}
   isEnhancing=true; S.soulStones-=cost;
   const overlay=document.getElementById('ultimateFxOverlay');
+  const useUltimateFx=appSettings.ultimateFx!==false&&appSettings.enhanceFx!==false;
   const txt=document.getElementById('ultimateFxText');
   const result=document.getElementById('ultimateResult');
   const chance=([50,40,30,20,15,10,7,4,2,1][u]||1);
-  overlay.className='show event-charge';
+  if(useUltimateFx)overlay.className='show event-charge';
   if(result) result.textContent='';
   if(txt) txt.innerHTML=`🔥 극의 ${u+1}단계<small>${it.name} · 운명을 판정한다</small>`;
   const svg=document.getElementById('stickmanSvg'); if(svg){svg.classList.add('ultimate-stage');}
   setTimeout(()=>{
     const success=Math.random()*100<chance;
-    overlay.classList.remove('event-charge');
-    overlay.classList.add(success?'event-success':'event-fail');
-    spawnUltimateParticles(success);
+    if(useUltimateFx){overlay.classList.remove('event-charge');overlay.classList.add(success?'event-success':'event-fail');}
+    if(useUltimateFx)spawnUltimateParticles(success);
     if(success){
       it.ultimate=u+1;
       if(txt) txt.innerHTML=`⚡ 극의 ${it.ultimate}단계<small>${it.name} · 한계를 초월한 흔적</small>`;
@@ -5964,12 +6041,13 @@ function doUltimate(slotKey, cost){
       if(downgrade) it.ultimate=u-1;
       if(txt) txt.innerHTML=`💥 극의 붕괴<small>${it.name} · 한계가 거부했다</small>`;
       if(result) result.innerHTML=downgrade?`극의 붕괴<br><small style="font-size:12px;letter-spacing:1px">${u} → ${it.ultimate} · 파편 +${failShard}</small>`:`극의 실패<br><small style="font-size:12px;letter-spacing:1px">단계 유지 · 파편 +${failShard}</small>`;
-      if(downgrade) toast(`💥 극의 실패! ${it.name} ${u} → ${it.ultimate}단계 강등 · 🌌 유물 파편 +${failShard}`);
+      if(useUltimateFx&&downgrade){overlay.classList.remove('event-fail');overlay.classList.add('event-collapse');}
+      if(downgrade) toast(`💥 극의 붕괴! ${it.name} ${u} → ${it.ultimate}단계 강등 · 🌌 유물 파편 +${failShard}`);
       else toast(`💥 극의 실패! 단계 유지 (${chance}%) · 🌌 유물 파편 +${failShard}`);
     }
     renderEnhance(); renderAll(); saveGame();
     setTimeout(()=>{
-      overlay.className=''; if(txt) txt.innerHTML='🔥 극의의 문이 열린다<small>THE LIMIT AWAITS</small>'; if(result) result.textContent='';
+      if(useUltimateFx)overlay.className=''; if(txt) txt.innerHTML='🔥 극의의 문이 열린다<small>THE LIMIT AWAITS</small>'; if(result) result.textContent='';
       const particles=document.getElementById('ultimateParticles'); if(particles) particles.innerHTML='';
       isEnhancing=false;
     },1900);
@@ -5979,7 +6057,7 @@ function doUltimate(slotKey, cost){
 /* ZERO_PET_RATE_VERIFIED: ZERO grade = 1% of pet summons */
 /* INIT */
 loadGame();
-appSettings = {reducedFx:false,vibration:false,bgm:false,sfx:true,gachaFx:true,enhanceFx:true,masterVolume:.72,...appSettings};
+appSettings = {reducedFx:false,vibration:false,bgm:false,sfx:true,gachaFx:true,enhanceFx:true,transcendFx:true,ultimateFx:true,masterVolume:.72,...appSettings};
 // 배경음은 완전히 제거: 기존 저장값이 true여도 항상 꺼짐
 appSettings.bgm = false;
 document.body.classList.toggle('reduced-fx', !!appSettings.reducedFx);

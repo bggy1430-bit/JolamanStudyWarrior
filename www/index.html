@@ -486,12 +486,12 @@ function renderPresetModal(){
   .btn-disabled{background:#3a3d55 !important; color:#777 !important;}
 
   .shopItem{
-    display:flex; justify-content:space-between; align-items:center; background:var(--panel2);
+    display:flex; justify-content:space-between; align-items:center; background:var(--panel2); pointer-events:none;
     border-radius:12px; padding:10px 12px; margin-bottom:8px; border:1px solid var(--line);
   }
   .shopItem .si-name{font-size:12.5px; font-weight:700;}
   .shopItem .si-desc{font-size:10px; color:var(--sub); margin-top:2px;}
-  .shopItem button{background:var(--gold); color:#3a2c00; border:none; border-radius:8px; padding:8px 10px; font-size:11px; font-weight:800; white-space:nowrap; cursor:pointer;}
+  .shopItem button{pointer-events:auto;background:var(--gold); color:#3a2c00; border:none; border-radius:8px; padding:8px 10px; font-size:11px; font-weight:800; white-space:nowrap; cursor:pointer;}
   .shopItem button:disabled{background:#555; color:#999;}
 
   /* PET UI */
@@ -561,9 +561,9 @@ function renderPresetModal(){
   #enhAnimOverlay {
     position: absolute; inset:0; background:rgba(10, 12, 20, 0.9);
     display:none; flex-direction:column; align-items:center; justify-content:center;
-    z-index:300; border-radius:18px;
+    z-index:300; border-radius:18px; pointer-events:none;
   }
-  #enhAnimOverlay.show{ display:flex; }
+  #enhAnimOverlay.show{ display:flex; pointer-events:auto; }
   .anim-orb {
     width:70px; height:70px; border-radius:50%;
     background: radial-gradient(circle, #ffffff, #00ffff, #ff00ea);
@@ -3965,9 +3965,11 @@ function onMonsterKilled(){
   
   // 몬스터 기본 골드 지급량: 기존 수치 유지
   let baseGold = isBoss ? rand(1200, 1900) : rand(20, 45);
-  const earlyGold=1;
-  const lateGold=2.44*Math.pow(Math.max(1,stage),1.7);
-  const goldStageMult=earlyGold*lateGold;
+  const earlyGold=0.80;
+  // 초반 골드는 낮게 시작하고, 1000~2000 스테이지 구간에서 기존 목표 성장량에 맞게 가속
+  const stageRamp=0.80 + 1.64*Math.pow(Math.max(1,stage)/1000,0.60);
+  const lateGold=Math.pow(Math.max(1,stage),1.7);
+  const goldStageMult=earlyGold*(stageRamp/0.80)*lateGold;
   const rareGoldMult=S.monster.isRare?5:1;
   const goldGain=Math.floor(baseGold*goldStageMult*rareGoldMult*goldBonus);
   const sellBoost = getPetEffectValue('sellBoost');
@@ -5965,18 +5967,26 @@ function doEnhance(slotKey, cost){
   const it = S.equip[slotKey];
   if(!it) return;
   if(S.soulStones < cost){ toast('영혼석이 부족합니다!'); return; }
-  
+
+  isEnhancing=true;
   S.soulStones -= cost;
-  const wait=playForgeFx(slotKey==='weapon'?'⚔️':slotKey==='helmet'?'🪖':slotKey==='armor'?'🛡️':slotKey==='gloves'?'🥊':'💍','강화!');
+  const overlay=document.getElementById('enhAnimOverlay');
+  if(overlay) overlay.classList.remove('show');
+
+  let wait=0;
+  try{
+    wait=Number(playForgeFx(slotKey==='weapon'?'⚔️':slotKey==='helmet'?'🪖':slotKey==='armor'?'🛡️':slotKey==='gloves'?'🥊':'💍','강화!'))||0;
+  }catch(e){ wait=0; }
+
   setTimeout(()=>{
-    it.enhance++;
+    it.enhance=(it.enhance||0)+1;
+    isEnhancing=false;
+    if(overlay) overlay.classList.remove('show');
     renderEnhance();
     renderAll(); saveGame();
     sfx('success');
     toast(`✨ ${it.name} +${it.enhance} 강화 성공!`);
-    isEnhancing=false;
-  }, wait || 0);
-  isEnhancing=true;
+  }, Math.min(900,Math.max(0,wait)));
 }
 
 function doEnhanceContinuousAll(){
@@ -6142,8 +6152,7 @@ document.addEventListener('click', function(e){
     '.growthNode',
     '.artifactCard',
     '.artifactFilter',
-    '.presetCard',
-    '.shopItem'
+    '.presetCard'
   ].join(',');
 
   function isDisabled(el){

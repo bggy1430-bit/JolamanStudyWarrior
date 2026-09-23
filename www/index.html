@@ -3569,25 +3569,6 @@ function combatTick(){
   
   if(crit && hasArtifactSynergy('bloodmoon',2) && Math.random()<0.25){ S.artifactBloodMark=true; spawnDmgText('monsterWrap','BLOOD SEAL!','dmgText extraDmg'); }
   // ===== 개별 유물 조합 시너지 =====
-  if(hasArtifactCombo('blood_crown','night_fang') && crit && Math.random()<0.12) dmg=Math.round(dmg*2);
-  if(hasArtifactCombo('void_star','crimson_sigil') && S.monster.isBoss && crit) dmg+=Math.max(1,Math.round(S.monster.hp*0.02));
-  if(hasArtifactCombo('immortal_heart','everlasting_bone') && S.player.hp/calcMaxHp()<=0.40) S.artifactGuardUntil=Date.now()+3000;
-  if(hasArtifactCombo('guardian_shield','sanctuary_lantern') && Math.random()<0.10) S.player.hp=Math.min(calcMaxHp(),S.player.hp+Math.round(calcMaxHp()*0.04));
-  if(hasArtifactCombo('eye_of_fate','oracle_mirror') && !crit) S.fateFailCount=(S.fateFailCount||0)+1;
-  if(hasArtifactCombo('eye_of_fate','oracle_mirror') && (S.fateFailCount||0)>=2) S.forceArtifactCrit=true;
-  if(hasArtifactCombo('boss_relic','abyss_core') && S.monster.isBoss && S.monster.hp/S.monster.maxHp<=0.50) dmg=Math.round(dmg*1.55);
-  if(hasArtifactCombo('star_collapse','world_end_eye') && S.monster.isBoss && S.monster.hp/S.monster.maxHp<=0.25 && Math.random()<0.05) dmg+=Math.max(1,Math.round(S.monster.hp*0.20));
-  if(hasArtifactCombo('apocalypse_mark','endless_flame') && crit && Math.random()<0.10) dmg=Math.round(dmg*1.50);
-  if(hasArtifactCombo('blood_crown','boss_relic') && S.monster.isBoss && (S.combatHits||0)===0) dmg=Math.round(dmg*1.30);
-  if(hasArtifactCombo('void_star','oracle_mirror') && crit && Math.random()<0.08) dmg+=Math.round(dmg*0.60);
-  if(hasArtifactCombo('sanctuary_lantern','null_feather') && Math.random()<0.15) S.artifactDodgeNext=true;
-  if(hasArtifactCombo('abyss_core','apocalypse_mark') && S.monster.hp/S.monster.maxHp<=0.35) dmg=Math.round(dmg*1.70);
-  if(hasArtifactCombo('crimson_sigil','world_end_eye') && S.monster.isBoss && Math.random()<0.06) dmg+=Math.max(1,Math.round(S.monster.hp*0.04));
-  if(hasArtifactCombo('star_collapse','endless_flame') && Math.random()<0.08) dmg+=Math.round(dmg*0.45);
-  if(hasArtifactCombo('blood_crown','void_star','crimson_sigil') && S.monster.isBoss && crit && Math.random()<0.05) dmg+=Math.max(1,Math.round(S.monster.hp*0.08));
-  if(hasArtifactCombo('immortal_heart','guardian_shield','sanctuary_lantern') && S.player.hp/calcMaxHp()<=0.50 && (S.combatHits||0)%5===4) S.player.hp=Math.min(calcMaxHp(),S.player.hp+Math.round(calcMaxHp()*0.05));
-  if(hasArtifactCombo('eye_of_fate','time_sand','oracle_mirror') && (S.combatHits||0)%7===6) S.forceArtifactCrit=true;
-  if(hasArtifactCombo('star_collapse','apocalypse_mark','world_end_eye') && S.monster.isBoss && S.monster.hp/S.monster.maxHp<=0.20 && Math.random()<0.10) dmg=Math.max(dmg,Math.ceil(S.monster.hp));
   if(S.artifactGuardUntil && Date.now()<S.artifactGuardUntil) dmg=Math.round(dmg*0.65);
   if(crit || S.forceArtifactCrit){ S.forceArtifactCrit=false;
     if(gearPower.infinity>0){ dmg += Math.max(1,Math.round(dmg*(.35+gearPower.infinity*.03))); spawnDmgText('monsterWrap','MUGUK IMPACT!','dmgText crit'); }

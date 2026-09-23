@@ -1736,7 +1736,7 @@ body{touch-action:manipulation;}
           <button id="settingsGachaFxToggle" class="settingsToggle on" onclick="toggleSetting('gachaFx')" aria-label="뽑기 연출 설정"></button>
         </div>
         <div class="settingsRow">
-          <div><b>🔨 강화·합성 연출</b><div class="desc">강화 및 합성의 망치/초월 연출을 표시합니다.</div></div>
+          <div><b>🔨 강화 연출</b><div class="desc">일반 강화의 망치 연출만 표시합니다.</div></div>
           <button id="settingsEnhanceFxToggle" class="settingsToggle on" onclick="toggleSetting('enhanceFx')" aria-label="강화 연출 설정"></button>
 </div>
 <div class="settingsRow"><div><b>⚡ 초월 연출</b><div class="desc">초월 돌파 전용 연출을 표시합니다.</div></div><button id="settingsTranscendFxToggle" class="settingsToggle on" onclick="toggleSetting('transcendFx')" aria-label="초월 연출 설정"></button></div>
@@ -4293,7 +4293,7 @@ function toggleSetting(key){
     bgm:appSettings.bgm?'🎵 잔잔한 BGM 켬':'🎵 BGM 끔',
     sfx:appSettings.sfx?'🔊 효과음 켬':'🔇 효과음 끔',
     gachaFx:appSettings.gachaFx?'✨ 뽑기 연출 켬':'✨ 뽑기 연출 끔',
-    enhanceFx:appSettings.enhanceFx?'🔨 강화·합성 연출 켬':'🔨 강화·합성 연출 끔',
+    enhanceFx:appSettings.enhanceFx?'🔨 강화 연출 켬':'🔨 강화 연출 끔',
     transcendFx:appSettings.transcendFx?'⚡ 초월 연출 켬':'⚡ 초월 연출 끔',
     ultimateFx:appSettings.ultimateFx?'🔥 극의 연출 켬':'🔥 극의 연출 끔'
   }[key] || '설정 변경';
@@ -6036,7 +6036,7 @@ function doSynthesisInPanel(type, cost){
   setTimeout(()=>{
     target.synthLv = oldSynth + 1;
 
-    if(overlay) if(useTransFx)overlay.classList.remove('show');
+    if(overlay) overlay.classList.remove('show');
     isEnhancing = false;
 
     renderSynthesis();
@@ -6189,7 +6189,7 @@ function doTranscend(slotKey, cost){
   S.soulStones -= cost;
   
   const overlay = document.getElementById('enhAnimOverlay');
-  const useTransFx=appSettings.transcendFx!==false&&appSettings.enhanceFx!==false;
+  const useTransFx=appSettings.transcendFx!==false;
   if(useTransFx)overlay.classList.add('show');
 
   setTimeout(() => {
@@ -6211,7 +6211,7 @@ function doTranscend(slotKey, cost){
       renderAll(); saveGame();
       toast(`💥 초월 실패! ${it.name}은(는) 그대로 유지됩니다. (성공률 ${chance}%)`);
     }
-  }, 1200);
+  }, useTransFx ? 1200 : 0);
 }
 
 function spawnUltimateParticles(success){
@@ -6236,7 +6236,7 @@ function doUltimate(slotKey, cost){
   if(S.soulStones<cost){toast(`💎 영혼석이 부족합니다! 극의 강화 필요: ${fmt(cost)}`);return;}
   isEnhancing=true; S.soulStones-=cost;
   const overlay=document.getElementById('ultimateFxOverlay');
-  const useUltimateFx=appSettings.ultimateFx!==false&&appSettings.enhanceFx!==false;
+  const useUltimateFx=appSettings.ultimateFx!==false;
   const txt=document.getElementById('ultimateFxText');
   const result=document.getElementById('ultimateResult');
   const chance=([50,40,30,20,15,10,7,4,2,1][u]||1);
@@ -6273,8 +6273,8 @@ function doUltimate(slotKey, cost){
       if(useUltimateFx)overlay.className=''; if(txt) txt.innerHTML='🔥 극의의 문이 열린다<small>THE LIMIT AWAITS</small>'; if(result) result.textContent='';
       const particles=document.getElementById('ultimateParticles'); if(particles) particles.innerHTML='';
       isEnhancing=false;
-    },1900);
-  },1500);
+    },useUltimateFx ? 1900 : 0);
+  },useUltimateFx ? 1500 : 0);
 }
 
 /* ZERO_PET_RATE_VERIFIED: ZERO grade = 1% of pet summons */

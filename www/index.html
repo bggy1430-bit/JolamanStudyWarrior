@@ -2256,39 +2256,39 @@ const ARTIFACTS = [
 const ARTIFACT_RATES=[['common',55],['rare',28],['epic',12],['legendary',5]];
 const ARTIFACT_RARITY_NAMES={common:'일반',rare:'희귀',epic:'영웅',legendary:'전설'};
 const ARTIFACT_SETS=[
- {id:'bloodmoon',name:'적월혈맥',ic:'🔻',pieces:['blood_crown','void_star','crimson_sigil','night_fang'],effects:{2:'혈흔 · 치명타 후 25% 확률로 다음 공격이 50% 강해진다.',3:'적월 추적 · 5번째 공격마다 피해가 35% 증가한다.',4:'적월 종언 · 보스 HP 30% 이하에서 모든 공격 피해가 50% 증가한다.'},lore:'치명타와 보스 처형에 특화된 순수 공격 세트.'},
- {id:'immortal',name:'불멸성역',ic:'🜂',pieces:['immortal_heart','guardian_shield','everlasting_bone','sanctuary_lantern'],effects:{2:'불멸의 문 · 전투당 1회 치명상을 버티고 HP 1로 생존한다.',3:'성역 수호 · 저체력 상태에서 받는 피해가 35% 감소한다.',4:'영겁의 귀환 · 불멸의 문 발동 시 최대 HP의 35%까지 회복한다.'},lore:'한 번의 생존을 확실하게 만들어 주는 방어 세트.'},
- {id:'treasure',name:'칠금역천',ic:'🜁',pieces:['golden_crown','wisdom_codex','merchant_eye','fortune_coin'],effects:{2:'황금의 손 · 처치 보상 골드가 20% 확률로 3배가 된다.',3:'역천의 금고 · 보스 처치 시 유물 파편을 추가 획득한다.',4:'칠금의 축복 · 일반 처치에서 10% 확률로 골드 5배가 된다.'},lore:'전투력 대신 성장 속도를 끌어올리는 파밍 세트.'},
- {id:'fate',name:'천문역행',ic:'🔮',pieces:['eye_of_fate','time_sand','fate_thread','oracle_mirror'],effects:{2:'운명의 예고 · 7번째 공격마다 다음 공격이 확정 치명타가 된다.',3:'역행의 한 수 · 치명타가 20% 확률로 55% 추가타를 만든다.',4:'천문의 판결 · 보스 HP 25% 이하에서 치명타 피해가 80% 증가한다.'},lore:'치명타의 빈도와 폭발력을 함께 다루는 정밀 공격 세트.'},
- {id:'void',name:'허무종언',ic:'◉',pieces:['boss_relic','abyss_core','null_feather','void_bell'],effects:{2:'허무의 균열 · 공격 시 15% 확률로 현재 피해의 80%를 추가한다.',3:'심연 포식 · 보스 적중 시 12% 확률로 보스 최대 HP의 2%를 추가한다.',4:'종언의 공백 · 보스 HP 20% 이하에서 35% 확률로 즉시 처형을 시도한다.'},lore:'추가 피해와 보스 체력 절단을 동시에 노리는 보스 특화 세트.'},
- {id:'apocalypse',name:'성계붕락',ic:'🌑',pieces:['star_collapse','apocalypse_mark','endless_flame','world_end_eye'],effects:{2:'붕성의 잔광 · 4번째 공격마다 현재 피해의 120%를 추가한다.',3:'재앙의 낙인 · 보스에게 20% 확률로 재앙 낙인을 남긴다.',4:'세계종말 · 낙인 보스가 25% 이하일 때 다음 공격이 200% 추가 폭발한다.'},lore:'공격 횟수가 쌓일수록 폭발력이 커지는 후반전 특화 세트.'}
+ {id:'bloodmoon',name:'적월의 전장',ic:'🔻',pieces:['blood_crown','void_star','crimson_sigil','night_fang'],effects:{2:'적월의 칼날 · 공격력 +8%',3:'피의 추적 · 치명타 피해 +10%',4:'적월 종언 · 공격력 +18% · 보스 피해 +8%'},lore:'치명타와 순수 공격을 밀어붙이는 공격형 세트.'},
+ {id:'immortal',name:'불멸의 성역',ic:'🜂',pieces:['immortal_heart','guardian_shield','everlasting_bone','sanctuary_lantern'],effects:{2:'불멸의 심장 · 최대 HP +12%',3:'성역 수호 · 최대 HP +18%',4:'영겁의 귀환 · 최대 HP +30%'},lore:'안정적인 생존력을 크게 끌어올리는 방어형 세트.'},
+ {id:'treasure',name:'칠금의 금고',ic:'🜁',pieces:['golden_crown','wisdom_codex','merchant_eye','fortune_coin'],effects:{2:'황금의 손 · 골드 획득량 +12%',3:'역천의 금고 · 골드 획득량 +20%',4:'칠금의 축복 · 골드 +28% · 경험치 +15%'},lore:'골드와 성장 재화를 집중시키는 파밍형 세트.'},
+ {id:'fate',name:'천문 역행',ic:'🔮',pieces:['eye_of_fate','time_sand','fate_thread','oracle_mirror'],effects:{2:'운명의 예고 · 치명타 확률 +4%',3:'역행의 일격 · 치명타 피해 +12%',4:'천문의 판결 · 치명타 확률 +6% · 치명타 피해 +18%'},lore:'치명타의 빈도와 폭발력을 함께 강화한다.'},
+ {id:'void',name:'허무의 종언',ic:'◉',pieces:['boss_relic','abyss_core','null_feather','void_bell'],effects:{2:'허무의 균열 · 보스 피해 +8%',3:'심연 포식 · 보스 피해 +12%',4:'종언의 공백 · 보스 피해 +20% · 공격력 +8%'},lore:'보스전과 후반 스테이지에 특화된 세트.'},
+ {id:'apocalypse',name:'성계 붕락',ic:'🌑',pieces:['star_collapse','apocalypse_mark','endless_flame','world_end_eye'],effects:{2:'붕성의 잔광 · 공격력 +10%',3:'재앙의 낙인 · 보스 피해 +10%',4:'세계종말 · 공격력 +20% · 보스 피해 +15%'},lore:'일반 공격과 보스 화력을 동시에 밀어붙이는 최종 공격 세트.'}
 ];
 
 const ARTIFACT_COMBO_SYNERGIES=[
- ['blood_crown','night_fang','혈월의 사냥','치명타 적중 시 12% 확률로 다음 공격 피해 2배'],
- ['void_star','crimson_sigil','적월의 종언','보스 치명타 시 적 현재 HP의 2% 추가 피해'],
- ['immortal_heart','everlasting_bone','불멸의 골격','HP 40% 이하에서 받는 피해 35% 감소'],
- ['guardian_shield','sanctuary_lantern','성역 봉쇄','큰 피해를 받으면 최대 HP의 4% 회복'],
- ['golden_crown','fortune_coin','황금 순환','골드 보상 획득 시 15% 확률로 유물 파편 +2'],
- ['wisdom_codex','time_sand','역천의 시간','8% 확률로 다음 전투 경험치 3배'],
- ['eye_of_fate','oracle_mirror','예언의 눈','치명타 실패 2회 연속 시 다음 공격 확정 치명타'],
- ['fate_thread','time_sand','운명의 되감기','7타마다 다음 피격 피해 무효화'],
- ['boss_relic','abyss_core','심연 포식자','보스 HP 50% 이하에서 피해 55% 증가'],
- ['null_feather','void_bell','무효의 장송','공격 시 10% 확률로 적 최대 HP 무시'],
- ['star_collapse','world_end_eye','붕성 종말','보스 HP 25% 이하에서 현재 HP 20% 추가 피해'],
- ['apocalypse_mark','endless_flame','재앙의 불씨','치명타 시 10% 확률로 피해 50% 증가'],
- ['blood_crown','boss_relic','적월종언','보스전 첫 공격 후 피해 30% 증가'],
- ['void_star','oracle_mirror','쌍성의 역거울','치명타 시 8% 확률로 피해 60% 추가타'],
- ['sanctuary_lantern','null_feather','무효 성역','피격 시 15% 확률로 다음 피해 무효'],
- ['abyss_core','apocalypse_mark','심연재앙','적 HP 35% 이하에서 피해 70% 증가'],
- ['void_bell','endless_flame','허공의 잔화','5타마다 최대 HP 무시 공격'],
- ['crimson_sigil','world_end_eye','종말의 혈안','보스 공격 시 6% 확률로 현재 HP 4% 추가 피해'],
- ['star_collapse','endless_flame','붕성의 불씨','추가타 발동 시 8% 확률로 추가타 반복'],
- ['blood_crown','void_star','crimson_sigil','적월 삼문','보스 치명타 시 5% 확률로 현재 HP 8% 추가 절단'],
- ['immortal_heart','guardian_shield','sanctuary_lantern','불멸 삼문','HP 50% 이하에서 5타마다 최대 HP 5% 회복'],
- ['eye_of_fate','time_sand','oracle_mirror','천문 삼문','7타마다 다음 공격 확정 치명타 + 피해 100%'],
- ['boss_relic','abyss_core','null_feather','허무 삼문','보스 최대 HP 25% 확률로 완전 무시'],
- ['star_collapse','apocalypse_mark','world_end_eye','종말 삼문','보스 HP 20% 이하에서 10% 확률로 즉시 처형']
+ ['blood_crown','void_star','적월의 쌍성','공격력 +5%'],
+ ['blood_crown','crimson_sigil','적월 판결','보스 피해 +6%'],
+ ['void_star','oracle_mirror','쌍성의 역거울','치명타 피해 +8%'],
+ ['immortal_heart','everlasting_bone','불멸의 골격','최대 HP +7%'],
+ ['guardian_shield','sanctuary_lantern','성역 봉쇄','최대 HP +8%'],
+ ['golden_crown','fortune_coin','황금 순환','골드 획득량 +8%'],
+ ['wisdom_codex','time_sand','역천의 시간','경험치 +8%'],
+ ['eye_of_fate','oracle_mirror','예언의 눈','치명타 확률 +3%'],
+ ['fate_thread','time_sand','운명의 되감기','치명타 피해 +6%'],
+ ['boss_relic','abyss_core','심연 포식자','보스 피해 +12%'],
+ ['null_feather','void_bell','무효의 장송','최대 HP +6%'],
+ ['star_collapse','world_end_eye','붕성 종말','보스 피해 +12%'],
+ ['apocalypse_mark','endless_flame','재앙의 불씨','공격력 +7%'],
+ ['blood_crown','boss_relic','적월종언','보스 피해 +8%'],
+ ['sanctuary_lantern','null_feather','무효 성역','최대 HP +7%'],
+ ['abyss_core','apocalypse_mark','심연재앙','보스 피해 +10%'],
+ ['void_bell','endless_flame','허공의 잔화','공격력 +6%'],
+ ['crimson_sigil','world_end_eye','종말의 혈안','보스 피해 +8%'],
+ ['star_collapse','endless_flame','붕성의 불씨','공격력 +7%'],
+ ['blood_crown','void_star','crimson_sigil','적월 삼문','공격력 +10% · 보스 피해 +5%'],
+ ['immortal_heart','guardian_shield','sanctuary_lantern','불멸 삼문','최대 HP +12%'],
+ ['eye_of_fate','time_sand','oracle_mirror','천문 삼문','치명타 확률 +5% · 치명타 피해 +10%'],
+ ['boss_relic','abyss_core','null_feather','허무 삼문','보스 피해 +15% · 최대 HP +5%'],
+ ['star_collapse','apocalypse_mark','world_end_eye','종말 삼문','공격력 +12% · 보스 피해 +10%']
 ];
 function hasArtifactCombo(...ids){ return ids.every(id=>getEquippedArtifactIds().includes(id)); }
 
@@ -2298,13 +2298,29 @@ function artifactLevelMultiplier(lv){ return lv<=0 ? 0 : 1 + (Math.min(10,lv)-1)
 function getEquippedArtifactIds(){ if(!Array.isArray(S.equippedArtifacts) && Array.isArray(S.artifactEquipped)) S.equippedArtifacts=S.artifactEquipped.slice(); return (S.equippedArtifacts||[]).filter(id=>getArtifactLevel(id)>0).slice(0,5); }
 function getArtifactSynergy(){
   const eq=new Set(getEquippedArtifactIds()); const abilities=[]; const names=[]; const counts={};
+  const stats={atkPct:0,hpPct:0,goldPct:0,critRate:0,expPct:0,critDmg:0,bossDmg:0};
+  const add=(key,val)=>{ if(stats[key]!==undefined) stats[key]+=val; };
+  const parse=(text)=>{
+    let m=text.match(/공격력\s*\+(\d+(?:\.\d+)?)%/); if(m)add('atkPct',Number(m[1]));
+    m=text.match(/최대 HP\s*\+(\d+(?:\.\d+)?)%/); if(m)add('hpPct',Number(m[1]));
+    m=text.match(/골드(?: 획득량)?\s*\+(\d+(?:\.\d+)?)%/); if(m)add('goldPct',Number(m[1]));
+    m=text.match(/경험치\s*\+(\d+(?:\.\d+)?)%/); if(m)add('expPct',Number(m[1]));
+    m=text.match(/치명타 확률\s*\+(\d+(?:\.\d+)?)%/); if(m)add('critRate',Number(m[1]));
+    m=text.match(/치명타 피해\s*\+(\d+(?:\.\d+)?)%/); if(m)add('critDmg',Number(m[1]));
+    m=text.match(/보스 피해\s*\+(\d+(?:\.\d+)?)%/); if(m)add('bossDmg',Number(m[1]));
+  };
   ARTIFACT_SETS.forEach(set=>{
     const count=set.pieces.filter(id=>eq.has(id)).length; counts[set.id]=count;
-    Object.entries(set.effects).forEach(([need,text])=>{ if(count>=Number(need)) abilities.push({setId:set.id,setName:set.name,need:Number(need),text}); });
-    if(count>=2) names.push(`${set.ic} ${set.name} ${count}/4`);
+    Object.entries(set.effects).forEach(([need,text])=>{
+      if(count>=Number(need)){ abilities.push({setId:set.id,setName:set.name,need:Number(need),text}); parse(text); }
+    });
+    if(count>=2) names.push(set.ic+' '+set.name+' '+count+'/4');
   });
-  ARTIFACT_COMBO_SYNERGIES.forEach(x=>{ if(hasArtifactCombo(...x.slice(0,-2))) abilities.push({setId:'combo',setName:x[x.length-2],need:x.length-2,text:x[x.length-1]}); });
-  return {stats:{atkPct:0,hpPct:0,hpPct:0,goldPct:0,critRate:0,expPct:0,critDmg:0,bossDmg:0},names,abilities,counts};
+  ARTIFACT_COMBO_SYNERGIES.forEach(x=>{
+    const ids=x.slice(0,-2); const comboName=x[x.length-2]; const text=x[x.length-1];
+    if(ids.every(id=>eq.has(id))){ abilities.push({setId:'combo',setName:comboName,need:ids.length,text}); names.push('✦ '+comboName); parse(text); }
+  });
+  return {stats,names,abilities,counts};
 }
 function hasArtifactSynergy(setId, need=2){ return (getArtifactSynergy().counts?.[setId]||0) >= need; }
 function artifactSynergyHasText(setId, need){ return hasArtifactSynergy(setId,need); }
@@ -2765,6 +2781,20 @@ function equippedBonus(){
 
 /* 장착 펫 보너스 중첩 계산 */
 const PET_SYNERGIES = [
+  {id:'legend_frost_treasure',pets:['pet_frost_mimic','pet_treasure_goblin'],name:'🧊🧌 얼음 보물사냥',effect:'골드 획득량 +6%',bonus:{goldBonus:6}},
+  {id:'legend_treasure_berserk',pets:['pet_treasure_goblin','pet_berserk_hamster'],name:'🧌🐹 폭주 금고',effect:'공격력 +6%',bonus:{atkBonus:6}},
+  {id:'legend_mirror_frost',pets:['pet_mirror_fox','pet_frost_mimic'],name:'🪞🧊 거울의 냉기',effect:'치명타 피해 +7%',bonus:{critDmg:7}},
+  {id:'legend_berserk_mirror',pets:['pet_berserk_hamster','pet_mirror_fox'],name:'🐹🪞 광폭 반사',effect:'보스에게 가하는 피해 +6%',bonus:{bossDmg:6}},
+  {id:'legend_treasure_mirror',pets:['pet_treasure_goblin','pet_mirror_fox'],name:'🧌🪞 환상의 금고',effect:'골드 획득량 +5% · 치명타 확률 +2%',bonus:{goldBonus:5,critRate:2}},
+  {id:'legend_all',pets:['pet_frost_mimic','pet_treasure_goblin','pet_berserk_hamster','pet_mirror_fox'],name:'👑 전설의 연합',effect:'공격력 +8% · 최대 HP +8%',bonus:{atkBonus:8,hpBonus:8}},
+  {id:'zero_zero1',pets:['pet_zero','zero1'],name:'0️⃣⚫ 무한 복제',effect:'공격력 +7%',bonus:{atkBonus:7}},
+  {id:'zero_alpha',pets:['pet_zero','alpha_zero'],name:'0️⃣🔷 영점 복구',effect:'최대 HP +7%',bonus:{hpBonus:7}},
+  {id:'zero_zero999',pets:['pet_zero','zero999'],name:'0️⃣⚡ 한계 돌파',effect:'공격력 +8%',bonus:{atkBonus:8}},
+  {id:'zero1_zero999',pets:['zero1','zero999'],name:'⚫⚡ 연쇄 한계',effect:'치명타 피해 +8%',bonus:{critDmg:8}},
+  {id:'zero_alpha999',pets:['alpha_zero','zero999'],name:'🔷⚡ 불사 한계',effect:'최대 HP +8% · 보스 피해 +5%',bonus:{hpBonus:8,bossDmg:5}},
+  {id:'zero_voidking',pets:['pet_zero','zeroOmega'],name:'0️⃣♾️ 영점의 공허',effect:'공격력 +6% · 보스 피해 +6%',bonus:{atkBonus:6,bossDmg:6}},
+  {id:'zero_all',pets:['pet_zero','zero1','alpha_zero','zero999'],name:'☯️ ZERO 완전체',effect:'공격력 +10% · 치명타 피해 +10%',bonus:{atkBonus:10,critDmg:10}},
+  {id:'zero_survival',pets:['alpha_zero','zeroOmega'],name:'🔷♾️ 공허 복구',effect:'최대 HP +10%',bonus:{hpBonus:10}},
   {id:'gold_coin_goblin',pets:['gold_slime','gold_goblin'],name:'🟡👺 금화 강탈',effect:'골드 획득량 +25%',bonus:{goldBonus:25}},
   {id:'gold_hunter',pets:['gold_goblin','gold_mimic'],name:'👺📦 보물 사냥꾼',effect:'골드 획득량 +20%',bonus:{goldBonus:20}},
   {id:'gold_roulette',pets:['gold_mimic','gold_roulette'],name:'📦🎰 황금 룰렛',effect:'골드 획득량 +20%',bonus:{goldBonus:20}},

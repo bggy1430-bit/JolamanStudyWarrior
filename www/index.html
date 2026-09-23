@@ -3053,18 +3053,20 @@ function finishFocusHour(){
   S.focusBoxes += r.boxes;
   const crystal=Math.max(1,Math.floor(r.kills/20)+Math.floor(r.boxes/2));
   S.focusCrystal += crystal;
+  const protectionReward=Math.min(5,Math.max(0,20-Number(S.breakProtectionTickets||0)));
+  S.breakProtectionTickets=Math.min(20,Number(S.breakProtectionTickets||0)+protectionReward);
   const overlay=document.getElementById('focusLockOverlay'); if(overlay)overlay.classList.remove('show');
   const btn=document.getElementById('focusHourBtn'); if(btn)btn.disabled=false;
   S.focusEndAt=0;
   renderFocusUpgrades(); renderAll(); saveGame();
   // 집중 시간이 끝나도 공부/자동전투는 종료하지 않는다. 결과만 보여준다.
   showFocusReward(r,crystal);
-  toast(`⏱️ 1시간 집중 완료! 보상 ${fmt(r.gold)}G · EXP ${fmt(r.exp)}`,4000);
+  toast(`⏱️ 1시간 집중 완료! 🎫 파괴방지권 +${protectionReward} · 보유 ${S.breakProtectionTickets}/20`,4000);
 }
 function showFocusReward(r,crystal){
   const box=document.getElementById('focusRewardResult');
   if(box){box.innerHTML=`<div class="focusReward"><div style="font-weight:900;font-size:16px">⏱️ 1시간 집중 완료!</div><div style="margin-top:9px">📦 집중 상자 <span class="big">${fmt(r.boxes)}</span>개</div><div>💰 골드 <span class="big">${fmt(r.gold)}</span></div><div>✨ 경험치 <span class="big">${fmt(r.exp)}</span></div><div>🔷 집중 결정 <span class="big">+${fmt(crystal)}</span></div><div style="margin-top:6px;color:var(--sub);font-size:10px">처치 ${fmt(r.kills)}마리 · 집중 결정으로 기본 공격력/최대 체력을 레벨당 5%씩 강화할 수 있습니다.</div></div>`; box.style.display='block';}
-  toast(`⏱️ 집중 완료! 상자 ${r.boxes}개 · 집중 결정 +${crystal}`,4000);
+  toast(`⏱️ 집중 완료! 상자 ${r.boxes}개 · 집중 결정 +${crystal} · 🎫 파괴방지권 +${protectionReward}`,4000);
 }
 
 function toggleStudy(){
@@ -5935,10 +5937,10 @@ function renderEnhance(){
           html += `
             <div class="enhCard" style="border-color:#ff8c00;">
               <div class="er-top">
-                <span class="er-name" style="color:#ffb347">${s.ic} ${it.name} [극의 ${u}단계]</span>
+                <span class="er-name" style="color:#ffb347">${s.ic} ${it.name} [극의 ${u}단계]</span><span style="font-size:11px;color:#7fffe0">🎫 ${Number(S.breakProtectionTickets||0)}개</span>
                 <span style="font-size:11px; color:#ffb347">극의 보너스 +${u*40}%</span>
               </div>
-              <div style="font-size:10px;color:var(--sub);margin-top:5px;">초월 5단계 이후 해금 · 성공률 50% → 1% · 실패 시 일정 확률로 1단계 강등</div>
+              <div style="font-size:10px;color:var(--sub);margin-top:5px;">초월 5단계 이후 해금 · 성공률 50% → 1% · 실패 시 일정 확률로 1단계 강등 · 🎫 보유 시 강등 방지</div>
               <button class="enhBtn ultimate-btn" onclick="doUltimate('${s.key}', ${uCost})">🔥 극의 돌파 ${u+1}단계 · 성공률 ${uRate}% (💎 ${fmt(uCost)} 필요)</button>
             </div>`;
         }else{
@@ -6069,12 +6071,16 @@ function doUltimate(slotKey, cost){
     }else{
       const failShard=3+Math.floor(u/3);
       S.artifactShards=(S.artifactShards||0)+failShard;
-      const downgrade=u>0 && Math.random()<0.30;
+      const wouldDowngrade=u>0 && Math.random()<0.30;
+      const protectedDowngrade=wouldDowngrade && Number(S.breakProtectionTickets||0)>0;
+      if(protectedDowngrade) S.breakProtectionTickets=Math.max(0,Number(S.breakProtectionTickets||0)-1);
+      const downgrade=wouldDowngrade && !protectedDowngrade;
       if(downgrade) it.ultimate=u-1;
       if(txt) txt.innerHTML=`💥 극의 붕괴<small>${it.name} · 한계가 거부했다</small>`;
-      if(result) result.innerHTML=downgrade?`극의 붕괴<br><small style="font-size:12px;letter-spacing:1px">${u} → ${it.ultimate} · 파편 +${failShard}</small>`:`극의 실패<br><small style="font-size:12px;letter-spacing:1px">단계 유지 · 파편 +${failShard}</small>`;
+      if(result) result.innerHTML=downgrade?`극의 붕괴<br><small style="font-size:12px;letter-spacing:1px">${u} → ${it.ultimate} · 파편 +${failShard}</small>`:protectedDowngrade?`극의 실패 방어<br><small style="font-size:12px;letter-spacing:1px">등급 유지 · 🎫 파괴방지권 -1 · 파편 +${failShard}</small>`:`극의 실패<br><small style="font-size:12px;letter-spacing:1px">단계 유지 · 파편 +${failShard}</small>`;
       if(useUltimateFx&&downgrade){overlay.classList.remove('event-fail');overlay.classList.add('event-collapse');}
       if(downgrade) toast(`💥 극의 붕괴! ${it.name} ${u} → ${it.ultimate}단계 강등 · 🌌 유물 파편 +${failShard}`);
+      else if(protectedDowngrade) toast(`🛡️ 극의 붕괴 방지! ${it.name} ${u}단계 유지 · 🎫 파괴방지권 1개 소모 · 🌌 유물 파편 +${failShard}`);
       else toast(`💥 극의 실패! 단계 유지 (${chance}%) · 🌌 유물 파편 +${failShard}`);
     }
     renderEnhance(); renderAll(); saveGame();

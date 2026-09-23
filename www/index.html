@@ -5585,40 +5585,9 @@ function renderPetList(){
   document.getElementById('petEssenceVal').textContent = fmt(S.essence);
 
   const ps=document.getElementById('petSynergyPanel'); if(ps){
-  const sy=getPetSynergy();
-  const eq=new Set(S.equippedPets||[]);
-  const synergyDefs=[
-    [['gold_slime','gold_goblin'],'🟡👺 금화 강탈'],
-    [['gold_goblin','gold_mimic'],'👺📦 보물 사냥꾼'],
-    [['gold_mimic','gold_roulette'],'📦🎰 황금 룰렛'],
-    [['gold_slime','gold_goblin','gold_mimic'],'🪙 황금 행운'],
-    [['gold_slime','gold_goblin','gold_mimic','gold_roulette'],'👑 골드 러시'],
-    [['gold_mimic','absolute_crit'],'📦🔴 황금 파괴'],
-    [['gold_roulette','absolute_executioner'],'🎰⚔️ 황금 처형'],
-    [['origin_meteor','origin_soul'],'☄️ 불굴의 영혼'],
-    [['origin_meteor','origin_chaos'],'☄️ 혼돈 방벽'],
-    [['origin_meteor','origin_star'],'☄️ 성운 운석'],
-    [['origin_soul','origin_chaos'],'👻 영혼 윤회'],
-    [['origin_soul','origin_star'],'👻 영혼 성운'],
-    [['origin_chaos','origin_star'],'🐉 절대 생존'],
-    [['absolute_void','absolute_executioner'],'☠️ 학살 처형'],
-    [['absolute_void','absolute_barrage'],'🌑 연쇄 폭격'],
-    [['absolute_void','absolute_crit'],'🔴 파괴 누적'],
-    [['absolute_executioner','absolute_barrage'],'⚔️ 폭격 처형'],
-    [['absolute_executioner','absolute_crit'],'⚔️ 종말의 일격'],
-    [['absolute_barrage','absolute_crit'],'🌀 폭발 저장']
-  ];
-  const active=synergyDefs.filter(([ids])=>ids.every(id=>eq.has(id)));
-  const activeHtml=active.length?active.map(([,n])=>`<span class="petSynergyChip active">✦ ${n}</span>`).join(''):'<span class="petSynergyEmpty">장착 조합이 맞으면 시너지가 활성화됩니다.</span>';
-  const lockedHtml=synergyDefs.filter(([ids])=>!ids.every(id=>eq.has(id))).slice(0,8).map(([ids,n])=>{
-    const have=ids.filter(id=>eq.has(id)).length;
-    const need=ids.map(id=>(PET_PRESETS.find(p=>p.id===id)||{name:id}).name).join(' + ');
-    return `<span class="petSynergyChip locked">🔒 ${n} <small>(${have}/${ids.length})</small></span>`;
-  }).join('');
-  ps.innerHTML=`<div class="artifactSynergyHead">✦ 펫 시너지 <b>${(S.equippedPets||[]).length}/12</b></div>
-    <div class="petSynergySection"><b>활성 시너지</b><div class="petSynergyWrap">${activeHtml}</div></div>
-    <div class="petSynergySection"><b>시너지 목록</b><div class="petSynergyWrap">${lockedHtml}</div></div>`;
-}
+    ps.innerHTML=`<div class="artifactSynergyHead">✦ 펫 시너지 도감 <b>${(S.equippedPets||[]).length}/12</b></div>
+      <div style="font-size:9px;color:var(--sub);margin-top:4px;">시너지 상세 조합과 효과는 아래 <b>📚 펫 시너지 전체 보기</b>에서 확인하세요.</div>`;
+  }
   const list = document.getElementById('petList');
   list.innerHTML = '';
   

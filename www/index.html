@@ -1919,7 +1919,7 @@ body{touch-action:manipulation;}
       </section>
       <section class="growthPanel" id="focusUpgradePanel" style="display:none">
         <div class="growthPanelHead"><b>⏱️ 집중 보상 강화</b><span>특별재화: <b id="focusCrystalVal">0</b></span></div>
-        <div class="growthHint">1시간 집중 전투로 얻는 <b>집중 결정</b>을 사용해 기본 능력치를 퍼센트가 아닌 <b>고정 수치</b>로 추가합니다.</div>
+        <div class="growthHint">1시간 집중 전투로 얻는 <b>집중 결정</b>을 사용해 기본 공격력과 최대 체력을 <b>레벨당 5%</b>씩 증가시킵니다.</div>
         <div id="focusUpgradeList"></div>
       </section>
       <section class="growthPanel playerGrowthPanel" id="playerGrowthScreen" style="display:none">
@@ -3008,10 +3008,10 @@ function nextStage(){
 function renderFocusUpgrades(){
   const box=document.getElementById('focusUpgradeList'); if(!box)return;
   const c=Number(S.focusCrystal||0), u=S.focusUpgrades||{atk:0,hp:0};
-  const rows=[['atk','⚔️','기본 공격력',5],['hp','❤️','기본 최대체력',5]];
-  box.innerHTML=rows.map(([k,ic,name,gain])=>{
-    const lv=Number(u[k]||0), cost=1+lv*2;
-    return `<div class="focusUpgradeRow"><div>${ic} <b>${name} +${lv*gain}</b><div style="font-size:9px;color:var(--sub);margin-top:2px;">집중 결정 ${cost}개 · 구매할 때마다 +${gain}</div></div><button ${c<cost?'disabled':''} onclick="buyFocusUpgrade('${k}')">강화</button></div>`;
+  const rows=[['atk','⚔️','기본 공격력'],['hp','❤️','기본 최대체력']];
+  box.innerHTML=rows.map(([k,ic,name])=>{
+    const lv=Number(u[k]||0), pct=lv*5, cost=1+lv*2;
+    return `<div class="focusUpgradeRow"><div>${ic} <b>${name} +${pct}%</b><div style="font-size:9px;color:var(--sub);margin-top:2px;">집중 결정 ${cost}개 · 구매할 때마다 +5%</div></div><button ${c<cost?'disabled':''} onclick="buyFocusUpgrade('${k}')">강화</button></div>`;
   }).join('');
   const cv=document.getElementById('focusCrystalVal'); if(cv)cv.textContent=c; const ft=document.getElementById('focusCrystalTabText'); if(ft)ft.textContent=`${c} 결정`;
 }
@@ -3058,7 +3058,7 @@ function finishFocusHour(){
 }
 function showFocusReward(r,crystal){
   const box=document.getElementById('focusRewardResult');
-  if(box){box.innerHTML=`<div class="focusReward"><div style="font-weight:900;font-size:16px">⏱️ 1시간 집중 완료!</div><div style="margin-top:9px">📦 집중 상자 <span class="big">${fmt(r.boxes)}</span>개</div><div>💰 골드 <span class="big">${fmt(r.gold)}</span></div><div>✨ 경험치 <span class="big">${fmt(r.exp)}</span></div><div>🔷 집중 결정 <span class="big">+${fmt(crystal)}</span></div><div style="margin-top:6px;color:var(--sub);font-size:10px">처치 ${fmt(r.kills)}마리 · 집중 결정으로 기본 공격력/최대 HP/체력을 고정 수치 강화할 수 있습니다.</div></div>`; box.style.display='block';}
+  if(box){box.innerHTML=`<div class="focusReward"><div style="font-weight:900;font-size:16px">⏱️ 1시간 집중 완료!</div><div style="margin-top:9px">📦 집중 상자 <span class="big">${fmt(r.boxes)}</span>개</div><div>💰 골드 <span class="big">${fmt(r.gold)}</span></div><div>✨ 경험치 <span class="big">${fmt(r.exp)}</span></div><div>🔷 집중 결정 <span class="big">+${fmt(crystal)}</span></div><div style="margin-top:6px;color:var(--sub);font-size:10px">처치 ${fmt(r.kills)}마리 · 집중 결정으로 기본 공격력/최대 체력을 레벨당 5%씩 강화할 수 있습니다.</div></div>`; box.style.display='block';}
   toast(`⏱️ 집중 완료! 상자 ${r.boxes}개 · 집중 결정 +${crystal}`,4000);
 }
 
@@ -4326,10 +4326,12 @@ function renderDetailStats() {
   try{b=equippedBonus()||b;}catch(e){}
   b.atk=num(b.atk); b.hp=num(b.hp);
 
-  const focusAtk=num(S.focusUpgrades?.atk)*10;
-  const focusHp=num(S.focusUpgrades?.hp)*25;
-  const baseAtk=num(p.atk)+b.atk+focusAtk;
-  const baseHp=num(p.maxHp)+b.hp+focusHp;
+  const focusAtkPct=num(S.focusUpgrades?.atk)*5;
+  const focusHpPct=num(S.focusUpgrades?.hp)*5;
+  const focusAtkMult=1+focusAtkPct/100;
+  const focusHpMult=1+focusHpPct/100;
+  const baseAtk=num(p.atk)+b.atk;
+  const baseHp=num(p.maxHp)+b.hp;
 
   const atkResearch=num(S.research?.atkLv)*5;
   const atkGrowth=safe(()=>growthBonus('atkPct'));
@@ -4343,8 +4345,8 @@ function renderDetailStats() {
   const hpEquip=safe(()=>getEquipOptionBonus('hpPct'))+safe(()=>getSetBonus('hpPct'))+safe(()=>getArtifactBonus('hpPct'));
   const hpMult=1+(hpGrowth+hpPet+hpEquip)/100;
 
-  const finalAtk=safe(()=>calcAtk(),Math.round(baseAtk*atkMult*originMult));
-  const finalHp=safe(()=>calcMaxHp(),Math.round(baseHp*hpMult*originMult));
+  const finalAtk=safe(()=>calcAtk(),Math.round(baseAtk*focusAtkMult*atkMult*originMult));
+  const finalHp=safe(()=>calcMaxHp(),Math.round(baseHp*focusHpMult*hpMult*originMult));
 
   const critRate=Math.min(99,15+safe(()=>growthBonus('critRate'))+safe(()=>getPetBonus('critRate'))+safe(()=>getEquipOptionBonus('critRate'))+safe(()=>getSetBonus('critRate'))+safe(()=>getArtifactBonus('critRate')));
   const critDmg=185+safe(()=>growthBonus('critDmg'))+safe(()=>getPetBonus('critDmg'))+safe(()=>getPetSynergyBonus('critDmg'))+safe(()=>getEquipOptionBonus('critDmg'))+safe(()=>getSetBonus('critDmg'))+safe(()=>getArtifactBonus('critDmg'));
@@ -4655,22 +4657,44 @@ function openModal(name){
 function renderPetSynergyBook(){
   const el=document.getElementById('petSynergyBook'); if(!el) return;
   const rows=getPetSynergyBookRows();
-  el.innerHTML=`<div class="codexCard"><div class="codexTitle">🐾 전체 펫 시너지 · ${rows.length}종</div><div class="codexEffect">서로 다른 펫 조합을 동시에 장착하면 시너지가 실제 능력치에 적용됩니다.</div></div>`+rows.map(r=>{const a=PET_PRESETS.find(p=>p.id===r[0]),b=PET_PRESETS.find(p=>p.id===r[1]);return `<div class="codexCard"><div class="codexTitle">${r[2]}</div><div class="codexPieces">${a?a.ic+' '+a.name:r[0]} + ${b?b.ic+' '+b.name:r[1]}</div><div class="codexEffect">${r[3]}</div></div>`}).join('');
+  const eq=new Set(S.equippedPets||[]);
+  const petById=id=>PET_PRESETS.find(p=>p.id===id);
+  el.innerHTML=`
+    <div class="codexCard">
+      <div class="codexTitle">🐾 전체 펫 시너지 · ${rows.length}종</div>
+      <div class="codexEffect">현재 존재하는 펫 조합의 시너지를 전체 목록으로 확인할 수 있습니다. 장착 중인 조합은 ✦로 표시됩니다.</div>
+    </div>
+  `+rows.map(r=>{
+    const ids=r[0], name=r[1], effect=r[2];
+    const pieces=ids.map(id=>{const p=petById(id);return p?p.ic+' '+p.name:id;}).join(' + ');
+    const active=ids.every(id=>eq.has(id));
+    return `<div class="codexCard ${active?'petSynergyBookActive':''}">
+      <div class="codexTitle">${active?'✦ ':''}${name}</div>
+      <div class="codexPieces">${pieces}</div>
+      <div class="codexEffect">${effect}</div>
+    </div>`;
+  }).join('');
 }
 function getPetSynergyBookRows(){ return [
-['origin_soul','origin_chaos','👻 혼돈윤회','최대 HP +12% · 최대 HP +12%'],
-['origin_chaos','origin_star','🐉 성운장벽','최대 HP +18% · HP 50% 이하 추가 피해 감소 15%'],
-['origin_meteor','origin_star','☄️ 성운낙하','최대 HP +15% · 5번째 적 공격 피해 90% 감소'],
-['absolute_void','absolute_executioner','☠️ 허무처형','보스 피해 +18% · 처형 구간 피해 +18%'],
-['absolute_barrage','absolute_crit','💥 폭격파괴','치명타 피해 +25% · 폭격 피해 +12%'],
-['absolute_executioner','absolute_crit','🔴 극점처형','치명타 확률 +8%p · 처형 치명타 피해 +20%'],
-['origin_soul','absolute_crit','👻 영혼폭발','최대 HP +15% · 치명타 피해 +18%'],
-['origin_star','absolute_barrage','🌌 성운폭격','최대 HP +10% · 공격력 +18%'],
-['pet_zero','zero1','0️⃣⚫ 이중연산','공격력 +18% · 치명타 피해 +18%'],
-['zero1','alpha_zero','⚫🔷 역산불멸','최대 HP +20% · 공격력 +12%'],
-['alpha_zero','zeroOmega','🔷♾️ 무한귀환','최대 HP +22% · 최대 HP +18%'],
-['zeroOmega','error','♾️❌ 오류흡수','최대 HP +15% · 공격력 +15%'],
-['pet_zero','zero1','zero999','💠 ZERO 삼중연산','공격력 +35% · 치명타 피해 +25%'],
+  [['gold_slime','gold_goblin'],'🟡👺 금화 강탈','골드 슬라임 + 황금 고블린 조합 시 금화 강탈 효과'],
+  [['gold_goblin','gold_mimic'],'👺📦 보물 사냥꾼','황금 고블린 + 황금 미믹 조합 시 보물 사냥 효과'],
+  [['gold_mimic','gold_roulette'],'📦🎰 황금 룰렛','황금 미믹 + 황금 재물룰렛 조합 시 룰렛 연계 효과'],
+  [['gold_slime','gold_goblin','gold_mimic'],'🪙 황금 행운','GOLD 펫 3종 이상 장착 시 황금 행운 발동'],
+  [['gold_slime','gold_goblin','gold_mimic','gold_roulette'],'👑 골드 러시','GOLD 펫 4종 모두 장착 시 골드 러시 발동'],
+  [['gold_mimic','absolute_crit'],'📦🔴 황금 파괴','황금 미믹 + 절대극 파괴신 조합'],
+  [['gold_roulette','absolute_executioner'],'🎰⚔️ 황금 처형','황금 재물룰렛 + 절대극 처형자 조합'],
+  [['origin_meteor','origin_chaos'],'☄️ 혼돈 방벽','태초 운석핵 + 태초 혼돈룡 조합'],
+  [['origin_meteor','origin_star'],'☄️ 성운 운석','태초 운석핵 + 태초 성운왕 조합'],
+  [['origin_chaos','origin_star'],'🐉 절대 생존','태초 혼돈룡 + 태초 성운왕 조합'],
+  [['absolute_void','absolute_executioner'],'☠️ 학살 처형','절대극 학살자 + 절대극 처형자 조합'],
+  [['absolute_void','absolute_barrage'],'🌑 연쇄 폭격','절대극 학살자 + 절대극 폭격자 조합'],
+  [['absolute_void','absolute_crit'],'🔴 파괴 누적','절대극 학살자 + 절대극 파괴신 조합'],
+  [['absolute_executioner','absolute_barrage'],'⚔️ 폭격 처형','절대극 처형자 + 절대극 폭격자 조합'],
+  [['absolute_executioner','absolute_crit'],'⚔️ 종말의 일격','절대극 처형자 + 절대극 파괴신 조합'],
+  [['absolute_barrage','absolute_crit'],'🌀 폭발 저장','절대극 폭격자 + 절대극 파괴신 조합'],
+  [['pet_zero','zero1'],'0️⃣⚫ 이중연산','ZERO + ZERO1 조합'],
+  [['zero1','alpha_zero'],'⚫🔷 역산불멸','ZERO1 + ALPHA ZERO 조합'],
+  [['pet_zero','zero1','zero999'],'💠 ZERO 삼중연산','ZERO + ZERO1 + ZERO999 3종 조합']
 ]; }
 
 function renderEquipSetBook(){
@@ -6500,5 +6524,6 @@ document.addEventListener('click', function(e){
 .petSynergyChip.locked{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.035);color:var(--sub)}
 .petSynergyChip small{opacity:.75}
 .petSynergyEmpty{color:var(--sub)}
+.petSynergyBookActive{border-color:rgba(255,215,0,.38)!important;box-shadow:0 0 10px rgba(255,215,0,.08);}
 </style></body>
 </html>

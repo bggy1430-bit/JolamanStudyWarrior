@@ -1677,8 +1677,7 @@ body{touch-action:manipulation;}
       <div class="tabs">
         <div class="tab active" id="tabBox" onclick="switchShopTab('box')">미스터리 박스</div>
         <div class="tab" id="tabGold" onclick="switchShopTab('gold')">영구 패시브</div>
-<div class="tab" id="tabPotion" onclick="switchShopTab('potion')">🧪 물약 상점</div>
-      </div>
+</div>
       <div id="shopBoxPane">
         <div style="text-align:center; font-size:11.5px; color:var(--sub); margin-bottom:8px;">
           총 누적 뽑기 횟수: <b id="pullCountVal" style="color:var(--gold)">0</b>회
@@ -1707,7 +1706,7 @@ body{touch-action:manipulation;}
         <div id="rateTableWrap" style="display:none; margin-bottom:12px;"></div>
         <div id="boxResultWrap"></div>
       </div>
-      <div id="shopGoldPane" style="display:none;"></div><div id="shopPotionPane" style="display:none;"></div>
+      <div id="shopGoldPane" style="display:none;"></div>
     </div>
   </div>
 
@@ -2158,7 +2157,6 @@ const PET_PRESETS = [
   // 태초 — 피해 감소/생존 특화 6종
   {id:'origin_meteor',grade:6,name:'태초 운석핵',ic:'☄️',effect:'originMeteorGuard',val:260,desc:'적의 3번째 공격마다 받는 피해 70% 감소'},
 
-  {id:'origin_soul',grade:6,name:'태초 영혼왕',ic:'👻',effect:'originSoulGuard',val:230,desc:'피격할 때마다 최대 HP의 4% 회복 · 영혼 최대 5중첩, 중첩당 피해 3% 감소'},
   {id:'origin_chaos',grade:6,name:'태초 혼돈룡',ic:'🐉',effect:'originChaosGuard',val:250,desc:'HP 50% 이하에서는 받는 피해 40% 감소'},
   {id:'origin_star',grade:6,name:'태초 성운왕',ic:'🌌',effect:'originStarGuard',val:300,desc:'모든 받는 피해 20% 감소'},
 
@@ -2170,16 +2168,15 @@ const PET_PRESETS = [
   {id:'absolute_barrage',grade:7,name:'절대극 폭격자',ic:'🌀',effect:'absBarrage',val:60,desc:'2번째 공격마다 플레이어 피해의 60%를 직접 추가 피해로 6회 연속 가한다.'},
   {id:'absolute_crit',grade:7,name:'절대극 파괴신',ic:'🔴',effect:'absDestroy',val:50,desc:'공격 피해의 50%를 저장. 저장량이 최대 HP의 100%에 도달하면 저장량의 100%를 추가 피해로 방출하고 초과분은 버림'},
 
-  {id:'pet_zero',grade:8,name:'제로',ic:'0️⃣',effect:'zeroCombo',val:8,desc:'ZERO 전용 강화 무한 콤보: 1~5타마다 강력한 추가 효과 발동. 피격되어도 콤보가 끊기지 않음'},
+  {id:'pet_zero',grade:8,name:'ZERO',ic:'0️⃣',effect:'zeroCombo',val:8,desc:'ZERO 전용 강화 무한 콤보: 1~5타마다 강력한 추가 효과 발동. 피격되어도 콤보가 끊기지 않음'},
   {id:'zero1',grade:8,name:'ZERO1',ic:'⚫',effect:'zeroOne',val:100,desc:'공격 피해를 70%로 복제. 첫 복제 확률 100%에서 복제할 때마다 10%씩 감소하며, 복제 피해도 다시 복제 가능'}
-  ,{id:'alpha_zero',grade:8,name:'알파제로',ic:'🔷',effect:'zeroReset',val:1,desc:'치명적인 피해를 처음 받을 때 공격을 완전히 무효화하고 전투 시작 시점의 HP로 복구. 디버프 제거. 전투당 1회'},
+  ,{id:'alpha_zero',grade:8,name:'ALPHA ZERO',ic:'🔷',effect:'zeroReset',val:1,desc:'치명적인 피해를 처음 받을 때 공격을 완전히 무효화하고 전투 시작 시점의 HP로 복구. 디버프 제거. 전투당 1회'},
 {id:'zero999',grade:8,name:'ZERO999',ic:'⚡',effect:'limitBreak',val:9,desc:'치명상 시 9연격. 매 타격마다 최대 HP의 1% + 공격력 10%의 피해를 가하며, 9번째 타격은 최대 HP의 5% + 공격력 300%의 필살 일격을 가한다.'},
-{id:'zeroOmega',grade:8,name:'ZERO∞',ic:'♾️',effect:'zeroOmega',val:40,stat:'hpBonus',statVal:80,levelScale:0,desc:'받는 피해의 40%를 확정 흡수해 저장. 다음 일반 공격 시 축적 피해의 200%를 고정 반사. 피해 흡수율은 레벨에 따라 증가하지 않는다.'},
-{id:'error',grade:8,name:'ERROR',ic:'❌',effect:'errorFixed',val:300,desc:'플레이어의 일반 공격마다 최종 플레이어 공격력의 300% 고정 피해를 추가한다. 3번째 일반 공격마다 추가로 공격력 1000%의 폭주 피해를 입힌다. 치명타를 무시하며 ZERO999 9연격에는 반응하지 않음'},
-{id:'gold_slime',grade:9,name:'골드 슬라임',ic:'🟡',effect:'goldCoin',val:220,desc:'3번째 공격마다 공격력의 220% 금화 충격파. 발동할 때 금화 1개를 모아 처치 시 금화 보너스가 쌓인다.'},
-{id:'gold_goblin',grade:9,name:'황금 고블린',ic:'👺',effect:'goldPickpocket',val:320,desc:'4번째 공격마다 공격력의 320% 강탈 공격. 적에게서 스테이지 × 5골드를 즉시 훔친다.'},
-{id:'gold_mimic',grade:9,name:'황금 미믹',ic:'📦',effect:'goldJackpot',val:450,desc:'5번째 공격마다 공격력의 450% 보물 공격. 20% 확률로 잭팟을 열어 이번 몬스터 처치 보상을 4배로 만든다.'},
-{id:'gold_dragon',grade:9,name:'황금 재물룡',ic:'🐉',effect:'goldVault',val:600,desc:'5번째 공격마다 공격력의 600% 황금 브레스. 처치 시 황금 금고가 열려 일반 몬스터는 3배, 보스는 6배의 골드를 지급한다.'}
+{id:'zeroOmega',grade:6,name:'태초 공허왕',ic:'♾️',effect:'zeroOmega',val:40,stat:'hpBonus',statVal:80,levelScale:0,desc:'받는 피해의 40%를 확정 흡수해 저장. 다음 일반 공격 시 축적 피해의 200%를 고정 반사. 피해 흡수율은 레벨에 따라 증가하지 않는다.'},
+{id:'gold_slime',grade:9,name:'골드 슬라임',ic:'🟡',effect:'goldCoin',val:220,desc:'공격할 때마다 금화 스택을 쌓는다. 최대 5중첩, 중첩마다 공격력 +12%. 3번째 공격마다 금화 충격파도 발동하며 처치 시 추가 골드를 준다.'},
+{id:'gold_goblin',grade:9,name:'황금 고블린',ic:'👺',effect:'goldPickpocket',val:250,desc:'4번째 공격마다 공격력의 250% 강탈 공격. 스테이지 × 10골드를 즉시 훔친다.'},
+{id:'gold_mimic',grade:9,name:'황금 미믹',ic:'📦',effect:'goldJackpot',val:500,desc:'매 공격마다 20% 확률로 공격력의 500% 추가 피해. 발동 공격으로 처치하면 처치 골드가 3배가 된다.'},
+{id:'gold_roulette',grade:9,name:'황금 재물룰렛',ic:'🎰',effect:'goldRoulette',val:1,desc:'전투 시작 시 황금 룰렛을 돌린다. 🪙30% / ⚔️25% / 💰대박20% / 💎보물15% / 🔥JACKPOT8% / 💀꽝2%의 결과로 전투 보너스가 결정된다.'}
 ];
 
 const MONSTER_TITLES = [
@@ -2587,8 +2584,6 @@ function loadGame(){
       if(!Number.isFinite(S.artifactShards)) S.artifactShards = 0;
       if(!Number.isFinite(S.originCoreLv)) S.originCoreLv = 0;
       if(!Number.isFinite(S.originCorePity)) S.originCorePity = 0;
-      if(!S.potions || typeof S.potions!=='object') S.potions={smallHp:0,bigHp:0,exp:0};
-      ['smallHp','bigHp','exp'].forEach(k=>{if(!Number.isFinite(Number(S.potions[k])))S.potions[k]=0;});
       if(!S.artifacts || typeof S.artifacts !== 'object') S.artifacts = {};
       if(!Array.isArray(S.equippedArtifacts)) S.equippedArtifacts=[];
       S.equippedArtifacts=S.equippedArtifacts.filter(id=>S.artifacts[id] && Number(S.artifacts[id].level)>0).slice(0,5);
@@ -2734,28 +2729,31 @@ function equippedBonus(){
 
 /* 장착 펫 보너스 중첩 계산 */
 function getPetSynergy(){
-  const eq=new Set(S.equippedPets||[]);
-  const out={atkBonus:0,hpBonus:0,hpBonus:0,critRate:0,critDmg:0,goldBonus:0,expBonus:0,bossDmg:0};
-  const names=[]; const flags=new Set();
-  const add=(vals,name,flag)=>{ names.push(name); Object.keys(vals||{}).forEach(k=>out[k]=(out[k]||0)+vals[k]); if(flag) flags.add(flag); };
-  const hasAll=ids=>ids.every(id=>eq.has(id));
+  const eq=new Set(S.equippedPets||[]),out={atkBonus:0,hpBonus:0,critRate:0,critDmg:0,goldBonus:0,expBonus:0,bossDmg:0},names=[],flags=new Set();
+  const add=(v,n,f)=>{names.push(n);Object.keys(v).forEach(k=>out[k]=(out[k]||0)+v[k]);if(f)flags.add(f)};
+  const all=ids=>ids.every(id=>eq.has(id));
   const combos=[
-    [['origin_soul','origin_chaos'],{hpBonus:12,hpBonus:12},'👻 혼돈윤회','origin_soul_chaos'],
-    [['origin_chaos','origin_star'],{hpBonus:18},'🐉 성운장벽','origin_chaos_star'],
-    [['origin_meteor','origin_star'],{hpBonus:15},'☄️ 성운낙하','origin_meteor_star'],
-    [['absolute_void','absolute_executioner'],{bossDmg:18},'☠️ 허무처형','abs_void_execute'],
-    [['absolute_barrage','absolute_crit'],{critDmg:25},'💥 폭격파괴','abs_barrage_destroy'],
-    [['absolute_executioner','absolute_crit'],{critRate:8,critDmg:20},'🔴 극점처형','abs_execute_destroy'],
-    [['origin_soul','absolute_crit'],{hpBonus:15,critDmg:18},'👻 영혼폭발','soul_destroy'],
-    [['origin_star','absolute_barrage'],{hpBonus:10,atkBonus:18},'🌌 성운폭격','star_barrage'],
-    [['pet_zero','zero1'],{atkBonus:18,critDmg:18},'0️⃣⚫ 이중연산','zero_dual'],
-    [['zero1','alpha_zero'],{hpBonus:20,atkBonus:12},'⚫🔷 역산불멸','zero_reverse'],
-    [['alpha_zero','zeroOmega'],{hpBonus:22,hpBonus:18},'🔷♾️ 무한귀환','zero_infinity'],
-    [['zeroOmega','error'],{hpBonus:15,atkBonus:15},'♾️❌ 오류흡수','omega_error'],
-    [['pet_zero','zero1','zero999'],{atkBonus:35,critDmg:25},'💠 ZERO 삼중연산','zero_trinity'],
-    [['origin_trinity','abs_trinity'],{atkBonus:20,hpBonus:20},'🌠 극원순환','origin_abs_trinity']
+    [['origin_meteor','origin_soul'],{hpBonus:12},'☄️ 불굴의 영혼','origin_meteor_soul'],
+    [['origin_meteor','origin_chaos'],{hpBonus:18},'☄️ 혼돈 방벽','origin_meteor_chaos'],
+    [['origin_meteor','origin_star'],{hpBonus:15},'☄️ 성운 운석','origin_meteor_star'],
+    [['origin_soul','origin_chaos'],{hpBonus:12},'👻 영혼 윤회','origin_soul_chaos'],
+    [['origin_soul','origin_star'],{hpBonus:15},'👻 영혼 성운','origin_soul_star'],
+    [['origin_chaos','origin_star'],{hpBonus:18},'🐉 절대 생존','origin_chaos_star'],
+    [['absolute_void','absolute_executioner'],{bossDmg:18},'☠️ 학살 처형','abs_slaughter_execute'],
+    [['absolute_void','absolute_barrage'],{atkBonus:15},'🌑 연쇄 폭격','abs_slaughter_barrage'],
+    [['absolute_void','absolute_crit'],{atkBonus:15},'🔴 파괴 누적','abs_slaughter_destroy'],
+    [['absolute_executioner','absolute_barrage'],{bossDmg:15},'⚔️ 폭격 처형','abs_execute_barrage'],
+    [['absolute_executioner','absolute_crit'],{bossDmg:20,critDmg:20},'⚔️ 종말의 일격','abs_execute_destroy'],
+    [['absolute_barrage','absolute_crit'],{atkBonus:18},'🌀 폭발 저장','abs_barrage_destroy'],
+    [['gold_slime','gold_goblin'],{goldBonus:25},'🟡👺 금화 강탈','gold_coin_goblin'],
+    [['gold_goblin','gold_mimic'],{goldBonus:20},'👺📦 보물 사냥꾼','gold_hunter'],
+    [['gold_mimic','gold_roulette'],{goldBonus:20},'📦🎰 황금 룰렛','gold_roulette'],
+    [['gold_slime','gold_goblin','gold_mimic'],{goldBonus:50},'🪙 황금 행운','gold_luck'],
+    [['gold_slime','gold_goblin','gold_mimic','gold_roulette'],{goldBonus:100},'👑 골드 러시','gold_rush'],
+    [['gold_mimic','absolute_crit'],{atkBonus:20},'📦🔴 황금 파괴','gold_destroy'],
+    [['gold_roulette','absolute_executioner'],{bossDmg:25},'🎰⚔️ 황금 처형','gold_execute']
   ];
-  combos.forEach(([ids,vals,name,flag])=>{if(hasAll(ids)) add(vals,name,flag);});
+  combos.forEach(([ids,v,n,f])=>{if(all(ids))add(v,n,f)});
   return {stats:out,names,flags};
 }
 function getPetSynergyBonus(stat){ return getPetSynergy().stats[stat]||0; }
@@ -2894,15 +2892,17 @@ function renderOriginGrowth(){
 }
 function calcAtk(){
   const b = equippedBonus();
-  let baseAtk = S.player.atk + b.atk + ((S.focusUpgrades?.atk||0) * 10);
+  let baseAtk = S.player.atk + b.atk;
+  const focusAtkMult = 1 + ((S.focusUpgrades?.atk||0) * 0.05);
   const researchMult = 1 + (S.research.atkLv * 0.05) + (growthBonus('atkPct')/100) + ((getPetBonus('atkBonus') + getPetSynergyBonus('atkBonus'))/100) + (getEquipOptionBonus('atkPct') + getSetBonus('atkPct') + getArtifactBonus('atkPct'))/100;
-  return Math.round(baseAtk * researchMult * originCoreMultiplier());
+  return Math.round(baseAtk * focusAtkMult * researchMult * originCoreMultiplier());
 }
 
 function calcMaxHp(){
-  const baseHp = S.player.maxHp + equippedBonus().hp + ((S.focusUpgrades?.hp||0) * 25);
+  const baseHp = S.player.maxHp + equippedBonus().hp;
+  const focusHpMult = 1 + ((S.focusUpgrades?.hp||0) * 0.05);
   const hpBonusMult = 1 + (growthBonus('hpPct')/100) + ((getPetBonus('hpBonus') + getPetSynergyBonus('hpBonus'))/100) + (getEquipOptionBonus('hpPct') + getSetBonus('hpPct') + getArtifactBonus('hpPct'))/100;
-  return Math.round(baseHp * hpBonusMult * originCoreMultiplier());
+  return Math.round(baseHp * focusHpMult * hpBonusMult * originCoreMultiplier());
 }
 function expNeeded(level){ return Math.round(25 * Math.pow(level, 1.35)); }
 
@@ -2912,7 +2912,7 @@ function spawnMonster(effect=true){
   let mobIndex = (S.stage-1) % MONSTERS.length;
 
   const mt = MONSTERS[mobIndex];
-  const isRare=!mt.isBoss&&Math.random()<0.03;
+  const isRare=!mt.isBoss&&Math.random()<0.04;
   const rareMultHp=isRare?4:1, rareMultAtk=isRare?1.5:1;
   // Normal monster growth: front-loaded difficulty, then strong late-game damping.
   // Each segment compounds from the previous segment so there are no stat resets at breakpoints.
@@ -3007,7 +3007,7 @@ function nextStage(){
 function renderFocusUpgrades(){
   const box=document.getElementById('focusUpgradeList'); if(!box)return;
   const c=Number(S.focusCrystal||0), u=S.focusUpgrades||{atk:0,hp:0};
-  const rows=[['atk','⚔️','기본 공격력',10],['hp','❤️','기본 최대체력',25]];
+  const rows=[['atk','⚔️','기본 공격력',5],['hp','❤️','기본 최대체력',5]];
   box.innerHTML=rows.map(([k,ic,name,gain])=>{
     const lv=Number(u[k]||0), cost=1+lv*2;
     return `<div class="focusUpgradeRow"><div>${ic} <b>${name} +${lv*gain}</b><div style="font-size:9px;color:var(--sub);margin-top:2px;">집중 결정 ${cost}개 · 구매할 때마다 +${gain}</div></div><button ${c<cost?'disabled':''} onclick="buyFocusUpgrade('${k}')">강화</button></div>`;
@@ -3514,23 +3514,23 @@ function combatTick(){
   if(getPetEffectValue('goldCoin') > 0 && goldHit % 3 === 0){
     const gd=Math.max(1,Math.round(attackBase * getPetEffectValue('goldCoin') / 100));
     dmg += gd; recordPetDamage('gold_slime',gd);
-    S.goldCoinStacks=Math.min(10,(S.goldCoinStacks||0)+1);
+    S.goldCoinStacks=Math.min(5,(S.goldCoinStacks||0)+1);
     spawnDmgText('monsterWrap','금화 충격 +'+gd.toLocaleString(),'dmgText extraDmg');
     triggerPetEffectVisual('goldCoin');
   }
   if(getPetEffectValue('goldPickpocket') > 0 && goldHit % 4 === 0){
-    const gd=Math.max(1,Math.round(attackBase * getPetEffectValue('goldPickpocket') / 100));
+    const gd=Math.max(1,Math.round(attackBase * 250 / 100));
     dmg += gd; recordPetDamage('gold_goblin',gd);
-    const stolen=Math.max(1,Math.floor(S.stage*5));
+    const stolen=Math.max(1,Math.floor(S.stage*10));
     S.gold += stolen;
     spawnDmgText('monsterWrap','강탈 +'+gd.toLocaleString(),'dmgText extraDmg');
     spawnDmgText('playerWrap','💰 훔침 +'+stolen.toLocaleString(),'dmgText extraDmg');
     triggerPetEffectVisual('goldPickpocket');
   }
-  if(getPetEffectValue('goldJackpot') > 0 && goldHit % 5 === 0){
-    const gd=Math.max(1,Math.round(attackBase * getPetEffectValue('goldJackpot') / 100));
+  if(getPetEffectValue('goldJackpot') > 0 && Math.random() < 0.20){
+    const gd=Math.max(1,Math.round(attackBase * 500 / 100));
     dmg += gd; recordPetDamage('gold_mimic',gd);
-    if(Math.random()<0.20){ S.goldJackpotReady=true; spawnDmgText('monsterWrap','JACKPOT!','dmgText crit'); }
+    if(true){ S.goldJackpotReady=true; spawnDmgText('monsterWrap','JACKPOT!','dmgText crit'); }
     else spawnDmgText('monsterWrap','보물 공격 +'+gd.toLocaleString(),'dmgText extraDmg');
     triggerPetEffectVisual('goldJackpot');
   }
@@ -3957,8 +3957,8 @@ function onMonsterKilled(){
   
   // 몬스터 기본 골드 지급량: 기존 수치 유지
   let baseGold = isBoss ? rand(1200, 1900) : rand(20, 45);
-  const earlyGold=0.70+0.30*Math.min(stage,50)/50;
-  const lateGold=1+0.003*Math.pow(Math.max(0,stage-50),1.5);
+  const earlyGold=1;
+  const lateGold=2.44*Math.pow(Math.max(1,stage),1.7);
   const goldStageMult=earlyGold*lateGold;
   const rareGoldMult=S.monster.isRare?5:1;
   const goldGain=Math.floor(baseGold*goldStageMult*rareGoldMult*goldBonus);
@@ -4680,13 +4680,12 @@ function renderEquipSetBook(){
 function closeModal(name){ document.getElementById(name+'ModalBg').classList.remove('show'); }
 
 function switchShopTab(tab){
+  if(tab==='potion') tab='box';
   document.getElementById('tabBox').classList.toggle('active', tab==='box');
   document.getElementById('tabGold').classList.toggle('active', tab==='gold');
-  document.getElementById('tabPotion').classList.toggle('active', tab==='potion');
   document.getElementById('shopBoxPane').style.display = tab==='box'?'block':'none';
   document.getElementById('shopGoldPane').style.display = tab==='gold'?'block':'none';
-  document.getElementById('shopPotionPane').style.display = tab==='potion'?'block':'none';
-  if(tab==='gold') renderGoldShop(); else if(tab==='potion') renderPotionShop(); else updateBoxCost();
+  if(tab==='gold') renderGoldShop(); else updateBoxCost();
 }
 
 /* BATCH ACTIONS */
@@ -6436,5 +6435,26 @@ document.addEventListener('click', function(e){
 })();
 </script>
 
+
+<script id="revision-2026-09">
+(function(){
+  try{
+    S.equippedPets=(S.equippedPets||[]).map(id=>id==='gold_dragon'?'gold_roulette':id).filter(id=>id!=='error'&&id!=='origin_soul');
+    if(S.pets){if(S.pets.gold_dragon!=null&&S.pets.gold_roulette==null)S.pets.gold_roulette=S.pets.gold_dragon;delete S.pets.gold_dragon;delete S.pets.error;delete S.pets.origin_soul;}
+  }catch(e){}
+  const _calcAtk=window.calcAtk;
+  if(typeof _calcAtk==='function')window.calcAtk=function(){let v=_calcAtk();const stacks=Math.min(5,Number(S.goldCoinStacks||0));if(stacks&&(S.equippedPets||[]).includes('gold_slime'))v=Math.round(v*(1+.12*stacks));if(Number(S.goldRouletteDamageMult||1)>1)v=Math.round(v*S.goldRouletteDamageMult);return v;};
+  function rr(){const r=Math.random()*100;if(r<30)return{icon:'🪙',name:'GOLD',dmg:3,gold:1,desc:'+300% 추가 피해 + 스테이지×10 골드'};if(r<55)return{icon:'⚔️',name:'BATTLE',dmg:5,gold:1,desc:'+500% 추가 피해'};if(r<75)return{icon:'💰',name:'대박',dmg:7,gold:2,desc:'+700% 추가 피해 + 처치 골드 ×2'};if(r<90)return{icon:'💎',name:'보물',dmg:10,gold:3,desc:'+1000% 추가 피해 + 처치 골드 ×3'};if(r<98)return{icon:'🔥',name:'JACKPOT',dmg:20,gold:5,desc:'+2000% 추가 피해 + 처치 골드 ×5'};return{icon:'💀',name:'MISS',dmg:1,gold:1,desc:'효과 없음'};}
+  function roulette(){if(!(S.equippedPets||[]).includes('gold_roulette'))return;const x=rr();S.goldRouletteDamageMult=x.dmg;S.goldRouletteGoldMult=x.gold;let o=document.getElementById('goldRouletteOverlay');if(!o){o=document.createElement('div');o.id='goldRouletteOverlay';o.innerHTML='<div class="grBox"><div class="grTitle">🎰 황금 재물룰렛</div><div class="grWheel">🪙 ⚔️ 💰 💎 🔥 💀</div><div class="grSpin">SPINNING...</div><div class="grResult"></div></div>';document.body.appendChild(o);}o.querySelector('.grResult').innerHTML=x.icon+' '+x.name+'<small>'+x.desc+'</small>';o.classList.remove('show','jackpot');void o.offsetWidth;o.classList.add('show');if(x.name==='JACKPOT')o.classList.add('jackpot');setTimeout(()=>o.classList.remove('show'),2400);}
+  const _spawn=window.spawnMonster;if(typeof _spawn==='function')window.spawnMonster=function(){S.goldRouletteDamageMult=1;S.goldRouletteGoldMult=1;const r=_spawn.apply(this,arguments);setTimeout(roulette,40);return r;};
+  const _kill=window.onMonsterKilled;if(typeof _kill==='function')window.onMonsterKilled=function(){const m=Math.max(1,Number(S.goldRouletteGoldMult||1));if(m>1){const before=S.gold;S.goldRouletteGoldMult=1;const r=_kill.apply(this,arguments);const earned=Math.max(0,S.gold-before);S.gold+=earned*(m-1);S.goldRouletteDamageMult=1;return r;}const r=_kill.apply(this,arguments);S.goldRouletteDamageMult=1;return r;};
+  delete S.potions;document.getElementById('tabPotion')?.remove();document.getElementById('shopPotionPane')?.remove();try{saveGame()}catch(e){}
+})();
+</script>
+<style id="gold-roulette-style">
+#goldRouletteOverlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(255,210,40,.18),rgba(5,3,15,.97) 58%);opacity:0;pointer-events:none;transition:opacity .18s}
+#goldRouletteOverlay.show{opacity:1}.grBox{width:min(92vw,440px);text-align:center;padding:28px 18px;border:2px solid #ffd700;border-radius:24px;background:linear-gradient(180deg,rgba(55,37,0,.96),rgba(16,13,28,.98));box-shadow:0 0 35px #ffd700,0 0 90px rgba(255,180,0,.35);transform:scale(.72)}
+#goldRouletteOverlay.show .grBox{animation:grIn 2.35s cubic-bezier(.12,.8,.18,1)}.grTitle{font-size:28px;font-weight:1000;color:#ffe66d;text-shadow:0 0 15px #ffd700;margin-bottom:22px}.grWheel{font-size:28px;letter-spacing:10px;animation:grSpin 1.75s cubic-bezier(.12,.75,.18,1)}.grSpin{margin-top:16px;color:#fff;letter-spacing:3px;font-weight:900}.grResult{margin-top:18px;font-size:42px;font-weight:1000;text-shadow:0 0 18px currentColor}.grResult small{display:block;font-size:13px;margin-top:7px;color:#fff;font-weight:800}#goldRouletteOverlay.jackpot{background:radial-gradient(circle,#fff4a8 0%,rgba(255,110,0,.72) 22%,rgba(10,0,0,.97) 68%);animation:grFlash .22s 4}#goldRouletteOverlay.jackpot .grBox{box-shadow:0 0 50px #fff,0 0 120px #ff8c00}@keyframes grSpin{0%{transform:rotate(0) scale(1)}65%{transform:rotate(720deg) scale(1.12)}100%{transform:rotate(1080deg) scale(1)}}@keyframes grIn{0%{opacity:0;transform:scale(.55)}20%{opacity:1}75%{transform:scale(1.04)}100%{transform:scale(1)}}@keyframes grFlash{50%{filter:brightness(2.8)}}
+</style>
 </body>
 </html>

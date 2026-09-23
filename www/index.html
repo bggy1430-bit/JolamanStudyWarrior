@@ -4519,11 +4519,11 @@ function renderDetailStats() {
   const spouseMult=safe(()=>getSpousePetDamageMult(),1);
   const spouse=safe(()=>getEquippedSpouse(),null);
 
-  set('detailAtkChar',fmt(num(p.atk))); set('detailAtkEquipBase','+'+fmt(b.atk)); set('detailAtkFocus','+'+fmt(focusAtk)); set('detailBaseAtk',fmt(baseAtk));
+  set('detailAtkChar',fmt(num(p.atk))); set('detailAtkEquipBase','+'+fmt(b.atk)); set('detailBaseAtk',fmt(baseAtk));
   set('detailAtkResearch','+'+atkResearch.toFixed(1)+'%'); set('detailAtkGrowth','+'+atkGrowth.toFixed(1)+'%'); set('detailAtkPet','+'+atkPet.toFixed(1)+'%'); set('detailAtkEquipPct','+'+atkEquip.toFixed(1)+'%');
   set('detailAtkMult','×'+atkMult.toFixed(4)); set('detailAtkOrigin','×'+originMult.toFixed(4)); set('detailFinalAtk',fmt(finalAtk));
 
-  set('detailHpChar',fmt(num(p.maxHp))); set('detailHpEquipBase','+'+fmt(b.hp)); set('detailHpFocus','+'+fmt(focusHp)); set('detailBaseHp',fmt(baseHp));
+  set('detailHpChar',fmt(num(p.maxHp))); set('detailHpEquipBase','+'+fmt(b.hp)); set('detailBaseHp',fmt(baseHp));
   set('detailHpGrowth','+'+hpGrowth.toFixed(1)+'%'); set('detailHpPet','+'+hpPet.toFixed(1)+'%'); set('detailHpEquipPct','+'+hpEquip.toFixed(1)+'%');
   set('detailHpMult','×'+hpMult.toFixed(4)); set('detailHpOrigin','×'+originMult.toFixed(4)); set('detailFinalHp',fmt(finalHp));
 

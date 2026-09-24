@@ -1,0 +1,26 @@
+name: Final pet balance fix
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply final pet patch
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('www/index.html'); s=p.read_text(encoding='utf-8')
+          marker='<!-- PET_FINAL_FIX_2026_09_24 -->'
+          if marker in s: raise SystemExit(0)
+          patch=r'''\n<!-- PET_FINAL_FIX_2026_09_24 -->\n<script>\n(function(){\n  // 전설 펫 4종 능력 전면 교체: 기존 확률형 파밍 효과 대신 전투/경제의 확정 발동형 능력\n  try{\n    if(typeof PET_PRESETS!=='undefined'){\n      const set=(id,effect,val,desc)=>{const p=PET_PRESETS.find(x=>x.id===id);if(p){p.effect=effect;p.val=val;p.desc=desc;}};\n      set('pet_frost_mimic','combo',18,'3번째 공격마다 공격력의 18% 추가 피해');\n      set('pet_treasure_goblin','goldPickpocket',250,'4번째 공격마다 공격력의 250% 강탈 피해 + 스테이지×10 골드');\n      set('pet_berserk_hamster','goldCoin',22,'3번째 공격마다 공격력의 22% 금화 충격 · 금화 스택 최대 5');\n      set('pet_mirror_fox','guardFixed',20,'적의 3번째 공격마다 받는 피해 20% 감소');\n    }\n  }catch(e){}\n\n  // 10,000회 뽑기: 실제 펫 프리셋(PET_PRESETS)을 사용하도록 최종 수정\n  window.drawPet10000=function(){\n    const count=10000,cost=500000; if((S.essence||0)<cost){toast(`🐣 생명의 정수가 부족합니다! 10,000회 필요: ${fmt(cost)}`);return;}\n    S.essence-=cost; const counts={};\n    for(let i=0;i<count;i++){let r=Math.random()*100,acc=0,g=0;for(let j=0;j<PET_GRADES.length;j++){acc+=Number(PET_GRADES[j].rate)||0;if(r<acc){g=j;break;}}const pool=PET_PRESETS.filter(x=>x.grade===g);if(!pool.length)continue;const pet=pool[Math.floor(Math.random()*pool.length)];S.pets[pet.id]=(S.pets[pet.id]||0)+1;counts[g]=(counts[g]||0)+1;}\n    const box=document.getElementById('petBatchResult');if(box){box.style.display='block';box.innerHTML=`<div style="padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);text-align:center"><b>🎉 10,000회 뽑기 완료</b><div style="margin-top:5px;font-size:10px;color:var(--sub)">총 비용 🌿${fmt(cost)}</div><div style="margin-top:7px">${Object.keys(counts).sort((a,b)=>b-a).map(g=>`<span style="display:inline-block;margin:2px;padding:3px 6px;border-radius:6px;background:rgba(255,255,255,.05);color:${PET_GRADES[g].color}">${PET_GRADES[g].name} ${fmt(counts[g])}</span>`).join('')}</div></div>`;}\n    if(typeof renderAll==='function')renderAll();saveGame();toast('🐾 10,000회 펫 뽑기 완료!',3500);\n  };\n\n  // 룰렛 연출이 끝난 뒤 첫 공격이 시작되도록 전투 잠금\n  const oldCombat=window.combatTick; if(typeof oldCombat==='function'){window.combatTick=function(){if(Number(S.goldRouletteLockUntil||0)>Date.now())return;return oldCombat.apply(this,arguments);};}\n  const oldSpawn=window.spawnMonster; if(typeof oldSpawn==='function'){window.spawnMonster=function(){const r=oldSpawn.apply(this,arguments);if((S.equippedPets||[]).includes('gold_roulette')){S.goldRouletteLockUntil=Date.now()+2450;setTimeout(()=>{S.goldRouletteLockUntil=0;},2500);}return r;};}\n\n  function refresh(){const b=document.getElementById('pet10000Btn');if(b)b.onclick=window.drawPet10000;} if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh);else refresh();setTimeout(refresh,500);\n})();\n</script>\n'''\n          s=s.replace('</body>',patch+'</body>');p.write_text(s,encoding='utf-8')\n          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add www/index.html
+          git commit -m '전설 펫 능력 개편 및 룰렛 종료 후 전투 시작 수정' || exit 0
+          git push

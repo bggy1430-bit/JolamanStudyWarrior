@@ -1889,10 +1889,11 @@ body{touch-action:manipulation;}
         <button onclick="drawPet10()" style="background:linear-gradient(135deg,#00b894,#0984e3); border:none; padding:10px 14px; border-radius:10px; font-weight:900; color:#fff; cursor:pointer; margin-left:5px;">
           ✨ 10회 (🌿 500)
         </button>
+        <button onclick="drawPet10000()" style="background:linear-gradient(135deg,#e84393,#6c5ce7); border:none; padding:10px 14px; border-radius:10px; font-weight:1000; color:#fff; cursor:pointer; margin-left:5px;">💥 1만회 (🌿 500,000)</button>
         <button onclick="togglePetRateTable()" style="background:var(--panel2); border:1px solid var(--line); color:var(--sub); padding:6px 12px; border-radius:8px; font-size:11px; cursor:pointer; margin-left:6px;">
           📊 펫 확률 보기
         </button>
-        <div style="font-size:9px;color:#00ff99;margin-top:5px">ZERO 등급 소환 확률: <b>2%</b> · 10회 뽑기에서도 동일 확률 적용</div>
+        <div style="font-size:9px;color:#00ff99;margin-top:5px">ZERO 등급 소환 확률: <b>0.4%</b> · 모든 뽑기에서 동일 확률 적용</div>
       </div>
 
       <div class="tabs" style="margin-top:10px;">
@@ -2155,16 +2156,16 @@ function getSetInfo(item){
 }
 
 const PET_GRADES = [
-  { grade: 0, name: '일반', color: '#b0b0b0', rate:33.5 },
-  { grade: 1, name: '고급', color: '#4caf50', rate:24 },
-  { grade: 2, name: '희귀', color: '#2196f3', rate:15 },
-  { grade: 3, name: '영웅', color: '#a259ff', rate:8 },
-  { grade: 4, name: '전설', color: '#ff9800', rate:4.5 },
-  { grade: 5, name: '신화', color: '#ff0055', rate:5 },
-  { grade: 6, name: '태초', color: '#00eaff', rate:3 },
-  { grade: 7, name: '절대극', color: '#e84393', rate:3 },
+  { grade: 0, name: '일반', color: '#b0b0b0', rate:60 },
+  { grade: 1, name: '고급', color: '#4caf50', rate:22 },
+  { grade: 2, name: '희귀', color: '#2196f3', rate:9 },
+  { grade: 3, name: '영웅', color: '#a259ff', rate:4 },
+  { grade: 4, name: '전설', color: '#ff9800', rate:0.4 },
+  { grade: 5, name: '신화', color: '#ff0055', rate:1.2 },
+  { grade: 6, name: '태초', color: '#00eaff', rate:0.7 },
+  { grade: 7, name: '절대극', color: '#e84393', rate:0.5 },
   { grade: 8, name: 'ZERO', color: '#00ff99', rate:2 },
-  { grade: 9, name: 'GOLD', color: '#ffd700', rate:2 }
+  { grade: 9, name: 'GOLD', color: '#ffd700', rate:0.2 }
 ];
 
 /* 펫 프리셋 (오징어 삭제 -> 크리티컬 60% 펫 변경 / 태초, 절대극 펫 추가) */
@@ -2185,10 +2186,10 @@ const PET_PRESETS = [
   {id:'pet_dragon_baby',grade:3,name:'화염 아기드래곤',ic:'🐲',effect:'burn',val:20,desc:'공격 시 20% 확률로 적 최대체력의 4% 추가 화상 피해 (보스는 1.5%)'},
   {id:'pet_lion',grade:3,name:'황금 갈기 사자',ic:'🦁',effect:'bossHunter',val:18,desc:'보스에게 주는 피해 +18%'},
   {id:'pet_eagle',grade:3,name:'천공의 수리',ic:'🦅',effect:'airStrike',val:18,desc:'3번째 공격마다 공격력의 18% 추가 공습 (스테이지마다 초기화)'},
-  {id:'pet_frost_mimic',grade:4,name:'빙결 미믹',ic:'🧊',effect:'essenceFind',val:14,desc:'몬스터 처치 시 14% 확률로 생명의 정수 +3'},
-  {id:'pet_treasure_goblin',grade:4,name:'보물 고블린',ic:'🧌',effect:'treasure',val:18,desc:'처치 시 18% 확률로 골드 3배'},
-  {id:'pet_berserk_hamster',grade:4,name:'폭주 햄스터',ic:'🐹',effect:'goldRain',val:12,desc:'몬스터 처치 시 12% 확률로 골드 2배'},
-  {id:'pet_mirror_fox',grade:4,name:'거울 여우',ic:'🪞',effect:'junkLuck',val:16,desc:'잡템 획득 시 16% 확률로 추가 1개 획득'},
+  {id:'pet_frost_mimic',grade:4,name:'빙결 미믹',ic:'🧊',effect:'burn',val:25,desc:'공격 시 25% 확률로 적 최대체력의 4% 추가 화상 피해 (보스는 1.5%)'},
+  {id:'pet_treasure_goblin',grade:4,name:'보물 고블린',ic:'🧌',effect:'bossHunter',val:30,desc:'보스에게 주는 피해 +30%'},
+  {id:'pet_berserk_hamster',grade:4,name:'폭주 햄스터',ic:'🐹',effect:'thunder',val:45,desc:'4번째 공격마다 공격력의 45% 번개 피해'},
+  {id:'pet_mirror_fox',grade:4,name:'거울 여우',ic:'🪞',effect:'airStrike',val:30,desc:'3번째 공격마다 공격력의 30% 추가 공습'},
   // 신화 — 강력한 상시 능력치 버프. 천공제는 치명타 피해 특화로 변경
   {id:'myth_iron_dragon',grade:5,name:'신화 철룡',ic:'🐲',stat:'atkBonus',effect:'statOnly',val:75,desc:'공격력 +75%'}, 
 
@@ -2360,7 +2361,7 @@ function pickArtifact(){
   const pool=ARTIFACTS.filter(a=>a.rarity===rarity);
   return pool[Math.floor(Math.random()*pool.length)];
 }
-function artifactPullCost(n){ return n===10 ? 900 : 100; }
+function artifactPullCost(n){ return n===10 ? 9000 : 1000; }
 function triggerArtifactSummonFx(n){
   const fx=document.getElementById('artifactSummonFx'); if(!fx) return;
   fx.classList.remove('show'); void fx.offsetWidth; fx.classList.add('show');
@@ -2476,7 +2477,7 @@ let uidSeed = 1;
 function uid(){ return 'it'+(uidSeed++)+'_'+Date.now().toString(36); }
 
 const SPOUSE_PRESETS = [
-  {id:'astra',grade:1,name:'아스트라',title:'별을 걷는 자',ic:'🌠',bonus:3,rate:35},
+  {id:'astra',grade:1,name:'아스트라',title:'별을 걷는 자',ic:'🌠',bonus:3,rate:34},
   {id:'selene',grade:2,name:'셀레네',title:'은빛 달의 여신',ic:'🌙',bonus:7,rate:25},
   {id:'anubis',grade:3,name:'아누비스',title:'죽음의 심판자',ic:'⚖️',bonus:15,rate:15},
   {id:'amaterasu',grade:4,name:'아마테라스',title:'태양의 여신',ic:'☀️',bonus:25,rate:8},
@@ -2485,12 +2486,17 @@ const SPOUSE_PRESETS = [
   {id:'gaia',grade:7,name:'가이아',title:'만물의 어머니',ic:'🌍',bonus:90,rate:3},
   {id:'ragnarok',grade:8,name:'라그나로크',title:'세계의 종말',ic:'🔥',bonus:130,rate:2},
   {id:'chronos',grade:9,name:'크로노스',title:'시간의 지배자',ic:'⌛',bonus:200,rate:2},
-  {id:'azathoth',grade:10,name:'아자토스',title:'무한의 근원',ic:'♾️',bonus:300,rate:1}
+  {id:'azathoth',grade:10,name:'아자토스',title:'무한의 근원',ic:'♾️',bonus:300,rate:1},
+  {id:'time_eater',grade:11,name:'시간포식자',title:'시간을 삼킨 자',ic:'⏳',bonus:350,rate:0.6,special:'doublePetChance',specialText:'펫 공격 20% 확률로 피해 2배'},
+  {id:'life_weaver',grade:12,name:'생명직조자',title:'생명을 엮는 자',ic:'🌿',bonus:450,rate:0.5,special:'petHeal',specialText:'펫이 준 피해의 3%만큼 플레이어 회복'},
+  {id:'abyss_king',grade:13,name:'심연왕',title:'심연을 지배하는 왕',ic:'👁️',bonus:550,rate:0.4,special:'bossPetDamage',specialText:'보스 대상 펫 피해 +60%'},
+  {id:'fate_lord',grade:14,name:'운명군주',title:'운명의 판결자',ic:'⚖️',bonus:700,rate:0.3,special:'lowHpPetDamage',specialText:'플레이어 HP 30% 이하에서 펫 피해 +80%'},
+  {id:'end_god',grade:15,name:'종말신',title:'세계의 마지막 신',ic:'☄️',bonus:900,rate:0.2,special:'executePetDamage',specialText:'적 HP 20% 이하에서 펫 피해 +150%'}
 ];
 const SPOUSE_GRADE_COLORS=['','#b0b0b0','#4caf50','#2196f3','#a259ff','#ff9800','#ff4d4d','#00bcd4','#5c6bff','#ff2f92','#ffd700'];
 function hasAllPetsForSpouse(){ return PET_PRESETS.length>0 && PET_PRESETS.every(p=>Number(S.pets?.[p.id]||0)>0); }
 function getEquippedSpouse(){ return SPOUSE_PRESETS.find(x=>x.id===S.equippedSpouse) || null; }
-function getSpousePetDamageMult(){ const sp=getEquippedSpouse(); return sp ? 1 + sp.bonus/100 : 1; }
+function getSpousePetDamageMult(){ const sp=getEquippedSpouse(); if(!sp)return 1; let mult=1+sp.bonus/100; if(sp.special==='doublePetChance'&&Math.random()<0.20)mult*=2; if(sp.special==='bossPetDamage'&&S.monster?.isBoss)mult*=1.60; if(sp.special==='lowHpPetDamage'&&S.player?.hp<=calcMaxHp()*0.30)mult*=1.80; if(sp.special==='executePetDamage'&&S.monster?.hp<=S.monster?.maxHp*0.20)mult*=2.50; return mult; }
 function getSpousePetDamageBonus(){ const sp=getEquippedSpouse(); return sp ? sp.bonus : 0; }
 function isSpouseUnlocked(){ return hasAllPetsForSpouse(); }
 function renderSpouseBadge(){
@@ -2523,7 +2529,7 @@ function renderSpouse(){
     const owned=Number(S.spouses?.[sp.id]||0)>0, eq=S.equippedSpouse===sp.id, color=SPOUSE_GRADE_COLORS[sp.grade]||'#fff';
     return `<div class="spouseCard ${owned?'':'locked'} ${eq?'equipped':''}">
       <div class="spouseIcon">${owned?sp.ic:'❔'}</div>
-      <div><div class="spouseGrade" style="color:${color}">${sp.grade}등급</div><div class="spouseName">${owned?sp.name:'???'}</div><div class="spouseTitle">${owned?'「'+sp.title+'」':'미획득'}</div><div class="spouseDesc">펫 피해 <b style="color:#ffd54a">+${sp.bonus}%</b></div></div>
+      <div><div class="spouseGrade" style="color:${color}">${sp.grade}등급</div><div class="spouseName">${owned?sp.name:'???'}</div><div class="spouseTitle">${owned?'「'+sp.title+'」':'미획득'}</div><div class="spouseDesc">펫 피해 <b style="color:#ffd54a">+${sp.bonus}%</b>${sp.specialText?'<br><span style="color:#8ff0ff">✦ '+sp.specialText+'</span>':''}</div></div>
       <div>${owned?(eq?`<button class="spouseBtn remove" onclick="unequipSpouse()">해제</button>`:`<button class="spouseBtn" onclick="equipSpouse('${sp.id}')">장착</button>`):''}</div>
     </div>`;
   }).join('');
@@ -2533,7 +2539,7 @@ function playSpouseSummonFx(sp){
   if(!fx) return Promise.resolve();
   const n=document.getElementById('summonName'), g=document.getElementById('summonGrade'), t=document.getElementById('summonTitle');
   if(n) n.textContent=`${sp.ic} ${sp.name}`;
-  if(g) g.textContent=`${sp.grade}등급 · 펫 피해 +${sp.bonus}%`;
+  if(g) g.textContent=`${sp.grade}등급 · 펫 피해 +${sp.bonus}%${sp.specialText?' · ✦ 특별 능력':''}`;
   if(t) t.textContent=`「${sp.title}」`;
   fx.classList.toggle('mythic',sp.grade===10); fx.classList.add('show');
   return new Promise(resolve=>setTimeout(()=>{fx.classList.remove('show','mythic');resolve();},3000));
@@ -2632,7 +2638,7 @@ function loadGame(){
       if(!Number.isFinite(S.originCoreLv)) S.originCoreLv = 0;
       if(!Number.isFinite(S.originCorePity)) S.originCorePity = 0;
       if(!Number.isFinite(S.breakProtectionTickets)) S.breakProtectionTickets = 0;
-      S.breakProtectionTickets=Math.max(0,Math.min(20,Math.floor(S.breakProtectionTickets)));
+      S.breakProtectionTickets=Math.max(0,Math.floor(S.breakProtectionTickets));
       if(!S.artifacts || typeof S.artifacts !== 'object') S.artifacts = {};
       if(!Array.isArray(S.equippedArtifacts)) S.equippedArtifacts=[];
       S.equippedArtifacts=S.equippedArtifacts.filter(id=>S.artifacts[id] && Number(S.artifacts[id].level)>0).slice(0,5);
@@ -2845,7 +2851,7 @@ function getPetBonus(statName){
 function petDamageName(id){
   const p=PET_PRESETS.find(x=>x.id===id); return p ? `${p.ic} ${p.name}` : id;
 }
-function recordPetDamage(petId, amount){
+function recordPetDamage(petId, amount){ const sp=getEquippedSpouse(); if(sp?.special==='petHeal'&&amount>0&&S.player)S.player.hp=Math.min(calcMaxHp(),Number(S.player.hp||0)+Math.max(1,Math.round(amount*0.03)));
   amount=Math.max(0,Math.round(amount||0)); if(!amount) return;
   if(!S.damageStats || typeof S.damageStats!=='object') S.damageStats={player:0,pets:{}};
   if(!S.damageStats.pets || typeof S.damageStats.pets!=='object') S.damageStats.pets={};
@@ -3128,8 +3134,8 @@ function finishFocusHour(){
   S.focusBoxes += r.boxes;
   const crystal=Math.max(1,Math.floor(r.kills/20)+Math.floor(r.boxes/2));
   S.focusCrystal += crystal;
-  const protectionReward=Math.min(5,Math.max(0,20-Number(S.breakProtectionTickets||0)));
-  S.breakProtectionTickets=Math.min(20,Number(S.breakProtectionTickets||0)+protectionReward);
+  const protectionReward=5;
+  S.breakProtectionTickets=Math.max(0,Number(S.breakProtectionTickets||0))+protectionReward;
   const overlay=document.getElementById('focusLockOverlay'); if(overlay)overlay.classList.remove('show');
   const btn=document.getElementById('focusHourBtn'); if(btn)btn.disabled=false;
   S.focusEndAt=0;
@@ -5624,6 +5630,7 @@ function buyFixedWeapon(grade, cost){
 }
 
 /* GOLD PASSIVE SHOP */
+function buyBreakProtectionTicket(){const cost=1000;if((S.soulStones||0)<cost){toast('💎 영혼석이 부족합니다! 필요: 1,000');return;}S.soulStones-=cost;S.breakProtectionTickets=Math.max(0,Number(S.breakProtectionTickets||0))+1;renderGoldShop();renderAll();saveGame();toast('🛡️ 파괴방지권 1개 구매 완료!');}
 function renderGoldShop(){
   const pane = document.getElementById('shopGoldPane');
   const atkCost = Math.floor(300 * Math.pow(1.3, S.research.atkLv));
@@ -5821,6 +5828,9 @@ function drawPet10(){
   toast(`✨ 펫 10회 소환 완료! ${summary}`);
 }
 
+function drawPet10000(){
+const cost=500000;if(S.essence<cost){toast('생명의 정수가 부족합니다! (1만회 = 500,000 필요)');return;}S.essence-=cost;const counts={};for(let i=0;i<10000;i++){let r=Math.random()*100,chosenGrade=PET_GRADES.length-1;for(let g=0;g<PET_GRADES.length;g++){r-=PET_GRADES[g].rate;if(r<=0){chosenGrade=g;break;}}let pool=PET_PRESETS.filter(p=>p.grade===chosenGrade);if(!pool.length)pool=PET_PRESETS.filter(p=>p.grade===Math.max(0,chosenGrade-1));const pet=pick(pool);S.pets[pet.id]=(S.pets[pet.id]||0)+1;counts[PET_GRADES[pet.grade].name]=(counts[PET_GRADES[pet.grade].name]||0)+1;}const summary=Object.entries(counts).map(([k,v])=>k+' ×'+v).join(' · ');switchPetTab(Math.max(...PET_GRADES.map(g=>counts[g.name]?g.grade:0)));renderAll();saveGame();const result=document.getElementById('petBatchResult');if(result){result.style.display='block';result.innerHTML='<div style="background:rgba(232,67,147,.10);border:1px solid rgba(232,67,147,.35);border-radius:10px;padding:9px;font-size:10px;text-align:center;">💥 1만회 소환 완료 · '+summary+'<br><span style="color:var(--sub)">총 10,000회 · 등급별 집계</span></div>';}toast('💥 펫 1만회 소환 완료! '+summary);}
+
 function equipPet(petId){
   if(!S.equippedPets) S.equippedPets = [];
   if(S.equippedPets.includes(petId)) return;
@@ -5876,7 +5886,7 @@ function renderAwakening(){
   const rows=[];
   ['weapon','helmet','armor','gloves','accessory'].forEach(k=>{
     const it=S.equip[k]; if(!it)return;
-    const lv=Math.min(3,it.awakening||0); const cost=(lv+1)*100000;
+    const lv=Math.min(3,it.awakening||0); const awakeningCosts=[10000,50000,100000]; const cost=awakeningCosts[lv]||100000;
     const power=it.grade>=15 ? ' · 고유 권능도 각성 단계에 따라 강화됩니다.' : '';
     const disabled=(lv>=3||S.soulStones<cost)?'disabled':'';
     const label=lv>=3?'최대 각성':'🌠 각성 · '+fmt(cost)+' 영혼석';
@@ -6621,7 +6631,7 @@ document.addEventListener('click', function(e){
   }catch(e){}
   const _calcAtk=window.calcAtk;
   if(typeof _calcAtk==='function')window.calcAtk=function(){let v=_calcAtk();const stacks=Math.min(5,Number(S.goldCoinStacks||0));if(stacks&&(S.equippedPets||[]).includes('gold_slime'))v=Math.round(v*(1+.12*stacks));if(Number(S.goldRouletteDamageMult||1)>1)v=Math.round(v*S.goldRouletteDamageMult);return v;};
-  function rr(){const r=Math.random()*100;if(r<30)return{icon:'🪙',name:'GOLD',dmg:3,gold:1,desc:'+300% 추가 피해 + 스테이지×10 골드'};if(r<55)return{icon:'⚔️',name:'BATTLE',dmg:5,gold:1,desc:'+500% 추가 피해'};if(r<75)return{icon:'💰',name:'대박',dmg:7,gold:2,desc:'+700% 추가 피해 + 처치 골드 ×2'};if(r<90)return{icon:'💎',name:'보물',dmg:10,gold:3,desc:'+1000% 추가 피해 + 처치 골드 ×3'};if(r<98)return{icon:'🔥',name:'JACKPOT',dmg:20,gold:5,desc:'+2000% 추가 피해 + 처치 골드 ×5'};return{icon:'💀',name:'MISS',dmg:1,gold:1,desc:'효과 없음'};}
+  function rr(){const r=Math.random()*100;if(r<30)return{icon:'🪙',name:'GOLD',dmg:1.5,gold:1,desc:'+150% 추가 피해 + 스테이지×10 골드'};if(r<55)return{icon:'⚔️',name:'BATTLE',dmg:2,gold:1,desc:'+200% 추가 피해'};if(r<75)return{icon:'💰',name:'대박',dmg:3,gold:2,desc:'+300% 추가 피해 + 처치 골드 ×2'};if(r<90)return{icon:'💎',name:'보물',dmg:4,gold:3,desc:'+400% 추가 피해 + 처치 골드 ×3'};if(r<98)return{icon:'🔥',name:'JACKPOT',dmg:6,gold:5,desc:'+600% 추가 피해 + 처치 골드 ×5'};return{icon:'💀',name:'MISS',dmg:1,gold:1,desc:'효과 없음'};}
   function roulette(){if(!(S.equippedPets||[]).includes('gold_roulette'))return;const x=rr();S.goldRouletteDamageMult=x.dmg;S.goldRouletteGoldMult=x.gold;let o=document.getElementById('goldRouletteOverlay');if(!o){o=document.createElement('div');o.id='goldRouletteOverlay';o.innerHTML='<div class="grBox"><div class="grTitle">🎰 황금 재물룰렛</div><div class="grWheel">🪙 ⚔️ 💰 💎 🔥 💀</div><div class="grSpin">SPINNING...</div><div class="grResult"></div></div>';document.body.appendChild(o);}o.querySelector('.grResult').innerHTML=x.icon+' '+x.name+'<small>'+x.desc+'</small>';o.classList.remove('show','jackpot');void o.offsetWidth;o.classList.add('show');if(x.name==='JACKPOT')o.classList.add('jackpot');setTimeout(()=>o.classList.remove('show'),2400);}
   const _spawn=window.spawnMonster;if(typeof _spawn==='function')window.spawnMonster=function(){S.goldRouletteDamageMult=1;S.goldRouletteGoldMult=1;const r=_spawn.apply(this,arguments);setTimeout(roulette,40);return r;};
   const _kill=window.onMonsterKilled;if(typeof _kill==='function')window.onMonsterKilled=function(){const m=Math.max(1,Number(S.goldRouletteGoldMult||1));if(m>1){const before=S.gold;S.goldRouletteGoldMult=1;const r=_kill.apply(this,arguments);const earned=Math.max(0,S.gold-before);S.gold+=earned*(m-1);S.goldRouletteDamageMult=1;return r;}const r=_kill.apply(this,arguments);S.goldRouletteDamageMult=1;return r;};
@@ -6643,5 +6653,11 @@ document.addEventListener('click', function(e){
 .petSynergyChip small{opacity:.75}
 .petSynergyEmpty{color:var(--sub)}
 .petSynergyBookActive{border-color:rgba(255,215,0,.38)!important;box-shadow:0 0 10px rgba(255,215,0,.08);}
-</style></body>
+</style><script id="balance-revision-2026-09-24">
+(function(){
+try{S.breakProtectionTickets=Math.max(0,Math.floor(Number(S.breakProtectionTickets||0)));}catch(e){}
+try{const pane=document.getElementById("shopGoldPane");if(pane){const original=renderGoldShop;renderGoldShop=function(){original();const item=document.createElement("div");item.className="shopItem";item.innerHTML='<div><div class="si-name">🛡️ 파괴방지권</div><div class="si-desc">극의 실패 시 강등 1회 방지 · 최대 보유 제한 없음 · 현재 '+fmt(S.breakProtectionTickets||0)+'개</div></div><button onclick="buyBreakProtectionTicket()">💎 1,000 영혼석</button>';pane.appendChild(item);};}}catch(e){}
+})();
+</script>
+</body>
 </html>

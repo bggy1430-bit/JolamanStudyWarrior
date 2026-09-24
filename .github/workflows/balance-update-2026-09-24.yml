@@ -1,0 +1,30 @@
+name: Apply balance update
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply balance patch
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('www/index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='<!-- BALANCE_PATCH_2026_09_24 -->'
+          if marker in s:
+              print('already patched'); raise SystemExit(0)
+          patch=r'''\n<!-- BALANCE_PATCH_2026_09_24 -->\n<script>\n(function(){\n  try { if (typeof PET_GRADES !== 'undefined') { const rates=[45,27,14,7,3,2,0.8,0.6,0.4,0.2]; PET_GRADES.forEach((g,i)=>g.rate=rates[i]??0); } } catch(e) {}\n  window.drawPet10000=function(){\n    const count=10000, cost=count*50;\n    if((S.essence||0)<cost){toast(`🐣 생명의 정수가 부족합니다! 10,000회 필요: ${fmt(cost)}`);return;}\n    S.essence-=cost; const counts={};\n    for(let i=0;i<count;i++){ let r=Math.random()*100,acc=0,g=0; for(let j=0;j<PET_GRADES.length;j++){acc+=Number(PET_GRADES[j].rate)||0;if(r<acc){g=j;break;}} const pool=typeof PETS!=='undefined'?PETS.filter(x=>x.grade===g):[]; if(!pool.length)continue; const pet=pool[Math.floor(Math.random()*pool.length)]; S.pets[pet.id]=(S.pets[pet.id]||0)+1; counts[g]=(counts[g]||0)+1; }\n    S.petPulls=(S.petPulls||0)+count; const box=document.getElementById('petBatchResult');\n    if(box){box.style.display='block';box.innerHTML=`<div style="padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);text-align:center"><b>🎉 10,000회 뽑기 완료</b><div style="margin-top:5px;font-size:10px;color:var(--sub)">총 비용 🌿${fmt(cost)} · 누적 ${fmt(S.petPulls)}회</div><div style="margin-top:7px">${Object.keys(counts).sort((a,b)=>b-a).map(g=>`<span style="display:inline-block;margin:2px;padding:3px 6px;border-radius:6px;background:rgba(255,255,255,.05);color:${PET_GRADES[g].color}">${PET_GRADES[g].name} ${fmt(counts[g])}</span>`).join('')}</div></div>`;}\n    if(typeof renderAll==='function')renderAll(); saveGame(); toast('🐾 10,000회 펫 뽑기 완료!',3500);\n  };\n  if(typeof window.artifactPullCost==='function') window.artifactPullCost=function(n){return Number(n)===10?9000:1000;};\n  window.buyBreakProtection=function(q){ q=Math.max(1,Math.floor(Number(q)||1)); const price=q*1000; if((S.artifactShards||0)<price){toast(`💎 영혼석이 부족합니다! ${q}장에 ${fmt(price)} 필요`);return;} S.artifactShards-=price; S.breakProtectionTickets=(Number(S.breakProtectionTickets)||0)+q; if(typeof renderAll==='function')renderAll(); if(typeof renderGoldShop==='function')renderGoldShop(); saveGame(); toast(`🎫 파괴방지권 +${q} · 영혼석 -${fmt(price)}`); };\n  window.renderBalanceProtection=function(){ const pane=document.getElementById('shopGoldPane'); if(!pane||pane.dataset.balanceProtection)return; pane.dataset.balanceProtection='1'; const div=document.createElement('div'); div.id='balanceProtectionShop'; div.innerHTML=`<div class="shopItem" style="pointer-events:auto"><div><div class="si-name">🎫 파괴방지권</div><div class="si-desc">극의 실패 시 등급 하락/붕괴를 1회 방지합니다. 보유 상한 없음 · 1장 💎1,000 영혼석</div></div><div style="display:flex;gap:5px"><button onclick="buyBreakProtection(1)">+1</button><button onclick="buyBreakProtection(10)">+10</button></div></div>`; pane.appendChild(div); };\n  const rg=window.renderGoldShop; if(typeof rg==='function') window.renderGoldShop=function(){rg.apply(this,arguments);renderBalanceProtection();};\n  function addPet10000Button(){ if(document.getElementById('pet10000Btn'))return; const one=document.querySelector('button[onclick="drawPet()"]'); if(!one)return; const b=document.createElement('button'); b.id='pet10000Btn'; b.textContent='💥 10,000회 (🌿 500,000)'; b.style.cssText='background:linear-gradient(135deg,#ff9800,#ff3d00);border:none;padding:10px 14px;border-radius:10px;font-weight:1000;color:#fff;cursor:pointer;margin-left:5px'; b.onclick=window.drawPet10000; one.parentElement.appendChild(b); }\n  const oldSpawn=window.spawnMonster; if(typeof oldSpawn==='function'){ window.spawnMonster=function(){const r=oldSpawn.apply(this,arguments); if((S.equippedPets||[]).includes('gold_roulette')){setTimeout(()=>{S.goldRouletteDamageMult=Math.min(Number(S.goldRouletteDamageMult||1),1.8);},60);} return r;}; }\n  function refresh(){addPet10000Button();renderBalanceProtection();} if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh); else refresh(); setTimeout(refresh,500); setTimeout(refresh,1500);\n})();\n</script>\n'''\n          s=s.replace('</body>',patch+'</body>')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add www/index.html
+          git commit -m '펫 확률 하향, 1만회 뽑기, 유물 비용 및 파괴방지권 상점 추가' || exit 0
+          git push

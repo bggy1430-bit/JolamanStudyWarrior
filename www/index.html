@@ -1984,8 +1984,8 @@ body{touch-action:manipulation;}
         <div class="num" id="artifactShardVal">0</div>
         <div style="font-size:8px;color:var(--sub);">보유한 파편은 전투와 분해, 극의의 실패가 남긴 흔적에서 축적된다.</div>
         <div class="artifactPullBtns">
-          <button class="artifactPullBtn" onclick="drawArtifact(1)">🌌 1회 뽑기<br><small>100 파편</small></button>
-          <button class="artifactPullBtn ten" onclick="drawArtifact(10)">✨ 10회 뽑기<br><small>900 파편</small></button>
+          <button class="artifactPullBtn" onclick="drawArtifact(1)">🌌 1회 뽑기<br><small>1,000 파편</small></button>
+          <button class="artifactPullBtn ten" onclick="drawArtifact(10)">✨ 10회 뽑기<br><small>9,000 파편</small></button>
         </div>
       </div>
       <div id="artifactPullResult" style="display:none"></div><div id="artifactSynergyPanel" class="artifactSynergyPanel"></div><button class="artifactPresetOpen" onclick="openModal('artifactSets')">📚 유물 세트 도감</button>
@@ -3145,7 +3145,7 @@ function finishFocusHour(){
   renderFocusUpgrades(); renderAll(); saveGame();
   // 집중 시간이 끝나도 공부/자동전투는 종료하지 않는다. 결과만 보여준다.
   showFocusReward(r,crystal);
-  toast(`⏱️ 1시간 집중 완료! 🎫 파괴방지권 +${protectionReward} · 보유 ${S.breakProtectionTickets}/20`,4000);
+  toast(`⏱️ 1시간 집중 완료! 🎫 파괴방지권 +${protectionReward} · 보유 ${S.breakProtectionTickets}개`,4000);
 }
 function showFocusReward(r,crystal){
   const box=document.getElementById('focusRewardResult');
@@ -4551,7 +4551,7 @@ function renderDetailStats() {
   set('detailArtifactCount',getEquippedArtifactIds().length+' / 5');
   set('detailFocusAtkLv','Lv.'+num(S.focusUpgrades?.atk)+' · +'+focusAtkPct+'%');
   set('detailFocusHpLv','Lv.'+num(S.focusUpgrades?.hp)+' · +'+focusHpPct+'%');
-  set('detailProtectionTickets',num(S.breakProtectionTickets)+' / 20');
+  set('detailProtectionTickets',num(S.breakProtectionTickets)+'개');
   set('detailOriginLv','Lv.'+num(S.originCoreLv)+' / 50');
   set('detailStage',fmt(S.stage));
   set('detailMonsterHp',fmt(num(S.monster?.hp)));
@@ -6731,7 +6731,7 @@ document.addEventListener('click', function(e){
 </style><script id="balance-revision-2026-09-24">
 (function(){
 try{S.breakProtectionTickets=Math.max(0,Math.floor(Number(S.breakProtectionTickets||0)));}catch(e){}
-try{const pane=document.getElementById("shopGoldPane");if(pane){const original=renderGoldShop;renderGoldShop=function(){original();const item=document.createElement("div");item.className="shopItem";item.innerHTML='<div><div class="si-name">🛡️ 파괴방지권</div><div class="si-desc">극의 실패 시 강등 1회 방지 · 최대 보유 제한 없음 · 현재 '+fmt(S.breakProtectionTickets||0)+'개</div></div><button onclick="buyBreakProtectionTicket()">💎 1,000 영혼석</button>';pane.appendChild(item);};}}catch(e){}
+try{const pane=document.getElementById("shopGoldPane");if(pane){const original=renderGoldShop;renderGoldShop=function(){original();const item=document.createElement("div");item.className="shopItem";item.innerHTML='<div><div class="si-name">🛡️ 파괴방지권</div><div class="si-desc">극의 실패 시 강등 1회 방지 · 최대 보유 제한 없음 · 현재 '+fmt(S.breakProtectionTickets||0)+'개</div></div><button onclick="buyBreakProtectionTicket()">💎 5,000 영혼석</button>';pane.appendChild(item);};}}catch(e){}
 })();
 </script>
 </body>

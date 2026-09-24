@@ -1695,6 +1695,9 @@ body{touch-action:manipulation;}
           <button onclick="openMysteryBox1000()" style="background:linear-gradient(135deg,#6c5ce7,#4b3fbf); border:none; padding:12px 20px; border-radius:12px; font-weight:800; font-size:13.5px; color:#fff; cursor:pointer;">
             🎁 1000회 뽑기
           </button>
+          <button onclick="openMysteryBox10000()" style="background:linear-gradient(135deg,#e84393,#6c5ce7); border:none; padding:12px 20px; border-radius:12px; font-weight:800; font-size:13.5px; color:#fff; cursor:pointer;">
+            🎁 1만회 뽑기
+          </button>
         </div>
         <label style="display:flex;align-items:center;justify-content:center;gap:6px;margin:4px 0 10px;font-size:10px;color:var(--sub);cursor:pointer;">
           <input id="autoEquipDismantle" type="checkbox" onchange="toggleAutoEquipDismantle(this.checked)" style="accent-color:#ffb347;">
@@ -1889,7 +1892,7 @@ body{touch-action:manipulation;}
         <button onclick="drawPet10()" style="background:linear-gradient(135deg,#00b894,#0984e3); border:none; padding:10px 14px; border-radius:10px; font-weight:900; color:#fff; cursor:pointer; margin-left:5px;">
           ✨ 10회 (🌿 500)
         </button>
-        <button onclick="drawPet10000()" style="background:linear-gradient(135deg,#e84393,#6c5ce7); border:none; padding:10px 14px; border-radius:10px; font-weight:1000; color:#fff; cursor:pointer; margin-left:5px;">💥 1만회 (🌿 500,000)</button>
+        
         <button onclick="togglePetRateTable()" style="background:var(--panel2); border:1px solid var(--line); color:var(--sub); padding:6px 12px; border-radius:8px; font-size:11px; cursor:pointer; margin-left:6px;">
           📊 펫 확률 보기
         </button>
@@ -2156,7 +2159,7 @@ function getSetInfo(item){
 }
 
 const PET_GRADES = [
-  { grade: 0, name: '일반', color: '#b0b0b0', rate:60 },
+  { grade: 0, name: '일반', color: '#b0b0b0', rate:61.7 },
   { grade: 1, name: '고급', color: '#4caf50', rate:22 },
   { grade: 2, name: '희귀', color: '#2196f3', rate:9 },
   { grade: 3, name: '영웅', color: '#a259ff', rate:4 },
@@ -2164,7 +2167,7 @@ const PET_GRADES = [
   { grade: 5, name: '신화', color: '#ff0055', rate:1.2 },
   { grade: 6, name: '태초', color: '#00eaff', rate:0.7 },
   { grade: 7, name: '절대극', color: '#e84393', rate:0.5 },
-  { grade: 8, name: 'ZERO', color: '#00ff99', rate:2 },
+  { grade: 8, name: 'ZERO', color: '#00ff99', rate:0.3 },
   { grade: 9, name: 'GOLD', color: '#ffd700', rate:0.2 }
 ];
 
@@ -2182,14 +2185,14 @@ const PET_PRESETS = [
   {id:'pet_turtle',grade:2,name:'철갑 거북',ic:'🐢',effect:'essenceFind',val:12,desc:'몬스터 처치 시 12% 확률로 생명의 정수 +3'},
   {id:'pet_owl',grade:2,name:'지혜의 부엉이',ic:'🦉',effect:'studyExp',val:15,desc:'전투 경험치 +15%'},
   {id:'pet_panda',grade:2,name:'대나무 판다',ic:'🐼',effect:'lifesteal',val:2,desc:'가한 피해의 2% 회복'},
-  {id:'pet_panther',grade:3,name:'벼락의 흑표범',ic:'🐆',effect:'thunder',val:24,desc:'4번째 공격마다 공격력의 24% 번개 피해 (스테이지마다 초기화)'},
-  {id:'pet_dragon_baby',grade:3,name:'화염 아기드래곤',ic:'🐲',effect:'burn',val:20,desc:'공격 시 20% 확률로 적 최대체력의 4% 추가 화상 피해 (보스는 1.5%)'},
-  {id:'pet_lion',grade:3,name:'황금 갈기 사자',ic:'🦁',effect:'bossHunter',val:18,desc:'보스에게 주는 피해 +18%'},
-  {id:'pet_eagle',grade:3,name:'천공의 수리',ic:'🦅',effect:'airStrike',val:18,desc:'3번째 공격마다 공격력의 18% 추가 공습 (스테이지마다 초기화)'},
-  {id:'pet_frost_mimic',grade:4,name:'빙결 미믹',ic:'🧊',effect:'burn',val:25,desc:'공격 시 25% 확률로 적 최대체력의 4% 추가 화상 피해 (보스는 1.5%)'},
-  {id:'pet_treasure_goblin',grade:4,name:'보물 고블린',ic:'🧌',effect:'bossHunter',val:30,desc:'보스에게 주는 피해 +30%'},
-  {id:'pet_berserk_hamster',grade:4,name:'폭주 햄스터',ic:'🐹',effect:'thunder',val:45,desc:'4번째 공격마다 공격력의 45% 번개 피해'},
-  {id:'pet_mirror_fox',grade:4,name:'거울 여우',ic:'🪞',effect:'airStrike',val:30,desc:'3번째 공격마다 공격력의 30% 추가 공습'},
+  {id:'pet_panther',grade:3,name:'벼락의 흑표범',ic:'🐆',effect:'thunder',val:30,desc:'4번째 공격마다 공격력의 30% 번개 피해 (스테이지마다 초기화)'},
+  {id:'pet_dragon_baby',grade:3,name:'화염 아기드래곤',ic:'🐲',effect:'burn',val:24,desc:'공격 시 24% 확률로 적 최대체력의 4% 추가 화상 피해 (보스는 1.5%)'},
+  {id:'pet_lion',grade:3,name:'황금 갈기 사자',ic:'🦁',effect:'bossHunter',val:22,desc:'보스에게 주는 피해 +22%'},
+  {id:'pet_eagle',grade:3,name:'천공의 수리',ic:'🦅',effect:'airStrike',val:22,desc:'3번째 공격마다 공격력의 22% 추가 공습 (스테이지마다 초기화)'},
+  {id:'pet_frost_mimic',grade:4,name:'빙결 미믹',ic:'🧊',effect:'burn',val:32,desc:'공격 시 32% 확률로 적 최대체력의 4% 추가 화상 피해 (보스는 1.5%)'},
+  {id:'pet_treasure_goblin',grade:4,name:'보물 고블린',ic:'🧌',effect:'bossHunter',val:40,desc:'보스에게 주는 피해 +40%'},
+  {id:'pet_berserk_hamster',grade:4,name:'폭주 햄스터',ic:'🐹',effect:'thunder',val:60,desc:'4번째 공격마다 공격력의 60% 번개 피해'},
+  {id:'pet_mirror_fox',grade:4,name:'거울 여우',ic:'🪞',effect:'airStrike',val:40,desc:'3번째 공격마다 공격력의 40% 추가 공습'},
   // 신화 — 강력한 상시 능력치 버프. 천공제는 치명타 피해 특화로 변경
   {id:'myth_iron_dragon',grade:5,name:'신화 철룡',ic:'🐲',stat:'atkBonus',effect:'statOnly',val:75,desc:'공격력 +75%'}, 
 
@@ -5519,6 +5522,81 @@ function openMysteryBox100(){
   toast(`🎁 100회 뽑기 완료! 최고 등급: [${g.name}]`);
 }
 
+function openMysteryBox10000(){
+  const count = 10000;
+  let totalCost = 0;
+  let tempPulls = S.mbox.pulls;
+
+  for(let i=0; i<count; i++){
+    totalCost += Math.floor(150 + (tempPulls * 2.5));
+    tempPulls++;
+  }
+
+  if(S.gold < totalCost){
+    toast(`💰 골드가 부족합니다! 1만회 필요: ${fmt(totalCost)}`);
+    return;
+  }
+
+  S.gold -= totalCost;
+  const counts = Array(GRADES.length).fill(0);
+  let best = null;
+
+  for(let i=0; i<count; i++){
+    S.mbox.pulls++;
+    const { weights, total } = getBoxProbabilities();
+    let r = Math.random()*total, grade = 0;
+    for(let g=0; g<GRADES.length; g++){
+      r -= weights[g];
+      if(r <= 0){ grade = g; break; }
+    }
+    const slot = pick(['weapon','helmet','armor','gloves','accessory']);
+    const item = makeEquip(slot, grade, S.stage);
+    S.bagEquip.push(item);
+    counts[grade]++;
+    if(!best || grade > best.grade) best = { grade, slot, item };
+  }
+
+  let autoCount = 0, autoSs = 0, autoArtifact = 0;
+  if(S.autoEquipDismantle){
+    const result = dismantleLowerGradeEquipments();
+    autoCount = result.count;
+    autoSs = result.totalSs;
+    autoArtifact = result.totalArtifactShards;
+  }
+
+  const batch = document.getElementById('boxBatchResult');
+  batch.style.display = 'block';
+  batch.innerHTML = `
+    <div style="background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:10px;">
+      <div style="font-weight:800; margin-bottom:7px;">🎉 1만회 뽑기 결과</div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px;">
+        ${GRADES.map((g,i)=>`
+          <div style="padding:5px; border-radius:7px; background:rgba(255,255,255,.04); text-align:center;">
+            <span style="color:${g.color}; font-weight:700;">${g.name}</span>
+            <b style="margin-left:3px;">${counts[i]}</b>
+          </div>`).join('')}
+      </div>
+      <div style="margin-top:8px; font-size:10.5px; color:var(--sub); text-align:center;">
+        총 비용 💰${fmt(totalCost)} · 누적 ${S.mbox.pulls}회
+        ${S.autoEquipDismantle && autoCount ? `<div style="margin-top:4px;color:#ffd166;">⚙️ 자동 분해 ${autoCount}개 · 영혼석 +${autoSs}${autoArtifact?` · 유물의 파편 +${autoArtifact}`:''}</div>` : S.autoEquipDismantle ? '<div style="margin-top:4px;color:#8bd7a5;">⚙️ 자동 분해: 해당 없음</div>' : ''}
+      </div>
+    </div>`;
+
+  const g = GRADES[best.grade];
+  document.getElementById('boxResultWrap').innerHTML = `
+    <div id="boxResult" style="text-align:center; padding:12px 0;">
+      <div style="font-size:38px;">${slotIcon(best.slot)}</div>
+      <div style="font-size:13px; font-weight:800; margin-top:4px; color:${g.color}">
+        최고 등급: ${best.item.name}
+      </div>
+    </div>`;
+
+  updateBoxCost();
+  renderAll();
+  saveGame();
+  toast(`🎁 1만회 뽑기 완료! 최고 등급: [${g.name}]`);
+}
+
 function openMysteryBox1000(){
   const count = 1000;
   let totalCost = 0;
@@ -5630,7 +5708,7 @@ function buyFixedWeapon(grade, cost){
 }
 
 /* GOLD PASSIVE SHOP */
-function buyBreakProtectionTicket(){const cost=1000;if((S.soulStones||0)<cost){toast('💎 영혼석이 부족합니다! 필요: 1,000');return;}S.soulStones-=cost;S.breakProtectionTickets=Math.max(0,Number(S.breakProtectionTickets||0))+1;renderGoldShop();renderAll();saveGame();toast('🛡️ 파괴방지권 1개 구매 완료!');}
+function buyBreakProtectionTicket(){const cost=5000;if((S.soulStones||0)<cost){toast('💎 영혼석이 부족합니다! 필요: 5,000');return;}S.soulStones-=cost;S.breakProtectionTickets=Math.max(0,Number(S.breakProtectionTickets||0))+1;renderGoldShop();renderAll();saveGame();toast('🛡️ 파괴방지권 1개 구매 완료!');}
 function renderGoldShop(){
   const pane = document.getElementById('shopGoldPane');
   const atkCost = Math.floor(300 * Math.pow(1.3, S.research.atkLv));
@@ -5827,9 +5905,6 @@ function drawPet10(){
   if(result){ result.style.display='block'; result.innerHTML=`<div style="background:rgba(0,234,255,.08);border:1px solid rgba(0,234,255,.25);border-radius:10px;padding:9px;font-size:10px;text-align:center;">✨ 10회 소환 완료 · ${summary}<br><span style="color:var(--sub)">${names.join(' · ')}</span></div>`; }
   toast(`✨ 펫 10회 소환 완료! ${summary}`);
 }
-
-function drawPet10000(){
-const cost=500000;if(S.essence<cost){toast('생명의 정수가 부족합니다! (1만회 = 500,000 필요)');return;}S.essence-=cost;const counts={};for(let i=0;i<10000;i++){let r=Math.random()*100,chosenGrade=PET_GRADES.length-1;for(let g=0;g<PET_GRADES.length;g++){r-=PET_GRADES[g].rate;if(r<=0){chosenGrade=g;break;}}let pool=PET_PRESETS.filter(p=>p.grade===chosenGrade);if(!pool.length)pool=PET_PRESETS.filter(p=>p.grade===Math.max(0,chosenGrade-1));const pet=pick(pool);S.pets[pet.id]=(S.pets[pet.id]||0)+1;counts[PET_GRADES[pet.grade].name]=(counts[PET_GRADES[pet.grade].name]||0)+1;}const summary=Object.entries(counts).map(([k,v])=>k+' ×'+v).join(' · ');switchPetTab(Math.max(...PET_GRADES.map(g=>counts[g.name]?g.grade:0)));renderAll();saveGame();const result=document.getElementById('petBatchResult');if(result){result.style.display='block';result.innerHTML='<div style="background:rgba(232,67,147,.10);border:1px solid rgba(232,67,147,.35);border-radius:10px;padding:9px;font-size:10px;text-align:center;">💥 1만회 소환 완료 · '+summary+'<br><span style="color:var(--sub)">총 10,000회 · 등급별 집계</span></div>';}toast('💥 펫 1만회 소환 완료! '+summary);}
 
 function equipPet(petId){
   if(!S.equippedPets) S.equippedPets = [];

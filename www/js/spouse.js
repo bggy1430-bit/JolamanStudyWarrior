@@ -58,7 +58,7 @@ function playSpouseSummonFx(sp){
   return new Promise(resolve=>setTimeout(()=>{fx.classList.remove('show','mythic');resolve();},3000));
 }
 
-function drawSpouse(){
+async function drawSpouse(){
   if(!isSpouseUnlocked()){ toast('모든 펫을 획득해야 배우자가 해금됩니다!'); return; }
   if(S.essence<10000){ toast('생명의 정수가 부족합니다! (10,000 필요)'); return; }
   const available=SPOUSE_PRESETS.filter(x=>!S.spouses?.[x.id]);

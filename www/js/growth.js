@@ -137,3 +137,11 @@ function buyPlayerTree10(e){
   if(typeof playerTreeUpgrade==='function') return bulkUpgrade10(playerTreeUpgrade);
   if(typeof upgradePlayer==='function') return bulkUpgrade10(upgradePlayer);
 }
+
+/* Extracted module. Gameplay behavior intentionally preserved. */
+
+function growthResetCost(treeName){
+  const tree = treeName==='pet' ? PET_GROWTH_TREE : PLAYER_GROWTH_TREE;
+  const spent = growthSpent(tree);
+  return Math.floor(1000 + spent * 250);
+}

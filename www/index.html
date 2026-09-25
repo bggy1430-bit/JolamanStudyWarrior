@@ -6910,6 +6910,13 @@ try{const pane=document.getElementById("shopGoldPane");if(pane){const original=r
     };
   }
 
+  /* 아이템 상세창은 renderAll 이후에 동적으로 만들어지므로 감시해서 제거 */
+  const sheet=document.getElementById('itemSheet');
+  if(sheet && window.MutationObserver){
+    const mo=new MutationObserver(cleanUniquePowerText);
+    mo.observe(sheet,{childList:true,subtree:true});
+  }
+
   /* 최초 로딩 및 강화창이 열려 있을 때 적용 */
   setTimeout(function(){
     cleanUniquePowerText();

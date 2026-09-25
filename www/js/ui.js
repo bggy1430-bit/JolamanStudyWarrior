@@ -31,6 +31,13 @@ function resetDamageReport(){
 }
 
 function renderAll(){
+  // 영혼석은 장비 분해/합성 등 여러 경로에서 변하므로 모든 렌더링 때 동기화한다.
+  const soul = Math.max(0, Math.floor(Number(S?.soulStones || 0)));
+  const ss1 = document.getElementById('ssVal');
+  const ss2 = document.getElementById('enhSsVal');
+  if(ss1) ss1.textContent = fmt(soul);
+  if(ss2) ss2.textContent = fmt(soul);
+
   renderTopStats();
   if(document.getElementById('growthModalBg')?.classList.contains('show')) renderGrowthTree();
   updateHpBars();

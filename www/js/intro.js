@@ -85,3 +85,7 @@ function init(){
     // removes these keys so the intro appears again.
     if(!saved || !seen) openIntro();
   }
+
+// Bootstrap extracted intro module after the HTML exists.
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+else init();

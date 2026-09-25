@@ -2819,41 +2819,13 @@ const PET_SYNERGIES = [
   {id:'abs_barrage_destroy',pets:['absolute_barrage','absolute_crit'],name:'🌀 폭발 저장',effect:'공격력 +18%',bonus:{atkBonus:18}}
 ];
 
-function getPetSynergy(){
-  const eq=new Set(S.equippedPets||[]);
-  const out={atkBonus:0,hpBonus:0,critRate:0,critDmg:0,goldBonus:0,expBonus:0,bossDmg:0};
-  const names=[],flags=new Set();
-  PET_SYNERGIES.forEach(syn=>{
-    if(!syn.pets.every(id=>eq.has(id))) return;
-    names.push(syn.name);
-    Object.entries(syn.bonus).forEach(([k,v])=>out[k]=(out[k]||0)+v);
-    flags.add(syn.id);
-  });
-  return {stats:out,names,flags};
-}
-function getPetSynergyBonus(stat){ return getPetSynergy().stats[stat]||0; }
-function hasPetSynergy(flag){ return getPetSynergy().flags.has(flag); }
 
-function getPetBonus(statName){
-  if(!S.equippedPets || S.equippedPets.length === 0) return 0;
-  let totalBonus = 0;
-  S.equippedPets.forEach(petId => {
-    const pet = PET_PRESETS.find(p => p.id === petId);
-    if(!pet) return;
-    const lv = S.pets[petId] || 1;
-    const scale = pet.levelScale || 0.20;
-    const totalVal = (pet.val || 0) * (1 + (lv - 1) * scale);
-    const statVal = pet.statVal != null ? pet.statVal * (1 + (lv - 1) * scale) : totalVal;
-    if(pet.stat === statName || pet.stat2 === statName || (pet.stat === 'all' && ['atkBonus', 'hpBonus', 'hpBonus'].includes(statName))) {
-      totalBonus += (pet.stat2 === statName ? statVal : totalVal);
-    }
-  });
-  return totalBonus;
-}
 
-function petDamageName(id){
-  const p=PET_PRESETS.find(x=>x.id===id); return p ? `${p.ic} ${p.name}` : id;
-}
+
+
+
+
+
 
 function applySpousePetDamageScale(petDamageBefore){
   const mult=getSpousePetDamageMult();
@@ -2904,22 +2876,8 @@ function resetDamageReport(){
   S.damageStats={player:0,pets:{},artifacts:{}}; saveGame(); renderDamageReport(); toast('📊 누적 데미지 기록을 초기화했습니다.');
 }
 
-function getPetExtraAtkMult(){
-  if(!S.equippedPets || S.equippedPets.length === 0) return 0;
-  let totalMult = 0;
-  S.equippedPets.forEach(petId => {
-    const pet = PET_PRESETS.find(p => p.id === petId);
-    if(!pet) return;
-    if(pet.stat === 'extraAtk' || pet.effect === 'extraAtk') {
-      const lv = S.pets[petId] || 1;
-      totalMult += pet.val * (1 + (lv - 1) * 0.2);
-    }
-  });
-  return totalMult;
-}
-function getPetExtraAtkEntries(){
-  return (S.equippedPets||[]).map(petId=>{const pet=PET_PRESETS.find(p=>p.id===petId); if(!pet || !(pet.stat==='extraAtk'||pet.effect==='extraAtk')) return null; const lv=S.pets[petId]||1; return [petId,pet.val*(1+(lv-1)*0.2)];}).filter(Boolean);
-}
+
+
 
 function originCoreMultiplier(){ return 1 + (Math.max(0,Number(S.originCoreLv||0)) * 0.025); }
 function originCoreBossBonus(){ const lv=Math.max(0,Number(S.originCoreLv||0)); return Math.floor(lv/10)*5; }
@@ -3157,149 +3115,11 @@ function triggerZeroResetVisual(){
 }
 
 /* 신화 이상 펫의 실제 특수효과 발동 순간에만 짧은 전투 연출 */
-function triggerPetEffectVisual(effectKey){
-  const scene = document.getElementById('scene') || document.body;
-  const fx = document.getElementById('petEffectFx') || scene;
-  const equippedIds = S.equippedPets || [];
 
-  // ZERO999는 패시브형이므로 전투 이펙트를 만들지 않는다.
-  if(effectKey === 'limitBreak') return;
 
-  // ZERO: 현재 콤보 숫자를 본인의 이모티콘 숫자로 바꾼다.
-  if(effectKey === 'zeroCombo'){
-    const petId = 'pet_zero';
-    const idx = equippedIds.indexOf(petId);
-    if(idx < 0) return;
-    const wrap = document.getElementById(`petWrap${idx+1}`);
-    if(!wrap) return;
-    const zeroHit = Math.min(5, ((S.combatHits || 0) % 5) + 1);
-    S.zeroComboDisplay = zeroHit;
-    const emojis = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'];
-    const emoji = wrap.querySelector(`#equippedPetEmoji${idx+1}`);
-    if(emoji) emoji.textContent = emojis[zeroHit-1];
-    const rect = wrap.getBoundingClientRect();
-    const base = scene.getBoundingClientRect();
-    return;
-  }
 
-  if(effectKey === 'zeroOmega'){
-    const absorbed = Math.max(0, Math.round(arguments[1] || 0));
-    const reflected = Math.max(0, Math.round(arguments[2] || 0));
-    const label=document.createElement('div');
-    label.className='zero-omega-impact';
-    if(reflected > 0){
-      label.textContent='ZERO∞  REFLECT ×2';
-      label.style.top='28%';
-    } else {
-      label.textContent='ZERO∞  ABSORB';
-      label.style.top='62%';
-    }
-    fx.appendChild(label);
-    setTimeout(()=>label.remove(),520);
-    return;
-  }
 
-  // ZERO1: 중앙 위쪽에는 이번 공격에서 몇 번 COPY 되었는지만 표시한다.
-  if(effectKey === 'zeroOne'){
-    const copyCount = Number(window.__zeroOneLastCount || 0);
-    if(copyCount <= 0) return;
-    const old = fx.querySelectorAll('.zeroOneCopyCount');
-    old.forEach(x=>x.remove());
-    const label=document.createElement('div');
-    label.className='zeroOneCopyCount';
-    label.textContent=`COPY: ${copyCount}회`;
-    fx.appendChild(label);
-    setTimeout(()=>label.remove(),680);
-    return;
-  }
 
-  // ERROR: 플레이어의 일반 공격에만 반응하는 고정 피해 연출.
-  if(effectKey === 'errorFixed'){
-    const label=document.createElement('div');
-    label.className='error-fixed-impact';
-    label.textContent='ERROR  FIXED';
-    fx.appendChild(label);
-
-    const monster=document.getElementById('monsterWrap');
-    if(monster){
-      const rect=monster.getBoundingClientRect();
-      const base=scene.getBoundingClientRect();
-      const ring=document.createElement('div');
-      ring.className='error-fixed-ring';
-      ring.style.left=`${rect.left-base.left+rect.width/2}px`;
-      ring.style.top=`${rect.top-base.top+rect.height/2}px`;
-      fx.appendChild(ring);
-      setTimeout(()=>ring.remove(),300);
-    }
-    setTimeout(()=>label.remove(),380);
-    return;
-  }
-
-  // 태초/절대극 12종은 각자 고유한 발동 연출을 사용한다.
-  const uniqueFx={
-    originMeteorGuard:['☄️','METEOR WALL','#00eaff'], originTimeGuard:['⏳','TIME STOP','#7ddcff'], originVoidGuard:['👁️','VOID ABSORB','#a875ff'],
-    originSoulGuard:['👻','SOUL FLOW','#d8c7ff'], originChaosGuard:['🐉','CHAOS SCALE','#ff6b3d'], originStarGuard:['🌌','STAR VEIL','#7d5fff'],
-    origin_trinity:['🌠','PRIMORDIAL BARRIER','#00eaff'], origin_chaos_star:['🌌','NEBULA FORTRESS','#5effff'],
-    absPierce:['💀','ARMOR BREAK','#ff3158'], absSlaughter:['🌑','MASSACRE','#ff4dff'], absSlaughterBurst:['☠️','MASSACRE BURST','#ff0055'],
-    absExecute:['⚔️','EXECUTE','#ff416c'], absBoss:['🐉','END DRAGON','#ff9d00'], absBarrage:['🌀','BARRAGE','#e84393'], absDestroy:['🔴','DESTRUCTION','#ff3158']
-  };
-  if(uniqueFx[effectKey]){
-    const [ic,label,color]=uniqueFx[effectKey];
-    const badge=document.createElement('div'); badge.className='petUniqueFx'; badge.textContent=`${ic} ${label}`; badge.style.color=color; badge.style.textShadow=`0 0 8px ${color},0 2px 5px #000`;
-    fx.appendChild(badge); setTimeout(()=>badge.remove(),620);
-    const ring=document.createElement('div'); ring.className='petUniqueRing'; ring.style.borderColor=color; ring.style.boxShadow=`0 0 10px ${color},inset 0 0 12px ${color}`; fx.appendChild(ring); setTimeout(()=>ring.remove(),420);
-  }
-
-  // 나머지 펫은 '발동!' 같은 문구 없이 펫의 짧은 모션/타격 이펙트만 유지한다.
-  const equipped = equippedIds
-    .map(id => PET_PRESETS.find(x => x.id === id))
-    .filter(p => p && p.effect === effectKey && Number(p.grade || 0) >= 5);
-  if(!equipped.length) return;
-
-  equipped.forEach(pet=>{
-    const petWrap = document.getElementById(`petWrap${equippedIds.indexOf(pet.id)+1}`);
-    if(!petWrap) return;
-    if(!petWrap.classList.contains('petAttackMotion')){
-      petWrap.classList.add('petAttackMotion');
-      setTimeout(()=>petWrap.classList.remove('petAttackMotion'), 230);
-    }
-
-    const rect = petWrap.getBoundingClientRect();
-    const base = scene.getBoundingClientRect();
-    const spark = document.createElement('div');
-    spark.className='petHitSpark';
-    spark.textContent='✦';
-    spark.style.left=`${Math.max(10,rect.right-base.left+20)}px`;
-    spark.style.top=`${Math.max(10,rect.top-base.top+8)}px`;
-    fx.appendChild(spark);
-    setTimeout(()=>spark.remove(),450);
-
-    const monster = document.getElementById('monsterWrap');
-    if(monster){
-      setTimeout(()=>{
-        monster.classList.remove('petAttackHit');
-        void monster.offsetWidth;
-        monster.classList.add('petAttackHit');
-        setTimeout(()=>monster.classList.remove('petAttackHit'),260);
-      },45);
-    }
-  });
-}
-
-function getPetEffectValue(effectKey){
-  let total = 0;
-  (S.equippedPets || []).forEach(petId => {
-    const pet = PET_PRESETS.find(p => p.id === petId);
-    if(pet && pet.effect === effectKey){
-      const lv = S.pets[petId] || 1;
-      const scale = pet.levelScale != null ? pet.levelScale : 0.08;
-      total += (pet.val || 0) * (1 + (lv - 1) * scale);
-    }
-  });
-  return total;
-}
-function hasPetEffect(effectKey){ return getPetEffectValue(effectKey) > 0; }
-function petProc(effectKey, chancePct){ const ok=hasPetEffect(effectKey) && Math.random() < chancePct/100; if(ok) triggerPetEffectVisual(effectKey); return ok; }
 
 function triggerZero999LastStand(){
   if(!hasPetEffect('limitBreak') || S.zero999LastStandUsed || S.zero999TimeStop) return false;
@@ -3643,13 +3463,7 @@ function bulkUpgrade10(singleFn){
   };
   run();
 }
-function buyPetTree10(e){
-  if(e) e.stopPropagation();
-  if(typeof upgradePetTree==='function') return bulkUpgrade10(upgradePetTree);
-  if(typeof buyPetTree==='function') return bulkUpgrade10(buyPetTree);
-  if(typeof petTreeUpgrade==='function') return bulkUpgrade10(petTreeUpgrade);
-  if(typeof upgradePet==='function') return bulkUpgrade10(upgradePet);
-}
+
 function buyPlayerTree10(e){
   if(e) e.stopPropagation();
   if(typeof upgradePlayerTree==='function') return bulkUpgrade10(upgradePlayerTree);
@@ -3773,26 +3587,7 @@ function renderDetailStats() {
 }
 
 /* 펫 12마리 전투 필드 연출 */
-function renderPetScene(){
-  for(let i=1;i<=12;i++){
-    const wrap=document.getElementById(`petWrap${i}`);
-    const emoji=document.getElementById(`equippedPetEmoji${i}`);
-    if(wrap) wrap.style.display='none';
-    if(emoji) emoji.textContent='✨';
-  }
-  (S.equippedPets||[]).slice(0,12).forEach((petId,i)=>{
-    const p=PET_PRESETS.find(x=>x.id===petId);
-    const wrap=document.getElementById(`petWrap${i+1}`);
-    const emoji=document.getElementById(`equippedPetEmoji${i+1}`);
-    if(p && wrap && emoji){
-      const zeroCombo = petId === 'pet_zero' && Number(S.zeroComboDisplay || 0) >= 1;
-      emoji.textContent = zeroCombo
-        ? ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'][Math.min(5, Number(S.zeroComboDisplay))-1]
-        : p.ic;
-      wrap.style.display='block';
-    }
-  });
-}
+
 function megaEquipShape(slot,g,c){
   const glow=`filter="drop-shadow(0 0 7px ${c})"`;
   const n=g-22;
@@ -4055,22 +3850,7 @@ function openModal(name){
   if(name==='equipSetBook') { renderEquipSetBook(); }
   if(name==='preset') { renderPresetModal(); }
 }
-function renderPetSynergyBook(){
-  const el=document.getElementById('petSynergyBook'); if(!el) return;
-  const eq=new Set(S.equippedPets||[]);
-  const petById=id=>PET_PRESETS.find(p=>p.id===id);
-  el.innerHTML=
-    '<div class="codexCard"><div class="codexTitle">🐾 전체 펫 시너지 · '+PET_SYNERGIES.length+'종</div><div class="codexEffect">현재 존재하는 펫 조합과 실제 적용 효과를 표시합니다.</div></div>'+
-    PET_SYNERGIES.map(syn=>{
-      const pieces=syn.pets.map(id=>{const p=petById(id);return p?p.ic+' '+p.name:id;}).join(' + ');
-      const active=syn.pets.every(id=>eq.has(id));
-      return '<div class="codexCard '+(active?'petSynergyBookActive':'')+'">'+
-        '<div class="codexTitle">'+(active?'✦ ':'🔒 ')+syn.name+'</div>'+
-        '<div class="codexPieces">'+pieces+'</div>'+
-        '<div class="codexEffect"><b>'+syn.effect+'</b> · '+(active?'🟢 현재 활성화':'⚪ 미활성')+'</div>'+
-      '</div>';
-    }).join('');
-}
+
 function renderEquipSetBook(){
   const el=document.getElementById('equipSetBook'); if(!el) return;
   el.innerHTML=EQUIP_SETS.map(set=>`<div class="codexCard"><div class="codexTitle">⚔️ ${set.name}</div><div class="codexPieces">대상 등급: ${GRADES[set.grades[0]].name} ~ ${GRADES[set.grades[1]].name}</div>${Object.entries(set.effects).map(([n,e])=>`<div class="codexEffect"><b>${n}세트</b> · ${Object.entries(e).map(([k,v])=>`${k} +${v}%`).join(' · ')}</div>`).join('')}</div>`).join('');
@@ -4313,11 +4093,7 @@ const PLAYER_GROWTH_TREE = [
   {id:'pGold',icon:'💰',name:'재물 진화',stat:'goldPct',step:2,max:100,desc:'골드 획득 +2%씩'},
   {id:'pExp',icon:'📘',name:'성장 진화',stat:'expPct',step:2,max:100,desc:'전투 경험치 +2%씩'}
 ];
-function getPetGrowthPoints(){
-  let total=0;
-  Object.keys(S.pets||{}).forEach(id=>{ total += Math.max(0,(S.pets[id]||0)-1); });
-  return total;
-}
+
 function getPlayerGrowthPoints(){ return Math.max(0,(S.player.level||1)-1); }
 function growthLevel(id){ return Math.max(0, Number((S.growthSkills||{})[id]||0)); }
 function growthSpent(tree){ return tree.reduce((n,x)=>n+growthLevel(x.id),0); }
@@ -4946,186 +4722,21 @@ function upgradeResearch(type, cost){
 }
 
 /* PET SYSTEM */
-function switchPetTab(tabG){
-  currentPetTab = Math.max(0, Math.min(9, Number(tabG)||0));
-  for(let g=0; g<PET_GRADES.length; g++){
-    const tabEl = document.getElementById(`tabPet${g}`);
-    if(tabEl) tabEl.classList.toggle('active', g===tabG);
-  }
-  renderPetList();
-}
 
-function togglePetRateTable(){
-  const wrap = document.getElementById('petRateTableWrap');
-  if(wrap.style.display==='none'){
-    let rows = '';
-    PET_GRADES.forEach(gObj => {
-      rows += `<tr>
-        <td style="color:${gObj.color}; font-weight:700;">${gObj.name}</td>
-        <td>${gObj.rate}%</td>
-      </tr>`;
-    });
-    wrap.innerHTML = `<table class="rateTable">
-      <thead><tr><th>등급</th><th>소환 확률</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
-    wrap.style.display = 'block';
-  } else {
-    wrap.style.display = 'none';
-  }
-}
 
-function renderPetEquipSlots(){
-  const box = document.getElementById('petEquipSlots');
-  if(!box) return;
-  box.innerHTML = '';
-  const equipped = (S.equippedPets || []).slice(0,12);
-  for(let i=0;i<12;i++){
-    const slot = document.createElement('div');
-    slot.className = 'petEquipSlot' + (equipped[i] ? ' filled' : '');
-    if(equipped[i]){
-      const p = PET_PRESETS.find(x => x.id === equipped[i]);
-      if(p){
-        const gObj = PET_GRADES[p.grade] || {};
-        slot.innerHTML = `<div class="petSlotIcon">${p.ic}</div>
-          <div class="petSlotName" style="color:${gObj.color || 'var(--sub)'}">${p.name}</div>
-          <button class="petSlotRemove" onclick="unequipPet('${p.id}')" title="해제">×</button>`;
-      }
-    }else{
-      slot.innerHTML = `<div class="petSlotEmpty">＋</div><div class="petSlotName">빈 슬롯</div>`;
-    }
-    box.appendChild(slot);
-  }
-}
 
-function renderPetList(){
-  renderPetEquipSlots();
-  document.getElementById('petGoldVal').textContent = fmt(S.gold);
-  document.getElementById('petEssenceVal').textContent = fmt(S.essence);
 
-  const ps=document.getElementById('petSynergyPanel'); if(ps){
-    ps.innerHTML=`<div class="artifactSynergyHead">✦ 펫 시너지 도감 <b>${(S.equippedPets||[]).length}/12</b></div>
-      <div style="font-size:9px;color:var(--sub);margin-top:4px;">시너지 상세 조합과 효과는 아래 <b>📚 펫 시너지 전체 보기</b>에서 확인하세요.</div>`;
-  }
-  const list = document.getElementById('petList');
-  list.innerHTML = '';
-  
-  const presets = PET_PRESETS.filter(p => p.grade === currentPetTab);
-  
-  presets.forEach(p => {
-    const ownedLv = S.pets[p.id] || 0;
-    const isEquipped = S.equippedPets && S.equippedPets.includes(p.id);
-    const gObj = PET_GRADES[p.grade] || {name:'GOLD',color:'#ffd700'};
-    
-    const card = document.createElement('div');
-    card.className = `petCard ${isEquipped ? 'active' : ''}`;
-    
-    let btnHtml = '';
-    if(ownedLv > 0){
-      if(isEquipped){
-        btnHtml = `<button class="batchBtn" onclick="unequipPet('${p.id}')">해제</button>`;
-      } else {
-        btnHtml = `<button class="batchBtn" style="background:var(--accent); color:#fff;" onclick="equipPet('${p.id}')">장착</button>`;
-      }
-    } else {
-      btnHtml = `<button class="batchBtn btn-disabled" disabled>미보유</button>`;
-    }
 
-    card.innerHTML = `
-      <div class="petInfo">
-        <div class="petIc">${p.ic}</div>
-        <div>
-          <div style="font-size:12.5px; font-weight:700; color:${gObj.color}">
-            ${p.name} ${ownedLv > 0 ? `<span style="font-size:10px; color:var(--gold)">[Lv.${ownedLv}]</span>` : ''}
-          </div>
-          <div style="font-size:10px; color:var(--sub); margin-top:2px;">${p.desc}</div>
-        </div>
-      </div>
-      <div style="min-width:60px; text-align:right;">${btnHtml}</div>
-    `;
-    list.appendChild(card);
-  });
-}
 
-function drawPet(){
-  if(S.essence < 50){ toast('생명의 정수가 부족합니다! (50 필요)'); return; }
-  S.essence -= 50;
-  
-  let r = Math.random() * 100;
-  let chosenGrade = 0;
-  for(let g=0; g<PET_GRADES.length; g++){
-    r -= PET_GRADES[g].rate;
-    if(r <= 0){ chosenGrade = PET_GRADES[g].grade; break; }
-  }
 
-  let pool = PET_PRESETS.filter(p => p.grade === chosenGrade);
-  if(!pool.length){
-    chosenGrade = Math.max(0, Math.min(7, chosenGrade - 1));
-    pool = PET_PRESETS.filter(p => p.grade === chosenGrade);
-  }
-  const pickedPet = pick(pool);
 
-  if(!S.pets[pickedPet.id]){
-    S.pets[pickedPet.id] = 1;
-    toast(`🐣 축하합니다! [${PET_GRADES[chosenGrade].name}] ${pickedPet.name} 획득!`);
-  } else {
-    S.pets[pickedPet.id]++;
-    toast(`✨ [${PET_GRADES[chosenGrade].name}] ${pickedPet.name} 중복 획득! 레벨업 (Lv.${S.pets[pickedPet.id]})`);
-  }
 
-  switchPetTab(chosenGrade);
-  playGachaFx('pet', pickedPet.ic, 'PET HATCH', `${PET_GRADES[chosenGrade].name} · ${pickedPet.name}`);
-  renderAll(); saveGame();
-}
 
-function drawPet10(){
-  const cost=500;
-  if(S.essence < cost){ toast('생명의 정수가 부족합니다! (10회 = 500 필요)'); return; }
-  S.essence -= cost;
-  const counts={};
-  const names=[];
-  for(let i=0;i<10;i++){
-    let r=Math.random()*100, chosenGrade=PET_GRADES.length-1;
-    for(let g=0;g<PET_GRADES.length;g++){ r-=PET_GRADES[g].rate; if(r<=0){ chosenGrade=g; break; } }
-    let pool=PET_PRESETS.filter(p=>p.grade===chosenGrade);
-    if(!pool.length) pool=PET_PRESETS.filter(p=>p.grade===Math.max(0,chosenGrade-1));
-    const pet=pick(pool);
-    S.pets[pet.id]=(S.pets[pet.id]||0)+1;
-    counts[PET_GRADES[pet.grade].name]=(counts[PET_GRADES[pet.grade].name]||0)+1;
-    names.push(pet.name);
-  }
-  const summary=Object.entries(counts).map(([k,v])=>`${k} ×${v}`).join(' · ');
-  switchPetTab(Math.max(...PET_GRADES.map(g=>counts[g.name]?g.grade:0)));
-  renderAll(); saveGame();
-  const result=document.getElementById('petBatchResult');
-  if(result){ result.style.display='block'; result.innerHTML=`<div style="background:rgba(0,234,255,.08);border:1px solid rgba(0,234,255,.25);border-radius:10px;padding:9px;font-size:10px;text-align:center;">✨ 10회 소환 완료 · ${summary}<br><span style="color:var(--sub)">${names.join(' · ')}</span></div>`; }
-  toast(`✨ 펫 10회 소환 완료! ${summary}`);
-}
 
-function equipPet(petId){
-  if(!S.equippedPets) S.equippedPets = [];
-  if(S.equippedPets.includes(petId)) return;
 
-  if(S.equippedPets.length >= 12){
-    toast('펫은 최대 12마리까지 장착할 수 있습니다!');
-    return;
-  }
-  S.equippedPets.push(petId);
-  renderPetList();
-  renderAll(); saveGame();
-  toast('펫을 장착했습니다!');
-}
 
-function unequipPet(petId){
-  if(!S.equippedPets) return;
-  const idx = S.equippedPets.indexOf(petId);
-  if(idx >= 0){
-    S.equippedPets.splice(idx, 1);
-    renderPetList();
-    renderAll(); saveGame();
-    toast('펫을 해제했습니다.');
-  }
-}
+
+
 
 
 let currentEnhTab = 'power';
@@ -5918,11 +5529,11 @@ document.addEventListener('click', function(e){
 .eqSetHighlight{margin:8px 0;padding:10px;border:1px solid rgba(255,209,102,.42);border-radius:12px;background:linear-gradient(135deg,rgba(255,209,102,.10),rgba(124,92,255,.08));box-shadow:0 0 12px rgba(255,209,102,.06)}
 .eqSetHead{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:1000;font-size:11px;color:#ffe66d}.eqSetCount{padding:3px 6px;border-radius:7px;background:rgba(255,209,102,.14);color:#ffe66d;font-size:8px}.eqSetEffect{margin-top:5px;padding:6px 7px;border-radius:8px;background:rgba(0,0,0,.18);font-size:9px;line-height:1.35;color:#cfd3e8}.eqSetEffect.active{border:1px solid rgba(0,234,255,.22);background:rgba(0,234,255,.07);color:#fff}.eqSetEffect b{color:#00eaff}.eqSetBookCard{margin-bottom:8px}.spouseAbilityBox{margin-top:7px;padding:7px 8px;border-radius:9px;background:rgba(0,234,255,.055);border:1px solid rgba(0,234,255,.18);font-size:9px;line-height:1.45}.spouseAbilityBox b{color:#7fffe0}.spouseAbilityBox.special{border-color:rgba(255,215,74,.24);background:rgba(255,215,74,.055)}.spouseAbilityBox.special b{color:#ffe66d}
 </style>
-
-  <script src="js/patches.js"></script>
-  <script src="js/update-check.js"></script>
+  <script src="js/pets.js"></script>
   <script src="js/damage.js"></script>
   <script src="js/battle.js"></script>
+  <script src="js/patches.js"></script>
+  <script src="js/update-check.js"></script>
   
 </body>
 </html>

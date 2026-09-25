@@ -2027,10 +2027,14 @@ body{touch-action:manipulation;}
       </div>
       <div class="enhTabs">
         <button class="enhTab active" id="enhTabPower" onclick="switchEnhTab('power')">💎 강화 / 초월</button>
-        <button class="enhTab" id="enhTabSynth" onclick="switchEnhTab('synth')">🔺 장비 합성</button><button class="enhTab" id="enhTabAwaken" onclick="switchEnhTab('awaken')">🌠 장비 각성</button>
+        <button class="enhTab" id="enhTabSynth" onclick="switchEnhTab('synth')">🔺 장비 합성</button>
+        <button class="enhTab" id="enhTabAwaken" onclick="switchEnhTab('awaken')">🌠 장비 각성</button>
+        <button class="enhTab" id="enhTabOptions" onclick="switchEnhTab('options')">✨ 추옵 변경</button>
       </div>
       <div id="enhList"></div>
-      <div id="synthPanel" style="display:none;"></div><div id="awakenPanel" style="display:none;"></div>
+      <div id="synthPanel" style="display:none;"></div>
+      <div id="awakenPanel" style="display:none;"></div>
+      <div id="optionRerollPanel" style="display:none;"></div>
     </div>
   </div>
 
@@ -6732,6 +6736,187 @@ document.addEventListener('click', function(e){
 (function(){
 try{S.breakProtectionTickets=Math.max(0,Math.floor(Number(S.breakProtectionTickets||0)));}catch(e){}
 try{const pane=document.getElementById("shopGoldPane");if(pane){const original=renderGoldShop;renderGoldShop=function(){original();const item=document.createElement("div");item.className="shopItem";item.innerHTML='<div><div class="si-name">🛡️ 파괴방지권</div><div class="si-desc">극의 실패 시 강등 1회 방지 · 최대 보유 제한 없음 · 현재 '+fmt(S.breakProtectionTickets||0)+'개</div></div><button onclick="buyBreakProtectionTicket()">💎 5,000 영혼석</button>';pane.appendChild(item);};}}catch(e){}
+})();
+</script>
+
+<script id="gear-ui-rework-2026-09-25">
+(function(){
+  /* 1) 고등급 장비의 '고유 권능' 시스템 제거.
+        등급 자체의 능력치와 일반 추옵만 사용하도록 한다. */
+  window.getGearPowerNameForGrade=function(){ return ''; };
+  window.getGearPowerState=function(){
+    return {holy:0,void:0,dimension:0,time:0,infinity:0,origin:0,absolute:0};
+  };
+  window.getGearPowerNames=function(){ return []; };
+
+  /* 기존 저장 데이터에 남아 있는 권능 관련 표시/효과도 비활성화 */
+  try{
+    ['weapon','helmet','armor','gloves','accessory'].forEach(function(k){
+      const it=S.equip?.[k];
+      if(it){
+        delete it.gearPower;
+        delete it.uniquePower;
+        delete it.powerName;
+      }
+      (S.bagEquip||[]).forEach(function(x){
+        delete x.gearPower;
+        delete x.uniquePower;
+        delete x.powerName;
+      });
+    });
+  }catch(e){}
+
+  /* 2) 장비 시너지/세트 효과의 내부 스탯 키를 한국어로 표시 */
+  const KO_STAT={
+    atkPct:'공격력',
+    hpPct:'최대 HP',
+    goldBonus:'골드 획득',
+    expBonus:'경험치 획득',
+    critRate:'치명타 확률',
+    critDmg:'치명타 피해',
+    bossDmg:'보스 피해'
+  };
+  function koSetEffect(e){
+    return Object.entries(e||{}).map(function(pair){
+      const k=pair[0],v=pair[1];
+      return (KO_STAT[k]||k)+' +'+v+'%';
+    }).join(' · ');
+  }
+
+  window.renderEquipSetBook=function(){
+    const el=document.getElementById('equipSetBook');
+    if(!el) return;
+    el.innerHTML=EQUIP_SETS.map(function(set){
+      return '<div class="codexCard">'+
+        '<div class="codexTitle">⚔️ '+set.name+'</div>'+
+        '<div class="codexPieces">대상 등급: '+GRADES[set.grades[0]].name+' ~ '+GRADES[set.grades[1]].name+'</div>'+
+        Object.entries(set.effects).map(function(pair){
+          return '<div class="codexEffect"><b>'+pair[0]+'세트</b> · '+koSetEffect(pair[1])+'</div>';
+        }).join('')+
+      '</div>';
+    }).join('');
+  };
+
+  /* 3) 강화 메뉴와 별도로 '추옵 변경' 전용 화면 */
+  function optionSourceItems(){
+    const out=[];
+    ['weapon','helmet','armor','gloves','accessory'].forEach(function(k){
+      if(S.equip?.[k]) out.push({source:'equip',id:k,item:S.equip[k],slot:k});
+    });
+    return out;
+  }
+  function renderEnhanceOptions(){
+    const pane=document.getElementById('optionRerollPanel');
+    if(!pane) return;
+    const items=optionSourceItems();
+    if(!items.length){
+      pane.innerHTML='<div class="enhCard" style="text-align:center;color:var(--sub);padding:24px;">장착된 장비가 없습니다.</div>';
+      return;
+    }
+    pane.innerHTML=
+      '<div class="enhCard" style="margin-bottom:8px;">'+
+        '<div style="font-weight:900;font-size:12px;">✨ 장비 개별 추가 옵션 변경</div>'+
+        '<div style="font-size:9px;color:var(--sub);margin-top:4px;">강화 수치와 별개로 각 장비의 추가 옵션을 하나씩 변경합니다. 변경할 옵션의 버튼만 누르면 됩니다.</div>'+
+      '</div>'+
+      items.map(function(x){
+        const g=GRADES[x.item.grade]||GRADES[0];
+        const opts=x.item.options||[];
+        return '<div class="enhCard" style="border-color:'+g.color+';margin-bottom:7px;">'+
+          '<div class="er-top"><span class="er-name" style="color:'+g.color+'">'+slotIcon(x.item)+' '+x.item.name+'</span><span style="font-size:10px;color:var(--sub)">+'+(x.item.enhance||0)+'</span></div>'+
+          '<div style="font-size:9px;color:var(--sub);margin:4px 0 6px;">'+g.name+' · 추옵 '+opts.length+'개</div>'+
+          (opts.length?opts.map(function(o,i){
+            const cost=getOptionRerollCost(x.item);
+            return '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin:5px 0;padding:6px 7px;border-radius:8px;background:rgba(255,255,255,.035);">'+
+              '<span style="font-size:10px;">✨ '+o.name+' <b style="color:#ffd166">+'+o.value+'%</b></span>'+
+              '<button class="optRerollBtn" onclick="rerollSingleOption(\'equip\',\''+x.slot+'\','+i+',true)">🔄 '+fmt(cost)+'💰</button>'+
+            '</div>';
+          }).join(''):'<div style="font-size:9px;color:var(--sub);">추가 옵션이 없습니다.</div>')+
+        '</div>';
+      }).join('');
+  }
+  window.renderEnhanceOptions=renderEnhanceOptions;
+
+  /* 기존 추옵 변경 함수에 전용 화면 갱신을 연결 */
+  window.rerollSingleOption=function(source,id,index,fromEnhance){
+    const it=source==='equip' ? S.equip?.[id] : (S.bagEquip||[]).find(function(x){return x.id===id;});
+    if(!it || !it.options || !it.options[index]) return;
+    const cost=getOptionRerollCost(it);
+    if(S.gold<cost){ toast('💰 골드가 부족합니다! 필요: '+fmt(cost)); return; }
+    const currentKey=it.options[index].key;
+    const pool=EQUIP_OPTION_POOL.filter(function(x){return x.key!==currentKey;});
+    const opt=pick(pool);
+    it.options[index]={key:opt.key,name:opt.name,value:Math.floor(rand(opt.min,opt.max+1))};
+    S.gold-=cost;
+    closeItemSheet();
+    renderAll();
+    saveGame();
+    if(document.getElementById('enhModalBg')?.classList.contains('show')) renderEnhanceOptions();
+    toast('✨ 추옵 변경 완료! 💰-'+fmt(cost));
+  };
+
+  /* 강화 메뉴의 탭을 확장 */
+  window.switchEnhTab=function(tab){
+    currentEnhTab=tab;
+    const powerTab=document.getElementById('enhTabPower');
+    const synthTab=document.getElementById('enhTabSynth');
+    const awakenTab=document.getElementById('enhTabAwaken');
+    const optionsTab=document.getElementById('enhTabOptions');
+    const enhList=document.getElementById('enhList');
+    const synthPanel=document.getElementById('synthPanel');
+    const awakenPanel=document.getElementById('awakenPanel');
+    const optionPanel=document.getElementById('optionRerollPanel');
+    if(!powerTab||!synthTab||!awakenTab||!optionsTab||!enhList||!synthPanel||!awakenPanel||!optionPanel) return;
+    powerTab.classList.toggle('active',tab==='power');
+    synthTab.classList.toggle('active',tab==='synth');
+    awakenTab.classList.toggle('active',tab==='awaken');
+    optionsTab.classList.toggle('active',tab==='options');
+    enhList.style.display=tab==='power'?'block':'none';
+    synthPanel.style.display=tab==='synth'?'block':'none';
+    awakenPanel.style.display=tab==='awaken'?'block':'none';
+    optionPanel.style.display=tab==='options'?'block':'none';
+    if(tab==='power') renderEnhance();
+    else if(tab==='synth') renderSynthesis();
+    else if(tab==='awaken') renderAwakening();
+    else renderEnhanceOptions();
+  };
+
+  /* 각성 화면에서도 삭제된 고유 권능을 언급하지 않도록 정리 */
+  window.renderAwakening=function(){
+    const panel=document.getElementById('awakenPanel'); if(!panel) return;
+    const rows=[];
+    ['weapon','helmet','armor','gloves','accessory'].forEach(function(k){
+      const it=S.equip?.[k]; if(!it) return;
+      const lv=Math.min(3,it.awakening||0);
+      const costs=[10000,50000,100000];
+      const cost=costs[lv]||100000;
+      const disabled=(lv>=3||S.soulStones<cost)?'disabled':'';
+      const label=lv>=3?'최대 각성':'🌠 각성 · '+fmt(cost)+' 영혼석';
+      rows.push('<div class="enhCard"><div class="er-top"><div class="er-name" style="color:'+GRADES[it.grade].color+'">'+it.name+'</div><div style="color:var(--gold)">각성 '+lv+'/3</div></div><div style="font-size:9px;color:var(--sub);margin-top:4px;">각성 1단계마다 장비 자체 능력치가 상승합니다.</div><button class="enhBtn" '+disabled+' onclick="awakenEquip(\''+k+'\','+cost+')">'+label+'</button></div>');
+    });
+    panel.innerHTML=rows.length?rows.join(''):'<div style="text-align:center;color:var(--sub);padding:25px;">장착된 장비가 없습니다.</div>';
+  };
+
+  /* 기존 아이템 상세창의 '고유 권능' 표시는 제거 */
+  function cleanUniquePowerText(){
+    document.querySelectorAll('.desc').forEach(function(el){
+      if((el.textContent||'').includes('고유 권능')) el.remove();
+    });
+  }
+  const _renderAll=window.renderAll;
+  if(typeof _renderAll==='function'){
+    window.renderAll=function(){
+      _renderAll.apply(this,arguments);
+      cleanUniquePowerText();
+    };
+  }
+
+  /* 최초 로딩 및 강화창이 열려 있을 때 적용 */
+  setTimeout(function(){
+    cleanUniquePowerText();
+    if(document.getElementById('enhModalBg')?.classList.contains('show')){
+      if(currentEnhTab==='options') renderEnhanceOptions();
+    }
+  },50);
 })();
 </script>
 </body>

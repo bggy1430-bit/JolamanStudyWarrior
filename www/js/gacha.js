@@ -344,3 +344,36 @@ function toggleRateTable(){
     wrap.style.display = 'none';
   }
 }
+
+/* Extracted module. Gameplay behavior intentionally preserved. */
+
+function renderGoldShop(){
+  const pane = document.getElementById('shopGoldPane');
+  const atkCost = Math.floor(300 * Math.pow(1.3, S.research.atkLv));
+  const hpCost = Math.floor(300 * Math.pow(1.3, S.research.hpLv||0));
+  const goldCost = Math.floor(500 * Math.pow(1.4, S.research.goldLv));
+
+  pane.innerHTML = `
+    <div class="shopItem">
+      <div>
+        <div class="si-name">⚔️ 공격력 단련 (Lv.${S.research.atkLv})</div>
+        <div class="si-desc">모든 공격력 +5% 증가 (현재: +${S.research.atkLv*5}%)</div>
+      </div>
+      <button onclick="upgradeResearch('atkLv', ${atkCost})">💰 ${fmt(atkCost)}</button>
+    </div>
+    <div class="shopItem">
+      <div>
+        <div class="si-name">❤️ 최대 HP 단련 (Lv.${S.research.hpLv||0})</div>
+        <div class="si-desc">최대 HP +5% 증가 (현재: +${(S.research.hpLv||0)*5}%)</div>
+      </div>
+      <button onclick="upgradeResearch('hpLv', ${hpCost})">💰 ${fmt(hpCost)}</button>
+    </div>
+    <div class="shopItem">
+      <div>
+        <div class="si-name">💰 행운 단련 (Lv.${S.research.goldLv})</div>
+        <div class="si-desc">골드 획득량 +10% 증가 (현재: +${S.research.goldLv*10}%)</div>
+      </div>
+      <button onclick="upgradeResearch('goldLv', ${goldCost})">💰 ${fmt(goldCost)}</button>
+    </div>
+  `;
+}

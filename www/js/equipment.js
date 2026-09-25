@@ -411,3 +411,9 @@ function autoProcessEquip(item){
     count: result.count
   };
 }
+
+/* Extracted module. Gameplay behavior intentionally preserved. */
+
+function getSetForGrade(grade){
+  return EQUIP_SETS.find(set => grade >= set.grades[0] && grade <= set.grades[1]) || null;
+}

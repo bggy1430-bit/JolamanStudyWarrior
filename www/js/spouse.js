@@ -86,3 +86,24 @@ function drawSpouse(){
 function equipSpouse(id){ if(!isSpouseUnlocked() || !S.spouses?.[id]) return; S.equippedSpouse=id; renderSpouse(); renderSpouseBadge(); saveGame(); toast(`💍 ${SPOUSE_PRESETS.find(x=>x.id===id)?.name||id} 장착!`); }
 
 function unequipSpouse(){ S.equippedSpouse=null; renderSpouse(); renderSpouseBadge(); saveGame(); toast('배우자를 해제했습니다.'); }
+
+/* Extracted module. Gameplay behavior intentionally preserved. */
+
+function applySpousePetDamageScale(petDamageBefore){
+  const mult=getSpousePetDamageMult();
+  if(mult===1) return 0;
+  const pets=S.damageStats?.pets||{};
+  let beforeTotal=0, afterTotal=0;
+  Object.keys(pets).forEach(id=>{ beforeTotal+=Number(petDamageBefore?.[id]||0); afterTotal+=Number(pets[id]||0); });
+  const currentDelta=Math.max(0,afterTotal-beforeTotal);
+  if(currentDelta<=0) return 0;
+  let target=Math.max(0,Math.round(currentDelta*mult));
+  const ids=Object.keys(pets).filter(id=>Number(pets[id]||0)>Number(petDamageBefore?.[id]||0));
+  let assigned=0;
+  ids.forEach((id,i)=>{
+    const delta=Number(pets[id]||0)-Number(petDamageBefore?.[id]||0);
+    const val=i===ids.length-1 ? target-assigned : Math.round(delta*mult);
+    pets[id]=Number(petDamageBefore?.[id]||0)+Math.max(0,val); assigned+=Math.max(0,val);
+  });
+  return Math.max(0,target-currentDelta);
+}

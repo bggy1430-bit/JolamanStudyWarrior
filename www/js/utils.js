@@ -12,3 +12,7 @@ function toast(msg, ms=1800){
   clearTimeout(toast._t);
   toast._t = setTimeout(()=>t.classList.remove('show'), ms);
 }
+
+/* Extracted module. Gameplay behavior intentionally preserved. */
+
+function uid(){ return 'it'+(uidSeed++)+'_'+Date.now().toString(36); }

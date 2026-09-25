@@ -2499,7 +2499,7 @@ const SPOUSE_PRESETS = [
 const SPOUSE_GRADE_COLORS=['','#b0b0b0','#4caf50','#2196f3','#a259ff','#ff9800','#ff4d4d','#00bcd4','#5c6bff','#ff2f92','#ffd700'];
 function hasAllPetsForSpouse(){ return PET_PRESETS.length>0 && PET_PRESETS.every(p=>Number(S.pets?.[p.id]||0)>0); }
 function getEquippedSpouse(){ return SPOUSE_PRESETS.find(x=>x.id===S.equippedSpouse) || null; }
-function getSpousePetDamageMult(){ const sp=getEquippedSpouse(); if(!sp)return 1; let mult=1+sp.bonus/100; if(sp.special==='doublePetChance'&&Math.random()<0.20)mult*=2; if(sp.special==='bossPetDamage'&&S.monster?.isBoss)mult*=1.60; if(sp.special==='lowHpPetDamage'&&S.player?.hp<=calcMaxHp()*0.30)mult*=1.80; if(sp.special==='executePetDamage'&&S.monster?.hp<=S.monster?.maxHp*0.20)mult*=2.50; return mult; }
+function getSpousePetDamageMult(){ const sp=getEquippedSpouse(); if(!sp)return 1; let mult=1+sp.bonus/100; if(sp.special==='doublePetChance')mult*=2; if(sp.special==='bossPetDamage'&&S.monster?.isBoss)mult*=1.60; if(sp.special==='lowHpPetDamage'&&S.player?.hp<=calcMaxHp()*0.30)mult*=1.80; if(sp.special==='executePetDamage'&&S.monster?.hp<=S.monster?.maxHp*0.20)mult*=2.50; return mult; }
 function getSpousePetDamageBonus(){ const sp=getEquippedSpouse(); return sp ? sp.bonus : 0; }
 function isSpouseUnlocked(){ return hasAllPetsForSpouse(); }
 function renderSpouseBadge(){
@@ -3547,7 +3547,6 @@ function combatTick(){
   const eclipse = petProc('eclipse', getPetEffectValue('eclipse'));
   const voidJoker = petProc('voidJoker', getPetEffectValue('voidJoker'));
   const gearPower=getGearPowerState();
-  if(gearPower.dimension>0 && Math.random() < Math.min(.35, gearPower.dimension*.08)){ spawnDmgText('monsterWrap','DIMENSION CUT!','dmgText crit'); }
   const petDamageBeforeHit=Object.assign({},(S.damageStats&&S.damageStats.pets)||{});
   let dmg = Math.max(1, Math.round(attackBase * rand(0.85,1.15)));
   const artifactBaseDamage=dmg;
@@ -3629,8 +3628,7 @@ function combatTick(){
     S.artifactCelestialUsed=true; dmg=Math.round(dmg*1.80); spawnDmgText('monsterWrap','CELESTIAL VERDICT!','dmgText crit');
   }
 
-  if(gearPower.time>0 && Math.random() < Math.min(.30, gearPower.time*.06)){ dmg += Math.max(1,Math.round(dmg*.90)); spawnDmgText('monsterWrap','TIME ECHO!','dmgText extraDmg'); }
-  if(gearPower.absolute>0 && Math.random() < Math.min(.20, gearPower.absolute*.04)){ dmg += Math.max(1,Math.round(dmg*2.5)); spawnDmgText('monsterWrap','ABSOLUTE AUTHORITY!','dmgText crit'); }
+  /* 장비 랜덤 발동 효과 제거: TIME / ABSOLUTE */
   // ===== 신화: 능력치 제공 전용 =====
   // 신화 펫은 getPetBonus()를 통해 공격/체력/치명타/골드 등의 능력치만 제공한다.
   // 전투 중 별도 proc은 발생하지 않는다.
@@ -3740,7 +3738,7 @@ function combatTick(){
       spawnDmgText('monsterWrap','파괴신: +'+burst.toLocaleString(),'dmgText extraDmg');
     }
   }
-  if(hasArtifactSynergy('fate',3) && crit && Math.random()<0.20){ const extra=Math.max(1,Math.round(dmg*0.55)); dmg+=extra; spawnDmgText('monsterWrap','FATE ECHO!','dmgText extraDmg'); }
+  if(hasArtifactSynergy('fate',3) && crit){ const extra=Math.max(1,Math.round(dmg*0.55)); dmg+=extra; spawnDmgText('monsterWrap','FATE ECHO!','dmgText extraDmg'); }
   if(hasArtifactSynergy('fate',4) && S.monster.isBoss && S.monster.hp/S.monster.maxHp<=0.25 && crit){ dmg=Math.round(dmg*1.80); spawnDmgText('monsterWrap','CELESTIAL VERDICT!','dmgText crit'); }
 
   const artifactPetDelta=Object.values((S.damageStats&&S.damageStats.pets)||{}).reduce((x,v)=>x+Number(v||0),0)-artifactPetBaseTotal;
@@ -3977,7 +3975,7 @@ function combatTick(){
     }
 
     let mdmg = Math.max(1, Math.round(S.monster.atk * rand(0.85,1.15)));
-    if(gearPower.void>0 && Math.random() < Math.min(.28, gearPower.void*.06)){ mdmg=0; spawnDmgText('playerWrap','VOID NULL!','dmgText crit'); }
+    /* 장비 랜덤 발동 효과 제거: VOID — 몬스터 피해를 0으로 만들던 확률 효과 */
     if(gearPower.holy>0 && mdmg>0 && !S.gearShieldUsed){ const shieldReduction=0.20; mdmg=Math.max(1,Math.round(mdmg*(1-shieldReduction))); S.gearShieldUsed=true; spawnDmgText('playerWrap','SANCTUARY!','dmgText extraDmg'); }
     // 생존 펫은 공격 횟수 기반으로 확정 발동
     const enemyHit = (S.enemyAttackCount || 0) + 1;

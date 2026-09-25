@@ -50,6 +50,8 @@ function loadGame(){
       }
       S = Object.assign(defaultState(), loaded);
       if(typeof S.autoEquipDismantle !== 'boolean') S.autoEquipDismantle = false;
+      if(!Number.isFinite(S.soulStones)) S.soulStones = 0;
+      S.soulStones = Math.max(0, Math.floor(Number(S.soulStones)));
       if(!Number.isFinite(S.artifactShards)) S.artifactShards = 0;
       if(!Number.isFinite(S.originCoreLv)) S.originCoreLv = 0;
       if(!Number.isFinite(S.originCorePity)) S.originCorePity = 0;

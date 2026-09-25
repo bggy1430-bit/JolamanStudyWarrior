@@ -97,7 +97,7 @@ try{const pane=document.getElementById("shopGoldPane");if(pane){const original=r
         '<div class="spouseTitle">'+(owned?'「'+sp.title+'」':'미획득')+'</div>'+
         '<div class="spouseAbilityBox"><b>기본 능력</b><br>펫 피해 +'+sp.bonus+'%</div>'+ 
         (sp.specialText?'<div class="spouseAbilityBox special"><b>특별 능력</b><br>'+sp.specialText+'</div>':'')+
-        '</div><div>'+(owned?(eq?'<button class="spouseBtn remove" onclick="unequipSpouse()">해제</button>':'<button class="spouseBtn" onclick="equipSpouse(\\''+sp.id+'\\')">장착</button>'):'')+'</div></div>';
+        '</div><div>'+(owned?(eq?'<button class="spouseBtn remove" onclick="unequipSpouse()">해제</button>':'<button class="spouseBtn" onclick="equipSpouse(\''+sp.id+'\')">장착</button>'):'')+'</div></div>';
     }).join('');
   };
 })();

@@ -2112,51 +2112,17 @@ function getSetForGrade(grade){
   return EQUIP_SETS.find(set => grade >= set.grades[0] && grade <= set.grades[1]) || null;
 }
 
-function rollEquipOptions(grade){
-  const count = grade <= 3 ? 1 : grade <= 7 ? 2 : grade <= 11 ? 2 : grade <= 15 ? 3 : 4;
-  const pool = [...EQUIP_OPTION_POOL];
-  const options = [];
-  while(options.length < count && pool.length){
-    const idx = Math.floor(Math.random()*pool.length);
-    const opt = pool.splice(idx,1)[0];
-    const highScale = grade >= 22 ? Math.pow(2.4, grade - 21) : 1;
-    const value = Math.floor(rand(opt.min, opt.max + 1) * highScale);
-    options.push({key:opt.key, name:opt.name, value});
-  }
-  return options;
-}
 
-function getEquipOptionBonus(stat){
-  let total = 0;
-  Object.values(S.equip).forEach(it => {
-    if(!it || !it.options) return;
-    it.options.forEach(o => { if(o.key === stat) total += o.value; });
-  });
-  return total;
-}
 
-function getSetBonus(stat){
-  let total = 0;
-  EQUIP_SETS.forEach(set => {
-    const count = Object.values(S.equip).filter(it => it && it.setId === set.id).length;
-    Object.entries(set.effects).forEach(([need, effect]) => {
-      if(count >= Number(need) && effect[stat]) total += effect[stat];
-    });
-  });
-  return total;
-}
 
-function getSetInfo(item){
-  const set = EQUIP_SETS.find(x => x.id === item.setId);
-  if(!set) return '';
-  const count = Object.values(S.equip).filter(it => it && it.setId === set.id).length;
-  const activeEffects = [];
-  Object.entries(set.effects).forEach(([need, effect]) => {
-    if(count >= Number(need)) Object.entries(effect).forEach(([k,v]) => activeEffects.push(`${need}세트 ${k}:${v}%`));
-  });
-  const active = activeEffects.length ? activeEffects.join(' · ') : '2세트부터 효과 활성화';
-  return `${set.name} (${count}/5) · ${active}`;
-}
+
+
+
+
+
+
+
+
 
 const PET_GRADES = [
   { grade: 0, name: '일반', color: '#b0b0b0', rate:61.7 },
@@ -2231,14 +2197,12 @@ const MONSTER_TITLES = [
 ];
 
 let artifactFilter='all';
-function setArtifactFilter(filter){ artifactFilter=filter; renderArtifacts(); }
-function artifactRole(a){
-  if(['atkPct','critRate','critDmg','bossDmg'].includes(a.stat)) return {label:'⚔️ 공격형',cls:'offense'};
-  if(['hpPct','hpPct'].includes(a.stat)) return {label:'🛡️ 생존형',cls:'survival'};
-  if(['goldPct','expPct'].includes(a.stat)) return {label:'💰 성장형',cls:'growth'};
-  return {label:'◆ 특수형',cls:'special'};
-}
-function artifactSetName(id){ const s=ARTIFACT_SETS.find(x=>x.pieces.includes(id)); return s ? s.name : '미분류'; }
+
+
+
+
+
+
 const ARTIFACTS = [
   {id:'blood_crown',name:'적월의 관',ic:'🔻',rarity:'common',stat:'atkPct',base:12,setId:'bloodmoon',desc:'핏빛 달이 기울던 밤, 이름 없는 왕이 왕좌보다 먼저 전장을 지배하였다.',lore:'피를 왕관으로 삼고, 왕관을 칼날로 삼는다.'},
   {id:'void_star',name:'공허에 잠긴 흑성',ic:'✦',rarity:'legendary',stat:'critDmg',base:20,setId:'bloodmoon',desc:'빛을 삼킨 별은 어둠 대신 존재의 겉면을 갈라놓았다.',lore:'세계가 찢어진 틈을 별이라 부른다.'},
@@ -2302,158 +2266,60 @@ const ARTIFACT_COMBO_SYNERGIES=[
  ['boss_relic','abyss_core','null_feather','허무 삼문','허무의 종말 · 보스 HP 15% 이하 진입 시 공격력 1200% 추가 피해 (전투당 1회)'],
  ['star_collapse','apocalypse_mark','world_end_eye','종말 삼문','세계 붕괴 · 보스 HP 40% 이하 진입 시 공격력 500% 추가 피해 (전투당 1회)']
 ];
-function hasArtifactCombo(...ids){ return ids.every(id=>getEquippedArtifactIds().includes(id)); }
-
-function getArtifactDef(id){ return ARTIFACTS.find(a=>a.id===id); }
-function getArtifactLevel(id){ return Math.max(0,Number((S.artifacts||{})[id]?.level||0)); }
-function artifactLevelMultiplier(lv){ return lv<=0 ? 0 : 1 + (Math.min(10,lv)-1)*0.24; }
-function getEquippedArtifactIds(){ if(!Array.isArray(S.equippedArtifacts) && Array.isArray(S.artifactEquipped)) S.equippedArtifacts=S.artifactEquipped.slice(); return (S.equippedArtifacts||[]).filter(id=>getArtifactLevel(id)>0).slice(0,5); }
-function getArtifactSynergy(){
-  const eq=new Set(getEquippedArtifactIds()); const abilities=[]; const names=[]; const counts={};
-  ARTIFACT_SETS.forEach(set=>{
-    const count=set.pieces.filter(id=>eq.has(id)).length; counts[set.id]=count;
-    if(count>=2) names.push(set.ic+' '+set.name+' '+count+'/4');
-    Object.entries(set.effects).forEach(([need,text])=>{
-      if(count>=Number(need)) abilities.push({setId:set.id,setName:set.name,need:Number(need),text});
-    });
-  });
-  ARTIFACT_COMBO_SYNERGIES.forEach(x=>{
-    const ids=x.slice(0,-2); const comboName=x[x.length-2]; const text=x[x.length-1];
-    if(ids.every(id=>eq.has(id))) { abilities.push({setId:'combo',setName:comboName,need:ids.length,text}); names.push('✦ '+comboName); }
-  });
-  return {stats:{atkPct:0,hpPct:0,goldPct:0,critRate:0,expPct:0,critDmg:0,bossDmg:0},names,abilities,counts};
-}
-function hasArtifactSynergy(setId, need=2){ return (getArtifactSynergy().counts?.[setId]||0) >= need; }
-function artifactSynergyHasText(setId, need){ return hasArtifactSynergy(setId,need); }
-
-function getArtifactSetCount(set){ return set.pieces.filter(id=>getEquippedArtifactIds().includes(id)).length; }
-function renderArtifactSetCodex(){
-  const el=document.getElementById('artifactSetCodex'); if(!el) return;
-  const eq=getEquippedArtifactIds();
-  const setCards=ARTIFACT_SETS.map(set=>{
-    const count=getArtifactSetCount(set);
-    const setCombos=ARTIFACT_COMBO_SYNERGIES.filter(x=>x.slice(0,-2).every(id=>set.pieces.includes(id)));
-    return `<div class="codexCard artifactSetCard"><div class="codexTitle">${set.ic} ${set.name}<span class="setCountBadge ${count>=2?'active':''}">${count}/4 장착</span></div><div class="codexPieces artifactBookPieces">${set.pieces.map(id=>{const a=getArtifactDef(id);const lv=getArtifactLevel(id);const equipped=eq.includes(id);return `<span class="${lv?'owned':''} ${equipped?'equipped':''}"><b>${a?.ic||'?'} ${a?.name||id}</b><small>${equipped?'✓ 장착':lv?'Lv.'+lv:'미획득'}</small></span>`}).join('')}</div>${Object.entries(set.effects).map(([n,e])=>`<div class="codexEffect"><b>${n}세트</b> · ${e}</div>`).join('')}<div class="codexComboTitle">✦ 이 세트의 추가 조합 시너지</div>${setCombos.length?setCombos.map(x=>{const ids=x.slice(0,-2);const comboName=x[x.length-2];const text=x[x.length-1];const comboNames=ids.map(id=>{const a=getArtifactDef(id);return a?.name||id;}).join(' + ');const active=ids.every(id=>eq.includes(id));return `<div class="codexEffect ${active?'active':''}"><b>${comboName}</b> · ${text}<small style="display:block;color:var(--sub);margin-top:2px;">${comboNames}${active?' · ✓ 발동 중':''}</small></div>`}).join(''):'<div class="codexEffect">추가 조합 시너지가 없습니다.</div>'}<div class="codexLore">${set.lore}</div></div>`;
-  }).join('');
-  const comboBook=`<div class="codexCard artifactComboCodex"><div class="codexTitle">🔗 유물 조합 시너지 도감 <span class="setCountBadge active">${ARTIFACT_COMBO_SYNERGIES.length}종</span></div>${ARTIFACT_COMBO_SYNERGIES.map(x=>{const ids=x.slice(0,-2);const comboName=x[x.length-2];const text=x[x.length-1];const active=ids.every(id=>eq.includes(id));const comboNames=ids.map(id=>{const a=getArtifactDef(id);return `${a?.ic||'?'} ${a?.name||id}`;}).join(' + ');return `<div class="codexEffect ${active?'active':''}"><b>${comboName}</b> · ${text}<small style="display:block;color:var(--sub);margin-top:2px;">${comboNames}${active?' · ✓ 발동 중':''}</small></div>`}).join('')}</div>`;
-  el.innerHTML=`<div class="artifactBookSummary">전체 <b>${ARTIFACTS.length}종</b> · 세트 <b>${ARTIFACT_SETS.length}개</b> · 조합 시너지 <b>${ARTIFACT_COMBO_SYNERGIES.length}종</b> · 장착 <b>${eq.length}/5</b></div>`+setCards+comboBook;
-}
 
 
-function artifactStatLabel(key){ return ({atkPct:'공격력',hpPct:'최대 HP',goldPct:'골드 획득량',critRate:'치명타 확률',expPct:'전투 경험치 획득량',critDmg:'치명타 피해',bossDmg:'보스에게 가하는 피해'})[key]||key; }
-function getArtifactBonus(stat){
-  let total=0;
-  getEquippedArtifactIds().forEach(id=>{
-    const a=getArtifactDef(id), lv=getArtifactLevel(id);
-    if(a && lv>0 && a.stat===stat) total += a.base * artifactLevelMultiplier(lv);
-  });
-  return total;
-}
-function addArtifactShards(n, reason=''){
-  n=Math.max(0,Math.floor(n||0)); if(!n) return;
-  S.artifactShards=(S.artifactShards||0)+n;
-  if(reason) toast(`🌌 유물의 파편 +${n} · ${reason}`);
-}
-function weightedArtifactRarity(){
-  const r=Math.random()*100; let acc=0;
-  for(const [name,rate] of ARTIFACT_RATES){ acc+=rate; if(r<acc) return name; }
-  return 'common';
-}
-function pickArtifact(){
-  const rarity=weightedArtifactRarity();
-  const pool=ARTIFACTS.filter(a=>a.rarity===rarity);
-  return pool[Math.floor(Math.random()*pool.length)];
-}
-function artifactPullCost(n){ return n===10 ? 9000 : 1000; }
-function triggerArtifactSummonFx(n){
-  const fx=document.getElementById('artifactSummonFx'); if(!fx) return;
-  fx.classList.remove('show'); void fx.offsetWidth; fx.classList.add('show');
-  const seal=fx.querySelector('.seal'), words=fx.querySelector('.words');
-  if(seal) seal.textContent=n===10?'✦ ᛉ ◈ ᛟ ◈ ᛉ ✦':'✦ ᛉ ◈ ᛟ ✦';
-  if(words) words.innerHTML=n===10?'열 개의 봉인이 동시에 깨어난다<small>THE TENFOLD RELIQUARY</small>':'유물의 문이 열린다<small>THE RELIQUARY REMEMBERS</small>';
-  setTimeout(()=>fx.classList.remove('show'),2800);
-}
-function drawArtifact(n=1){
-  n=Number(n)===10?10:1; const cost=artifactPullCost(n);
-  if((S.artifactShards||0)<cost){ toast(`🌌 유물의 파편이 부족합니다! 필요: ${cost}`); return; }
-  S.artifactShards-=cost;
-  triggerArtifactSummonFx(n);
-  const results=[];
-  for(let i=0;i<n;i++){
-    const a=pickArtifact(); const old=getArtifactLevel(a.id);
-    if(old>=10){ addArtifactShards(30); results.push({a,lv:10,max:true}); }
-    else { S.artifacts[a.id]={level:old+1}; results.push({a,lv:old+1,max:false}); }
-  }
-  renderArtifacts(results); renderAll(); saveGame();
-}
-function upgradeArtifact(id){
-  const a=getArtifactDef(id), lv=getArtifactLevel(id); if(!a||lv<=0||lv>=10) return;
-  const cost=Math.floor(60 + lv*45 + lv*lv*12);
-  if((S.artifactShards||0)<cost){toast(`🌌 유물의 파편이 부족합니다! 필요: ${cost}`);return;}
-  S.artifactShards-=cost; S.artifacts[id].level=Math.min(10,lv+1);
-  renderArtifacts(); renderAll(); saveGame(); toast(`🌌 ${a.name} Lv.${lv+1} 강화!`);
-}
-function artifactExactText(a,val){
-  const n=(v)=>Number(v.toFixed(2));
-  const map={atkPct:`공격력 ${n(val)}% 상승`,hpPct:`최대 HP ${n(val)}% 상승`,goldPct:`골드 획득량 ${n(val)}% 상승`,critRate:`치명타 확률 ${n(val)}%p 상승`,expPct:`전투 경험치 획득량 ${n(val)}% 상승`,critDmg:`치명타 피해 ${n(val)}% 상승`,bossDmg:`보스에게 가하는 피해 ${n(val)}% 상승`};
-  return map[a.stat]||`기록되지 않은 권능 ${n(val)}`;
-}
-function artifactMysteryText(a,lv){
-  const t={atkPct:['칼날이 조금 더 무거워진다.','전장의 기류가 그 주위를 따른다.','힘의 근원이 서서히 드러난다.','그 힘은 결국 공격으로 귀결될 것이다.'],hpPct:['심장이 아닌 것이 박동한다.','죽음의 문턱이 한 걸음 물러난다.','육신의 경계가 희미해진다.','그 권능은 생명을 붙든다.'],goldPct:['금속이 주인을 기억한다.','손에 닿지 않은 재물의 향이 난다.','재화의 흐름이 한쪽으로 기운다.','그 권능은 재물의 귀환을 부른다.'],critRate:['눈동자 너머에 다른 시선이 있다.','아직 오지 않은 한 점을 본다.','명중의 순간이 먼저 보인다.','그 권능은 필연을 겨눈다.'],expPct:['읽지 않은 문장이 스스로 열린다.','시간이 지식의 편을 든다.','배움의 흔적이 깊어진다.','그 권능은 기억을 가속한다.'],critDmg:['상처보다 먼저 균열이 생긴다.','한 번의 궤적이 길어진다.','파괴의 깊이가 모습을 드러낸다.','그 권능은 치명적인 결말을 부른다.'],bossDmg:['거대한 존재를 향해 반응한다.','왕의 그림자에만 불이 켜진다.','종언을 가진 적에게 균열이 생긴다.','그 권능은 거대한 적을 겨눈다.']}[a.stat]||['봉인이 흔들린다.','기록이 되살아난다.','권능의 윤곽이 드러난다.','마침내 이름을 알 수 있을 것 같다.'];
-  return t[Math.min(lv-1,3)];
-}
-function toggleArtifactEquip(id){
-  const lv=getArtifactLevel(id); if(lv<=0) return;
-  if(!Array.isArray(S.equippedArtifacts)) S.equippedArtifacts=[];
-  const idx=S.equippedArtifacts.indexOf(id);
-  if(idx>=0){ S.equippedArtifacts.splice(idx,1); toast('🌌 유물을 장착 해제했습니다.'); }
-  else { if(S.equippedArtifacts.length>=5){toast('유물은 최대 5개까지 장착할 수 있습니다!');return;} S.equippedArtifacts.push(id); toast('🌌 유물을 장착했습니다!'); }
-  renderArtifacts(); renderAll(); saveGame();
-}
-function renderArtifactSynergy(){
-  const el=document.getElementById('artifactSynergyPanel'); if(!el) return;
-  const syn=getArtifactSynergy();
-  el.innerHTML=`<div class="artifactSynergyHead">✦ 유물 시너지 <b>${getEquippedArtifactIds().length}/5</b></div><div class="artifactEquippedList">${getEquippedArtifactIds().map(id=>{const a=getArtifactDef(id);return `<span>${a.ic} ${a.name}</span>`}).join('')||'<span>아직 선택된 유물이 없습니다.</span>'}</div><div class="artifactSynergyNames">${syn.names.length?syn.names.map(n=>`<b>✦ ${n}</b>`).join(' · '):'세트 유물이 2개 이상 모이면 특수 능력이 깨어납니다.'}</div><div class="artifactSynergyDesc">${syn.abilities.length?syn.abilities.map(a=>`<div>🔹 <b>${a.setName} ${a.need}세트</b> · ${a.text}</div>`).join(''):'<div style="color:var(--sub)">현재 발동 중인 유물 시너지가 없습니다.</div>'}</div>`;
-}
 
 
-function renderArtifacts(results){
-  const shardCount=fmt(S.artifactShards||0); const cur=document.getElementById('artifactShardVal'); if(cur) cur.textContent=shardCount; const navShard=document.getElementById('artifactNavShard'); if(navShard) navShard.textContent=shardCount;
-  const ownedCount=ARTIFACTS.filter(a=>getArtifactLevel(a.id)>0).length;
-  const owned=document.getElementById('artifactOwnedCount'); if(owned) owned.textContent=ownedCount;
-  const ec=document.getElementById('artifactEquippedCount'); if(ec) ec.textContent=getEquippedArtifactIds().length;
-  renderArtifactSynergy();
-  const grid=document.getElementById('artifactGrid'); if(!grid) return;
 
-  const filters=`<div class="artifactGuide">
-    <div class="artifactGuideHead"><b>🌌 유물 선택</b><span>장착한 5개만 능력치가 적용됩니다.</span></div>
-    <div class="artifactFilterBtns">
-      ${[['all','전체'],['owned','보유'],['equipped','장착중'],['offense','⚔️ 공격'],['survival','🛡️ 생존'],['growth','💰 성장']].map(([k,t])=>`<button class="artifactFilter ${artifactFilter===k?'active':''}" onclick="setArtifactFilter('${k}')">${t}</button>`).join('')}
-    </div>
-    <div class="artifactLegend"><span class="legendEquipped">● 장착</span><span>🟣 전설/영웅 등급</span><span>🟢 보유</span><span>⚪ 미획득</span></div>
-  </div>`;
 
-  let sorted=[...ARTIFACTS].sort((a,b)=>{const ea=getEquippedArtifactIds().includes(a.id),eb=getEquippedArtifactIds().includes(b.id); if(ea!==eb)return eb-ea; const la=getArtifactLevel(a.id),lb=getArtifactLevel(b.id); if(la!==lb)return lb-la; return a.id.localeCompare(b.id);});
-  sorted=sorted.filter(a=>{const lv=getArtifactLevel(a.id),eq=getEquippedArtifactIds().includes(a.id),role=artifactRole(a).cls; if(artifactFilter==='owned')return lv>0; if(artifactFilter==='equipped')return eq; if(['offense','survival','growth'].includes(artifactFilter))return role===artifactFilter; return true;});
-  grid.innerHTML=filters+`<div class="artifactGridInner">`+sorted.map(a=>{
-    const lv=getArtifactLevel(a.id); const val=lv?a.base*artifactLevelMultiplier(lv):0; const ownedLv=lv>0; const equippedNow=getEquippedArtifactIds().includes(a.id);
-    const cost=lv>0&&lv<5?Math.floor(60+lv*45+lv*lv*12):0;
-    const role=artifactRole(a); const set=ARTIFACT_SETS.find(x=>x.pieces.includes(a.id)); const setCount=set?getArtifactSetCount(set):0;
-    const powerText=a.stat==='atkPct'?'공격력':a.stat==='hpPct'?'최대 HP':a.stat==='hpPct'?'최대 HP':a.stat==='goldPct'?'골드 획득량':a.stat==='critRate'?'치명타 확률':a.stat==='expPct'?'전투 경험치':a.stat==='critDmg'?'치명타 피해':'보스 피해';
-    const exact=artifactExactText(a,val); const reveal=lv===0?'미획득 · 소환에서 획득할 수 있습니다.':lv<5?artifactMysteryText(a,lv):exact;
-    return `<div class="artifactCard ${a.rarity} ${equippedNow?'artifactSelected':''} ${ownedLv?'ownedArtifact':''}" onclick="${ownedLv?`toggleArtifactEquip('${a.id}')`:''}">
-      <div class="artifactStatus">${equippedNow?'✓ 장착중':ownedLv?'보유':'미획득'}</div>
-      <div class="artifactIc">${a.ic}</div><div class="artifactName">${a.name}</div>
-      <div class="artifactRarity" style="color:${a.rarity==='legendary'?'#ffd166':a.rarity==='epic'?'#b06cff':a.rarity==='rare'?'#4da6ff':'#aaa'}">${ARTIFACT_RARITY_NAMES[a.rarity]}</div>
-      <div class="artifactRole ${role.cls}">${role.label}</div><div class="artifactSetLine">${set?set.ic+' '+set.name+' · '+setCount+'/4':''}</div>
-      <div class="artifactLv">${ownedLv?'Lv.'+lv:'미획득'}</div><div class="artifactDesc"><b>${powerText}</b><br>${reveal}${lv===5?' · 「완전개방」':''}</div>
-      ${ownedLv&&lv<5?`<button class="artifactUpgrade" onclick="event.stopPropagation();upgradeArtifact('${a.id}')">⬆️ 봉인 해제 · ${cost} 파편</button>`:''}
-      ${ownedLv?`<button class="artifactEquipBtn" onclick="event.stopPropagation();toggleArtifactEquip('${a.id}')">${equippedNow?'✓ 장착 해제':'＋ 장착하기'}</button>`:''}
-    </div>`;
-  }).join('')+`</div>`;
-  const result=document.getElementById('artifactPullResult');
-  if(results && results.length){ result.style.display='block'; result.innerHTML='<div class="artifactPullResult"><b>🌌 유물 소환 결과</b><div>'+results.map(x=>`<span class="artifactResultItem">${x.a.ic} ${x.a.name} ${x.max?'· MAX 중복 → +30 파편':'Lv.'+x.lv}</span>`).join('')+'</div></div>'; }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 const MONSTERS = [
@@ -2497,114 +2363,32 @@ const SPOUSE_PRESETS = [
   {id:'end_god',grade:15,name:'종말신',title:'세계의 마지막 신',ic:'☄️',bonus:900,rate:0.2,special:'executePetDamage',specialText:'적 HP 20% 이하에서 펫 피해 +150%'}
 ];
 const SPOUSE_GRADE_COLORS=['','#b0b0b0','#4caf50','#2196f3','#a259ff','#ff9800','#ff4d4d','#00bcd4','#5c6bff','#ff2f92','#ffd700'];
-function hasAllPetsForSpouse(){ return PET_PRESETS.length>0 && PET_PRESETS.every(p=>Number(S.pets?.[p.id]||0)>0); }
-function getEquippedSpouse(){ return SPOUSE_PRESETS.find(x=>x.id===S.equippedSpouse) || null; }
-function getSpousePetDamageMult(){ const sp=getEquippedSpouse(); if(!sp)return 1; let mult=1+sp.bonus/100; if(sp.special==='doublePetChance')mult*=2; if(sp.special==='bossPetDamage'&&S.monster?.isBoss)mult*=1.60; if(sp.special==='lowHpPetDamage'&&S.player?.hp<=calcMaxHp()*0.30)mult*=1.80; if(sp.special==='executePetDamage'&&S.monster?.hp<=S.monster?.maxHp*0.20)mult*=2.50; return mult; }
-function getSpousePetDamageBonus(){ const sp=getEquippedSpouse(); return sp ? sp.bonus : 0; }
-function isSpouseUnlocked(){ return hasAllPetsForSpouse(); }
-function renderSpouseBadge(){
-  const box=document.getElementById('spouseSceneBadge'); const sp=getEquippedSpouse();
-  if(!box) return;
-  if(!sp){ box.classList.remove('show'); return; }
-  box.classList.add('show');
-  const n=document.getElementById('spouseSceneName'), t=document.getElementById('spouseSceneTitle');
-  const aura=SPOUSE_GRADE_COLORS[sp.grade]||'#ffd700';
-  box.style.setProperty('--spouse-aura',aura);
-  if(n) n.textContent=sp.ic;
-  if(t) t.textContent='';
-}
-function renderSpouse(){
-  const unlocked=isSpouseUnlocked();
-  const area=document.getElementById('spouseUnlockArea');
-  const count=PET_PRESETS.filter(p=>Number(S.pets?.[p.id]||0)>0).length;
-  if(area) area.innerHTML=unlocked
-    ? `<div class="spouseUnlockBox"><b>💍 배우자 시스템 해금 완료</b><div style="font-size:9px;color:var(--sub);margin-top:4px;">전체 펫 ${count}/${PET_PRESETS.length}종 획득 · 1명만 장착 가능</div></div>`
-    : `<div class="spouseUnlockBox locked"><b>🔒 배우자 시스템 잠금</b><div style="font-size:9px;color:var(--sub);margin-top:4px;">모든 펫 획득 시 해금 · 현재 ${count}/${PET_PRESETS.length}종 획득</div></div>`;
-  const ev=document.getElementById('spouseEssenceVal'); if(ev) ev.textContent=fmt(S.essence||0);
-  const btn=document.getElementById('spousePullBtn'); if(btn){ btn.disabled=!unlocked || S.essence<10000 || SPOUSE_PRESETS.every(x=>Number(S.spouses?.[x.id]||0)>0); btn.textContent=SPOUSE_PRESETS.every(x=>Number(S.spouses?.[x.id]||0)>0)?'✨ 모든 배우자 획득 완료':`💍 1회 소환 · 🌿 10,000`; }
-  const rateWrap=document.getElementById('spouseRateTableWrap');
-  if(rateWrap){
-    rateWrap.innerHTML=`<table class="spouseRateTable"><thead><tr><th>등급</th><th>배우자</th><th>펫 피해</th><th>확률</th></tr></thead><tbody>${SPOUSE_PRESETS.map(sp=>`<tr><td>${sp.grade}등급</td><td>${sp.name}</td><td>+${sp.bonus}%</td><td>${sp.rate}%</td></tr>`).join('')}</tbody></table>`;
-  }
-  const result=document.getElementById('spouseResult');
-  const grid=document.getElementById('spouseGrid'); if(!grid)return;
-  grid.innerHTML=SPOUSE_PRESETS.map(sp=>{
-    const owned=Number(S.spouses?.[sp.id]||0)>0, eq=S.equippedSpouse===sp.id, color=SPOUSE_GRADE_COLORS[sp.grade]||'#fff';
-    return `<div class="spouseCard ${owned?'':'locked'} ${eq?'equipped':''}">
-      <div class="spouseIcon">${owned?sp.ic:'❔'}</div>
-      <div><div class="spouseGrade" style="color:${color}">${sp.grade}등급</div><div class="spouseName">${owned?sp.name:'???'}</div><div class="spouseTitle">${owned?'「'+sp.title+'」':'미획득'}</div><div class="spouseDesc">펫 피해 <b style="color:#ffd54a">+${sp.bonus}%</b>${sp.specialText?'<br><span style="color:#8ff0ff">✦ '+sp.specialText+'</span>':''}</div></div>
-      <div>${owned?(eq?`<button class="spouseBtn remove" onclick="unequipSpouse()">해제</button>`:`<button class="spouseBtn" onclick="equipSpouse('${sp.id}')">장착</button>`):''}</div>
-    </div>`;
-  }).join('');
-}
-function playSpouseSummonFx(sp){
-  const fx=document.getElementById('spouseSummonFx');
-  if(!fx) return Promise.resolve();
-  const n=document.getElementById('summonName'), g=document.getElementById('summonGrade'), t=document.getElementById('summonTitle');
-  if(n) n.textContent=`${sp.ic} ${sp.name}`;
-  if(g) g.textContent=`${sp.grade}등급 · 펫 피해 +${sp.bonus}%${sp.specialText?' · ✦ 특별 능력':''}`;
-  if(t) t.textContent=`「${sp.title}」`;
-  fx.classList.toggle('mythic',sp.grade===10); fx.classList.add('show');
-  return new Promise(resolve=>setTimeout(()=>{fx.classList.remove('show','mythic');resolve();},3000));
-}
 
-async function drawSpouse(){
-  if(!isSpouseUnlocked()){ toast('모든 펫을 획득해야 배우자가 해금됩니다!'); return; }
-  if(S.essence<10000){ toast('생명의 정수가 부족합니다! (10,000 필요)'); return; }
-  const available=SPOUSE_PRESETS.filter(x=>!S.spouses?.[x.id]);
-  if(!available.length){ toast('모든 배우자를 이미 획득했습니다!'); return; }
-  S.essence-=10000;
-  // 모든 소환은 아래 확률표의 고정 확률을 그대로 1회 판정합니다.
-  let r=Math.random()*100, picked=SPOUSE_PRESETS[SPOUSE_PRESETS.length-1];
-  for(const sp of SPOUSE_PRESETS){ r-=sp.rate; if(r<=0){ picked=sp; break; } }
-  const alreadyOwned=Number(S.spouses?.[picked.id]||0)>0;
-  if(alreadyOwned){
-    const result=document.getElementById('spouseResult');
-    if(result) result.innerHTML=`<div class="spouseResult"><div style="font-size:24px">🔁</div><b style="font-size:14px">중복 소환</b><div style="font-size:10px;color:var(--sub);margin-top:3px;">${picked.name} · 확률 ${picked.rate}%</div></div>`;
-    toast(`🔁 ${picked.name} 중복 소환 · 추가 보상 없음`);
-    renderSpouse(); renderAll(); saveGame();
-    return;
-  }
-  S.spouses[picked.id]=1;
-  const result=document.getElementById('spouseResult');
-  await playSpouseSummonFx(picked);
-  if(result) result.innerHTML=`<div class="spouseResult"><div style="font-size:24px">${picked.ic}</div><b style="font-size:15px;color:${SPOUSE_GRADE_COLORS[picked.grade]}">${picked.grade}등급 · ${picked.name}</b><div style="font-size:10px;color:var(--sub);margin-top:3px;">「${picked.title}」 · 펫 피해 +${picked.bonus}%</div></div>`;
-  toast(`💍 ${picked.name}이(가) 강림했습니다! 펫 피해 +${picked.bonus}%`);
-  renderSpouse(); renderAll(); saveGame();
-}
-function equipSpouse(id){ if(!isSpouseUnlocked() || !S.spouses?.[id]) return; S.equippedSpouse=id; renderSpouse(); renderSpouseBadge(); saveGame(); toast(`💍 ${SPOUSE_PRESETS.find(x=>x.id===id)?.name||id} 장착!`); }
-function unequipSpouse(){ S.equippedSpouse=null; renderSpouse(); renderSpouseBadge(); saveGame(); toast('배우자를 해제했습니다.'); }
 
-function defaultState(){
-  return {
-    player:{ level:1, exp:0, atk:10, maxHp:80, hp:80 },
-    gold:500, soulStones:0, essence:0,
-    stage:1, maxStage:1,
-    pendingBoss: false,
-    monster:null,
-    equip:{ weapon:null, helmet:null, armor:null, gloves:null, accessory:null },
-    bagJunk:[],
-    bagEquip:[],
-    pets:{},
-    equippedPets:[], // 최대 12개 착용 지원
-    mbox:{ pulls:0 },
-    autoEquipDismantle: false,
-    research:{ atkLv:0, hpLv:0, goldLv:0 },
-    studying:false,
-    totalStudySec:0,
-    lastSaveAt:0,
-    showDetailStats: false,
-    petGrowthSpent: 0,
-    playerGrowthSpent: 0,
-    growthSkills: {},
-    artifactShards: 0,
-    artifacts: {},
-    equippedArtifacts: [],
-    artifactPresets: [{name:'사냥',pets:[],artifacts:[],equip:{}},{name:'보스',pets:[],artifacts:[],equip:{}},{name:'파밍',pets:[],artifacts:[],equip:{}}],
-    spouses:{}, equippedSpouse:null,
-    zeroOmegaCharge: 0, focusMode:false, focusEndAt:0, focusSession:{gold:0,exp:0,boxes:0,kills:0}, focusBoxes:0, focusCrystal:0, focusUpgrades:{atk:0,hp:0}, breakProtectionTickets:0, originCoreLv:0, originCorePity:0, errorHitCount:0, damageStats:{player:0,pets:{},artifacts:{}}, artifactApocBossHits:0, artifactApocStacks:0, artifactApocKillCount:0, artifactApocKillReady:false, artifactApocCollapseUsed:false, artifactStarCritCharge:0
-  };
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async 
+
+
+
+
+
+
+
+
 
 let S = defaultState();
 let currentBagTab = 'junk';
@@ -2618,115 +2402,11 @@ let combatTimer=null, autosaveTimer=null, studyTickTimer=null, focusCountdownTim
 let isEnhancing = false;
 
 /* SAVE / LOAD */
-function saveGame(){
-  try{
-    S.lastSaveAt = Date.now();
-    localStorage.setItem('zolaman_study_save', JSON.stringify(S));
-  }catch(e){ console.error(e); }
-}
 
-function loadGame(){
-  try{
-    const rawData = localStorage.getItem('zolaman_study_save');
-    if(rawData){
-      const loaded = JSON.parse(rawData);
-      if(loaded.bag && Array.isArray(loaded.bag)){
-        loaded.bagJunk = loaded.bag.filter(x=>x.kind==='junk');
-        loaded.bagEquip = loaded.bag.filter(x=>x.kind!=='junk');
-        delete loaded.bag;
-      }
-      S = Object.assign(defaultState(), loaded);
-      if(typeof S.autoEquipDismantle !== 'boolean') S.autoEquipDismantle = false;
-      if(!Number.isFinite(S.artifactShards)) S.artifactShards = 0;
-      if(!Number.isFinite(S.originCoreLv)) S.originCoreLv = 0;
-      if(!Number.isFinite(S.originCorePity)) S.originCorePity = 0;
-      if(!Number.isFinite(S.breakProtectionTickets)) S.breakProtectionTickets = 0;
-      S.breakProtectionTickets=Math.max(0,Math.floor(S.breakProtectionTickets));
-      if(!S.artifacts || typeof S.artifacts !== 'object') S.artifacts = {};
-      if(!Array.isArray(S.equippedArtifacts)) S.equippedArtifacts=[];
-      S.equippedArtifacts=S.equippedArtifacts.filter(id=>S.artifacts[id] && Number(S.artifacts[id].level)>0).slice(0,5);
-      Object.keys(S.artifacts).forEach(id=>{ if(Number(S.artifacts[id].level)>10) S.artifacts[id].level=10; });
-      if(!Array.isArray(S.artifactPresets) || S.artifactPresets.length<3) S.artifactPresets=[{name:'사냥',pets:[],artifacts:[],equip:{}},{name:'보스',pets:[],artifacts:[],equip:{}},{name:'파밍',pets:[],artifacts:[],equip:{}}];
-          if(!S.spouses || typeof S.spouses!=='object') S.spouses={};
-      if(!S.equippedSpouse || !S.spouses[S.equippedSpouse]) S.equippedSpouse=null;
-      if(!S.bagJunk) S.bagJunk = [];
-      if(!S.bagEquip) S.bagEquip = [];
-      if(Array.isArray(S.pets)){
-        const oldPets = S.pets;
-        S.pets = {};
-        oldPets.forEach(pId => { S.pets[pId] = 1; });
-      } else if(!S.pets){
-        S.pets = {};
-      }
-      // Prototype v1 migration: permanently remove retired pet entries from old saves.
-      const retiredPetsV1 = ['myth_guardian','myth_treasure_god','origin_time','origin_void','absolute_annihilator','absolute_boss'];
-      retiredPetsV1.forEach(id=>{ if(S.pets && Object.prototype.hasOwnProperty.call(S.pets,id)) delete S.pets[id]; });
-      if(Array.isArray(S.equippedPets)) S.equippedPets=S.equippedPets.filter(id=>!retiredPetsV1.includes(id));
-      if(Array.isArray(S.artifactPresets)) S.artifactPresets.forEach(p=>{
-        if(Array.isArray(p.pets)) p.pets=p.pets.filter(id=>!retiredPetsV1.includes(id));
-      });
 
-      if(!S.equippedPets){
-        S.equippedPets = [];
-        if(S.equippedPet) {
-          S.equippedPets.push(S.equippedPet);
-          delete S.equippedPet;
-        }
-      }
 
-      // PET_REBUILD_V16: 기존 신화/태초/절대극 보유분을 모두 폐기하고 새 6+6+6 체계로 시작
-      const legacyHighPetIds = new Set([
-        'pet_crit_master','pet_shadow_echo','pet_reaper','pet_gambler','pet_gravity_jelly','pet_cursed_dice','pet_hourglass','pet_void_jester',
-        'pet_star_whale','pet_soul_collector','pet_ancient_mimic','pet_essence_wisp','pet_void_dragon','pet_time_dragon','pet_black_hole','pet_soul_merger',
-        'pet_absolute_god','pet_dimension_eater','pet_fate_weaver','pet_apocalypse_clock','pet_prism_fairy','pet_dimension_fox','pet_eternal_sword','pet_endless_eye','pet_creator_dragon','pet_final_crown','pet_star_judge',
-        'pet_storm_hawk','pet_rune_golem','pet_dream_eater'
-      ]);
-      Object.keys(S.pets).forEach(id => { if(legacyHighPetIds.has(id)) delete S.pets[id]; });
-      S.equippedPets = S.equippedPets.filter(id => !legacyHighPetIds.has(id));
 
-      if(!S.essence) S.essence = 0;
-      if(!S.research || typeof S.research !== 'object') S.research = { atkLv:0, hpLv:0, goldLv:0 };
-      if(S.research.hpLv === undefined) S.research.hpLv = Number(S.research.defLv||0);
-      delete S.research.defLv;
-      if(S.player && 'def' in S.player) delete S.player.def;
-      if(S.focusUpgrades && 'def' in S.focusUpgrades){ S.focusUpgrades.hp = Number(S.focusUpgrades.hp||0) + Number(S.focusUpgrades.def||0); delete S.focusUpgrades.def; }
-      if(!S.mbox) S.mbox = { pulls:0 };
-      if(S.pendingBoss === undefined) S.pendingBoss = false;
-      if(S.showDetailStats === undefined) S.showDetailStats = false;
-      if(S.petGrowthSpent === undefined) S.petGrowthSpent = 0;
-      if(S.playerGrowthSpent === undefined) S.playerGrowthSpent = 0;
-      if(!S.growthSkills || typeof S.growthSkills !== 'object') S.growthSkills = {};
-      if(!S.focusSession || typeof S.focusSession !== 'object') S.focusSession={gold:0,exp:0,boxes:0,kills:0};
-      if(!Number.isFinite(S.focusBoxes)) S.focusBoxes=0; if(!Number.isFinite(S.focusCrystal)) S.focusCrystal=0;
-      if(!S.focusUpgrades || typeof S.focusUpgrades !== 'object') S.focusUpgrades={atk:0,hp:0};
-      S.focusMode=false; S.focusEndAt=0;
-      if(!S.damageStats || typeof S.damageStats!=='object') S.damageStats={player:0,pets:{},artifacts:{}};
-      if(!Number.isFinite(S.damageStats.player)) S.damageStats.player=0;
-      if(!S.damageStats.pets || typeof S.damageStats.pets!=='object') S.damageStats.pets={}; if(!S.damageStats.artifacts || typeof S.damageStats.artifacts!=='object') S.damageStats.artifacts={};
-      S.studying = false;
-    }
-  }catch(e){ console.error(e); }
-  
-  ['weapon','helmet','armor','gloves','accessory'].forEach(slot => {
-    if(S.equip[slot] && S.equip[slot].transcend === undefined) S.equip[slot].transcend = 0;
-  });
-  S.bagEquip.forEach(it => {
-    if(it.transcend === undefined) it.transcend = 0;
-    if(!it.options) it.options = rollEquipOptions(it.grade || 0);
-    if(!it.setId) { const set = getSetForGrade(it.grade || 0); it.setId = set ? set.id : null; }
-  });
-  ['weapon','helmet','armor','gloves','accessory'].forEach(slot => {
-    const it = S.equip[slot];
-    if(it){
-      if(!it.options) it.options = rollEquipOptions(it.grade || 0);
-      if(!it.setId) { const set = getSetForGrade(it.grade || 0); it.setId = set ? set.id : null; }
-    }
-  });
 
-  if(!S.monster) spawnMonster(false);
-  renderAll();
-  document.getElementById('studyTimer').textContent = `누적 학습시간 ${Math.floor(S.totalStudySec/60)}분`;
-}
 
 window.addEventListener('beforeunload', () => {
   if (resetInProgress) return;
@@ -2738,52 +2418,29 @@ window.addEventListener('beforeunload', () => {
 });
 
 /* UTIL */
-function rand(a,b){ return Math.random()*(b-a)+a; }
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function fmt(n){ return Math.floor(n).toLocaleString(); }
-function toast(msg, ms=1800){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(()=>t.classList.remove('show'), ms);
-}
+
+
+
+
+
+
+
+
 
 /* STAT CALC */
-function getGearPowerNameForGrade(g){ return ({15:'성역',16:'허무',17:'차원절단',18:'시간메아리',19:'무극의극점',20:'태초회귀',21:'절대권능'})[g]||''; }
 
-function itemStatValue(item){
-  const g = GRADES[item.grade];
-  const base = 8 + item.grade*4.5;
-  const ultraGradeMult = item.grade >= 22 ? Math.pow(3.2, item.grade - 21) : 1;
-  const transMult = 1 + (item.transcend || 0) * 0.5;
-  const ultimateMult = 1 + (item.ultimate || 0) * 0.40;
-  const synthMult = 1 + (item.synthLv || 0) * 0.10;
-  const awakeningMult = 1 + Math.min(3,item.awakening || 0) * 0.75;
-  return Math.round(base * g.mult * ultraGradeMult * (1+item.stage*0.03) * (1 + item.enhance*0.06) * transMult * ultimateMult * synthMult * awakeningMult);
-}
 
-function getGearPowerState(){
-  const gs=Object.values(S.equip||{}).filter(Boolean).map(it=>Number(it.grade||0));
-  return {holy:gs.filter(g=>g>=15).length, void:gs.filter(g=>g>=16).length, dimension:gs.filter(g=>g>=17).length, time:gs.filter(g=>g>=18).length, infinity:gs.filter(g=>g>=19).length, origin:gs.filter(g=>g>=20).length, absolute:gs.filter(g=>g>=21).length};
-}
-function getGearPowerNames(){
-  const h=getGearPowerState(); const a=[]; if(h.holy)a.push('신성·성역'); if(h.void)a.push('허공·허무'); if(h.dimension)a.push('차원·절단'); if(h.time)a.push('시공·메아리'); if(h.infinity)a.push('무극·극점'); if(h.origin)a.push('태초극·회귀'); if(h.absolute)a.push('절대극·절대권능'); return a;
-}
 
-function equippedBonus(){
-  let atk=0, hp=0;
-  ['weapon','helmet','armor','gloves','accessory'].forEach(slot=>{
-    const it = S.equip[slot];
-    if(!it) return;
-    const v = itemStatValue(it);
-    if(slot==='weapon') atk += v;
-    else if(slot==='helmet'){ hp += Math.round(v*1.55); }
-    else if(slot==='armor'){ hp += Math.round(v*2.65); }
-    else if(slot==='gloves'){ atk += Math.round(v*0.3); hp += Math.round(v*0.25); }
-    else { atk += Math.round(v*0.45); hp += Math.round(v*1.0); }
-  });
-  return {atk,hp};
-}
+
+
+
+
+
+
+
+
+
+
 
 /* 장착 펫 보너스 중첩 계산 */
 const PET_SYNERGIES = [
@@ -2847,34 +2504,10 @@ function applySpousePetDamageScale(petDamageBefore){
 }
 
 
-function renderDamageReport(){
-  const ds=S.damageStats||{player:0,pets:{},artifacts:{}};
-  const player=Number(ds.player||0);
-  const petEntries=(S.equippedPets||[]).map(id=>[id,Number(ds.pets?.[id]||0)]).filter(([,v])=>v>0);
-  if(Number(ds.pets?.zero999||0)>0&&!petEntries.some(([id])=>id==='zero999')) petEntries.push(['zero999',Number(ds.pets.zero999)]);
-  const petTotal=petEntries.reduce((x,[,v])=>x+v,0);
-  const artifactEntries=Object.entries(ds.artifacts||{}).filter(([,v])=>Number(v)>0);
-  const artifactTotal=artifactEntries.reduce((x,[,v])=>x+Number(v),0);
-  const total=Math.max(0,player+petTotal+artifactTotal);
-  const pct=v=>total>0?((v/total)*100).toFixed(1)+'%':'0%';
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set('damageReportTotal',fmt(total)); set('damageReportPlayer',fmt(player)); set('damageReportPlayerPct',pct(player));
-  set('damageReportPet',fmt(petTotal)); set('damageReportPetPct',pct(petTotal));
-  set('damageReportArtifact',fmt(artifactTotal)); set('damageReportArtifactPct',pct(artifactTotal));
-  const list=document.getElementById('damageReportList');
-  if(list){
-    const directIds=new Set(['combo','thunder','burn','airStrike','zeroCombo','zeroOne','zero999','zeroOmega','errorFixed','absSlaughter','absBoss','absBarrage','absDestroy','goldCoin','goldPickpocket','goldJackpot','goldVault']);
-    const direct=(S.equippedPets||[]).filter(id=>{const p=PET_PRESETS.find(x=>x.id===id);return p&&(directIds.has(p.effect)||p.stat==='extraAtk');});
-    const rows=direct.map(id=>{const p=PET_PRESETS.find(x=>x.id===id);const v=Number(ds.pets?.[id]||0);return '<div class="damageReportRow"><div class="ic">'+p.ic+'</div><div><div class="name">'+p.name+'</div><div class="sub">전체 피해의 '+pct(v)+'</div></div><div class="dmg">'+fmt(v)+'</div></div>';});
-    if(Number(ds.pets?.zero999||0)>0&&!direct.includes('zero999')){const p=PET_PRESETS.find(x=>x.id==='zero999');const v=Number(ds.pets.zero999);if(p)rows.push('<div class="damageReportRow"><div class="ic">'+p.ic+'</div><div><div class="name">'+p.name+'</div><div class="sub">전체 피해의 '+pct(v)+'</div></div><div class="dmg">'+fmt(v)+'</div></div>');}
-    list.innerHTML=rows.length?rows.join(''):'<div class="damageReportEmpty">현재 기록된 직접 피해형 펫이 없습니다.</div>';
-  }
-  const al=document.getElementById('damageReportArtifactList');
-  if(al)al.innerHTML=artifactEntries.length?'<div class="damageReportSectionTitle">🌌 유물 피해 기여</div>'+artifactEntries.map(([name,v])=>'<div class="damageReportRow"><div class="ic">🌌</div><div><div class="name">'+name+'</div><div class="sub">전체 피해의 '+pct(Number(v))+'</div></div><div class="dmg">'+fmt(v)+'</div></div>').join(''):'<div class="damageReportEmpty">이번 기록에는 별도 유물 피해 기여가 없습니다.</div>';
-}
-function resetDamageReport(){
-  S.damageStats={player:0,pets:{},artifacts:{}}; saveGame(); renderDamageReport(); toast('📊 누적 데미지 기록을 초기화했습니다.');
-}
+
+
+
+
 
 
 
@@ -2909,11 +2542,8 @@ function attemptOriginCore(){
   }
   renderGrowthTree(); renderAll(); saveGame();
 }
-function triggerOriginAwakening(lv){
-  const fx=document.createElement('div'); fx.className='originForgeFx';
-  fx.innerHTML=`<div class="core">🜂</div><div class="label">ABSOLUTE ORIGIN · LV.${lv}</div>`;
-  document.body.appendChild(fx); setTimeout(()=>fx.remove(),1200);
-}
+
+
 function renderOriginGrowth(){
   const box=document.getElementById('originGrowthCore'); if(!box)return;
   const lv=Math.max(0,Number(S.originCoreLv||0)), cost=originCoreCost(), rate=calcOriginSuccessRate();
@@ -2926,7 +2556,8 @@ function renderOriginGrowth(){
 
 
 
-function expNeeded(level){ return Math.round(25 * Math.pow(level, 1.35)); }
+
+
 
 /* MONSTER SPANNER */
 
@@ -2936,141 +2567,27 @@ function expNeeded(level){ return Math.round(25 * Math.pow(level, 1.35)); }
 
 
 /* COMBAT LOOP */
-function renderFocusUpgrades(){
-  const box=document.getElementById('focusUpgradeList'); if(!box)return;
-  const c=Number(S.focusCrystal||0), u=S.focusUpgrades||{atk:0,hp:0};
-  const rows=[['atk','⚔️','기본 공격력'],['hp','❤️','기본 최대체력']];
-  box.innerHTML=rows.map(([k,ic,name])=>{
-    const lv=Number(u[k]||0), pct=lv*5, cost=1+lv*2;
-    return `<div class="focusUpgradeRow"><div>${ic} <b>${name} +${pct}%</b><div style="font-size:9px;color:var(--sub);margin-top:2px;">집중 결정 ${cost}개 · 구매할 때마다 +5%</div></div><button ${c<cost?'disabled':''} onclick="buyFocusUpgrade('${k}')">강화</button></div>`;
-  }).join('');
-  const cv=document.getElementById('focusCrystalVal'); if(cv)cv.textContent=c; const ft=document.getElementById('focusCrystalTabText'); if(ft)ft.textContent=`${c} 결정`;
-}
-function buyFocusUpgrade(type){
-  if(!S.focusUpgrades)S.focusUpgrades={atk:0,hp:0};
-  const lv=Number(S.focusUpgrades[type]||0), cost=1+lv*2;
-  if((S.focusCrystal||0)<cost){toast('⏱️ 집중 결정이 부족합니다.');return;}
-  S.focusCrystal-=cost; S.focusUpgrades[type]=lv+1;
-  renderFocusUpgrades(); renderAll(); saveGame();
-  toast('✨ 기본 능력치 강화 완료!');
-}
-function startFocusHour(){  if(S.focusMode) return;
-  if(!S.studying){ toast('먼저 📖 공부 시작을 눌러주세요.'); return; }
-  S.focusMode=true; S.focusEndAt=Date.now()+60*60*1000;
-  S.focusSession={gold:0,exp:0,boxes:0,kills:0};
-  const overlay=document.getElementById('focusLockOverlay'); if(overlay)overlay.classList.add('show');
-  const btn=document.getElementById('focusHourBtn'); if(btn)btn.disabled=true;
-  updateFocusCountdown();
-  clearInterval(focusCountdownTimer); focusCountdownTimer=setInterval(updateFocusCountdown,1000);
-  saveGame(); toast('⏱️ 1시간 집중 시작! 공부에 집중하세요.',2500);
-}
-function updateFocusCountdown(){
-  if(!S.focusMode)return;
-  const remain=Math.max(0,S.focusEndAt-Date.now());
-  const sec=Math.ceil(remain/1000), m=Math.floor(sec/60), ss=sec%60;
-  const el=document.getElementById('focusRemainText'); if(el)el.textContent=`${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
-  if(remain<=0) finishFocusHour();
-}
-function finishFocusHour(){
-  if(!S.focusMode)return;
-  S.focusMode=false;
-  clearInterval(focusCountdownTimer); focusCountdownTimer=null;
-  const r={...S.focusSession};
-  S.focusBoxes += r.boxes;
-  const crystal=Math.max(1,Math.floor(r.kills/20)+Math.floor(r.boxes/2));
-  S.focusCrystal += crystal;
-  const protectionReward=5;
-  S.breakProtectionTickets=Math.max(0,Number(S.breakProtectionTickets||0))+protectionReward;
-  const overlay=document.getElementById('focusLockOverlay'); if(overlay)overlay.classList.remove('show');
-  const btn=document.getElementById('focusHourBtn'); if(btn)btn.disabled=false;
-  S.focusEndAt=0;
-  renderFocusUpgrades(); renderAll(); saveGame();
-  // 집중 시간이 끝나도 공부/자동전투는 종료하지 않는다. 결과만 보여준다.
-  showFocusReward(r,crystal);
-  toast(`⏱️ 1시간 집중 완료! 🎫 파괴방지권 +${protectionReward} · 보유 ${S.breakProtectionTickets}개`,4000);
-}
-function showFocusReward(r,crystal){
-  const box=document.getElementById('focusRewardResult');
-  if(box){box.innerHTML=`<div class="focusReward"><div style="font-weight:900;font-size:16px">⏱️ 1시간 집중 완료!</div><div style="margin-top:9px">📦 집중 상자 <span class="big">${fmt(r.boxes)}</span>개</div><div>💰 골드 <span class="big">${fmt(r.gold)}</span></div><div>✨ 경험치 <span class="big">${fmt(r.exp)}</span></div><div>🔷 집중 결정 <span class="big">+${fmt(crystal)}</span></div><div style="margin-top:6px;color:var(--sub);font-size:10px">처치 ${fmt(r.kills)}마리 · 집중 결정으로 기본 공격력/최대 체력을 레벨당 5%씩 강화할 수 있습니다.</div></div>`; box.style.display='block';}
-  toast(`⏱️ 집중 완료! 상자 ${r.boxes}개 · 집중 결정 +${crystal} · 🎫 파괴방지권 +${protectionReward}`,4000);
-}
-
-function toggleStudy(){
-  if(S.focusMode) return;
-  S.studying = !S.studying;
-  const btn = document.getElementById('studyBtn');
-  const focusBtn = document.getElementById('focusHourBtn');
-  const actionRow = document.getElementById('studyActionRow');
-  if(S.studying){
-    actionRow?.classList.add('started');
-    btn.textContent = '⏸ 공부 종료';
-    btn.classList.add('on');
-    if(focusBtn){ focusBtn.style.display='block'; focusBtn.disabled=false; }
-    studySessionStart = Date.now();
-    startCombatLoop();
-    studyTickTimer = setInterval(()=>{
-      document.getElementById('studyTimer').textContent =
-        `누적 학습시간 ${Math.floor((S.totalStudySec + (Date.now()-studySessionStart)/1000)/60)}분`;
-    }, 1000);
-    toast('공부 시작! 자동 전투를 진행합니다 📖');
-  }else{
-    actionRow?.classList.remove('started');
-    btn.textContent = '📖 공부 시작';
-    btn.classList.remove('on');
-    if(focusBtn){ focusBtn.style.display='none'; }
-    S.totalStudySec += (Date.now()-studySessionStart)/1000;
-    stopCombatLoop();
-    clearInterval(studyTickTimer);
-    document.getElementById('studyTimer').textContent = `누적 학습시간 ${Math.floor(S.totalStudySec/60)}분`;
-    saveGame();
-    toast('공부 종료! 게임이 저장되었습니다 💾');
-  }
-}
 
 
 
 
-function spawnDmgText(wrapId, text, cls){
-  const wrap = document.getElementById(wrapId);
-  const scene = document.getElementById('scene');
-  if(!wrap || !scene) return;
 
-  const raw = String(text).trim();
-  // 전투 중 "발동! / IMPACT!" 같은 설명 문구는 데미지 숫자와 겹치므로 표시하지 않는다.
-  // 실제 피해 숫자(일반/CRIT/+추가피해)만 표시한다.
-  // 실제 데미지만 허용: 일반 숫자 + ZERO의 zero: + ZERO1의 COPY:
-  const isPlainDamage = /^\+?\s*(?:CRIT\s*)?\d[\d,]*(?:\.\d+)?$/.test(raw);
-  const isZeroDamage = /^zero:\s*\+?\d[\d,]*(?:\.\d+)?$/i.test(raw);
-  const isCopyDamage = /^COPY:\s*\+?\d[\d,]*(?:\.\d+)?$/i.test(raw);
-  if(!isPlainDamage && !isZeroDamage && !isCopyDamage) return;
 
-  const d = document.createElement('div');
-  d.className = 'dmgText '+cls;
-  d.classList.add(isPlainDamage ? 'playerDmgText' : 'petDmgText');
-  if(isZeroDamage) d.classList.add('zeroDmgText');
-  if(isCopyDamage) d.classList.add('copyDmgText');
-  d.textContent = raw;
-  d.style.zIndex = (wrapId === 'playerWrap') ? '32' : '31';
-  d.style.maxWidth = 'calc(100vw - 16px)';
-  d.style.overflow = 'visible';
-  d.style.whiteSpace = 'nowrap';
 
-  // 중요: 데미지 숫자는 wrap 안에 append되므로 absolute 기준점도 wrap이다.
-  // scene 좌표를 left에 넣으면 #playerWrap/#monsterWrap의 left/right 위치가
-  // 한 번 더 더해져 숫자가 오른쪽으로 밀린다. 대상 자체의 정중앙(50%)을 사용한다.
-  d.style.left = '50%';
-  d.style.transform = 'translateX(-50%)';
 
-  // 머리 바로 위를 기준점으로 잡고, 같은 대상에서 이미 떠 있는 숫자만큼만 위로 쌓는다.
-  const active = [...wrap.querySelectorAll('.dmgText')].filter(x => x.isConnected);
-  const lane = active.length;
-  const top = -50 - Math.min(lane, 8) * 23;
-  d.style.setProperty('--dmg-top', `${top}px`);
-  d.dataset.dmgLane = String(lane);
-  wrap.appendChild(d);
 
-  setTimeout(()=>d.remove(),800);
-}
+
+
+
+
+
+
+
+
+
+
+
+
 /* 알파제로 전용: 치명상 무효화 ZERO RESET 연출 */
 function triggerZeroResetVisual(){
   const scene = document.getElementById('battleScene') || document.querySelector('.battle-scene') || document.body;
@@ -3381,430 +2898,54 @@ function resetSaveNow(){
   }
   window.location.reload();
 }
-function renderCharacterPreview(){
-  const target=document.getElementById('characterHeroVisual');
-  const source=document.getElementById('stickmanSvg');
-  if(!target || !source) return;
-  const clone=source.cloneNode(true);
-  clone.removeAttribute('id');
-  clone.classList.add('characterHeroPreviewSvg');
-  clone.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
-  target.replaceChildren(clone);
-}
-
-function renderCharacter(){
-  renderCharacterPreview();
-  const levelEl=document.getElementById('characterLevelVal');
-  const atkEl=document.getElementById('characterAtkVal');
-  const hpEl=document.getElementById('characterHpVal');
-  if(levelEl) levelEl.textContent=S.player.level;
-  if(atkEl) atkEl.textContent=fmt(calcAtk());
-  if(hpEl) hpEl.textContent=fmt(calcMaxHp());
-
-  const grid=document.getElementById('characterEquipmentGrid');
-  if(grid){
-    const slots=[
-      ['weapon','⚔️','무기'],
-      ['helmet','🪖','투구'],
-      ['armor','🛡️','갑옷'],
-      ['gloves','🥊','장갑'],
-      ['accessory','💍','장신구']
-    ];
-    grid.innerHTML=slots.map(([slot,icon,label])=>{
-      const it=S.equip?.[slot];
-      if(!it){
-        return `<div class="characterEquipCard">
-          <div class="characterEquipIcon">${icon}</div>
-          <div class="characterEquipSlot">${label}</div>
-          <div class="characterEquipName" style="color:var(--sub)">없음</div>
-          <div class="characterEquipStat">장착 장비 없음</div>
-        </div>`;
-      }
-      const g=GRADES[it.grade]||GRADES[0];
-      const value=itemStatValue(it);
-      let contribution='';
-      if(slot==='weapon') contribution=`공격 +${fmt(value)}`;
-      else if(slot==='helmet') contribution=`HP +${fmt(Math.round(value*1.55))}`;
-      else if(slot==='armor') contribution=`HP +${fmt(Math.round(value*2.65))}`;
-      else if(slot==='gloves') contribution=`공격 +${fmt(Math.round(value*.3))} · HP +${fmt(Math.round(value*.25))}`;
-      else contribution=`공격 +${fmt(Math.round(value*.45))} · HP +${fmt(value)}`;
-      const options=(it.options||[]).map(o=>`${o.name} +${o.value}%`).join('<br>');
-      return `<div class="characterEquipCard" style="border-color:${g.color}">
-        <div class="characterEquipIcon">${icon}</div>
-        <div class="characterEquipSlot">${label}</div>
-        <div class="characterEquipName" style="color:${g.color}">${it.name.replace(/^\[[^\]]+\]\s*/,'')}${it.enhance>0?` +${it.enhance}`:''}</div>
-        <div class="characterEquipGrade" style="color:${g.color}">${g.name || ('등급 '+it.grade)}</div>
-        <div class="characterEquipStat">${contribution}</div>
-        ${options?`<div class="characterEquipOptions">${options}</div>`:''}
-      </div>`;
-    }).join('');
-  }
-
-  const summary=document.getElementById('characterCompanionSummary');
-  if(summary){
-    const petCount=(S.equippedPets||[]).length;
-    const artifactCount=getEquippedArtifactIds().length;
-    const spouse=getEquippedSpouse?.();
-    summary.innerHTML=`
-      <div class="ccard">🐾 장착 펫<b>${petCount} / 12</b></div>
-      <div class="ccard">🌌 장착 유물<b>${artifactCount} / 5</b></div>
-      <div class="ccard">💍 배우자<b>${spouse?spouse.name:'없음'}</b></div>`;
-  }
-}
 
 
-function bulkUpgrade10(singleFn){
-  let n=0;
-  const run=()=>{
-    if(n>=10) return;
-    n++;
-    try{ singleFn(); }catch(e){ console.warn(e); }
-    requestAnimationFrame(run);
-  };
-  run();
-}
 
-function buyPlayerTree10(e){
-  if(e) e.stopPropagation();
-  if(typeof upgradePlayerTree==='function') return bulkUpgrade10(upgradePlayerTree);
-  if(typeof buyPlayerTree==='function') return bulkUpgrade10(buyPlayerTree);
-  if(typeof playerTreeUpgrade==='function') return bulkUpgrade10(playerTreeUpgrade);
-  if(typeof upgradePlayer==='function') return bulkUpgrade10(upgradePlayer);
-}
+
+
+
+
+
+
+
+
+
 
 /* RENDER ENGINE */
-function renderAll(){
-  renderTopStats();
-  if(document.getElementById('growthModalBg')?.classList.contains('show')) renderGrowthTree();
-  updateHpBars();
-  renderBag();
-  renderEquipSlots();
-  renderStickmanForm();
-  renderPetScene();
-  renderSceneArtifacts();
-  renderSpouseBadge();
-  renderDetailStats();
-  if(document.getElementById('characterModalBg')?.classList.contains('show')) renderCharacter();
-  if(document.getElementById('artifactModalBg')?.classList.contains('show')) renderArtifacts();
-}
 
-function toggleDetailStats() {
-  S.showDetailStats = !S.showDetailStats;
-  renderDetailStats();
-  saveGame();
-}
 
-function renderDetailStats() {
-  const panel=document.getElementById('detailStatsPanel');
-  const btn=document.getElementById('detailStatsToggleBtn');
-  if(!panel) return;
 
-  // 버튼을 눌렀을 때는 항상 현재 저장 상태를 다시 계산한다.
-  if(S.showDetailStats){
-    panel.classList.add('show');
-    panel.style.setProperty('display','flex','important');
-    if(btn) btn.textContent='📊 상세 스탯표 닫기 ▲';
-  }else{
-    panel.classList.remove('show');
-    panel.style.removeProperty('display');
-    if(btn) btn.textContent='📊 상세 스탯표 보기 ▼';
-  }
 
-  const num=v=>{const n=Number(v);return Number.isFinite(n)?n:0;};
-  const safe=(fn,fallback=0)=>{try{const v=fn();const n=Number(v);return Number.isFinite(n)?n:fallback;}catch(e){return fallback;}};
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
 
-  const p=S.player||{};
-  let b={atk:0,hp:0};
-  try{b=equippedBonus()||b;}catch(e){}
-  b.atk=num(b.atk); b.hp=num(b.hp);
 
-  const focusAtkPct=num(S.focusUpgrades?.atk)*5;
-  const focusHpPct=num(S.focusUpgrades?.hp)*5;
-  const focusAtkMult=1+focusAtkPct/100;
-  const focusHpMult=1+focusHpPct/100;
-  const baseAtk=num(p.atk)+b.atk;
-  const baseHp=num(p.maxHp)+b.hp;
 
-  const atkResearch=num(S.research?.atkLv)*5;
-  const atkGrowth=safe(()=>growthBonus('atkPct'));
-  const atkPet=safe(()=>getPetBonus('atkBonus'))+safe(()=>getPetSynergyBonus('atkBonus'));
-  const atkEquip=safe(()=>getEquipOptionBonus('atkPct'))+safe(()=>getSetBonus('atkPct'))+safe(()=>getArtifactBonus('atkPct'));
-  const atkMult=1+(atkResearch+atkGrowth+atkPet+atkEquip)/100;
-  const originMult=safe(()=>originCoreMultiplier(),1);
 
-  const hpGrowth=safe(()=>growthBonus('hpPct'));
-  const hpPet=safe(()=>getPetBonus('hpBonus'))+safe(()=>getPetSynergyBonus('hpBonus'));
-  const hpEquip=safe(()=>getEquipOptionBonus('hpPct'))+safe(()=>getSetBonus('hpPct'))+safe(()=>getArtifactBonus('hpPct'));
-  const hpMult=1+(hpGrowth+hpPet+hpEquip)/100;
-
-  const finalAtk=safe(()=>calcAtk(),Math.round(baseAtk*focusAtkMult*atkMult*originMult));
-  const finalHp=safe(()=>calcMaxHp(),Math.round(baseHp*focusHpMult*hpMult*originMult));
-
-  const critRate=Math.min(99,15+safe(()=>growthBonus('critRate'))+safe(()=>getPetBonus('critRate'))+safe(()=>getEquipOptionBonus('critRate'))+safe(()=>getSetBonus('critRate'))+safe(()=>getArtifactBonus('critRate')));
-  const critDmg=185+safe(()=>growthBonus('critDmg'))+safe(()=>getPetBonus('critDmg'))+safe(()=>getPetSynergyBonus('critDmg'))+safe(()=>getEquipOptionBonus('critDmg'))+safe(()=>getSetBonus('critDmg'))+safe(()=>getArtifactBonus('critDmg'));
-  const goldBonus=num(S.research?.goldLv)*10+safe(()=>growthBonus('goldPct'))+safe(()=>getPetBonus('goldBonus'))+safe(()=>getPetSynergyBonus('goldBonus'))+safe(()=>getEquipOptionBonus('goldBonus'))+safe(()=>getSetBonus('goldBonus'))+safe(()=>getArtifactBonus('goldPct'));
-  const expBonus=safe(()=>growthBonus('expPct'))+safe(()=>getPetBonus('expBonus'))+safe(()=>getPetSynergyBonus('expBonus'))+safe(()=>getEquipOptionBonus('expBonus'))+safe(()=>getSetBonus('expBonus'))+safe(()=>getArtifactBonus('expPct'));
-  const bossDmg=safe(()=>getPetSynergyBonus('bossDmg'))+safe(()=>getEquipOptionBonus('bossDmg'))+safe(()=>getSetBonus('bossDmg'))+safe(()=>getArtifactBonus('bossDmg'));
-  const spousePetDmg=safe(()=>getSpousePetDamageBonus());
-  const spouseMult=safe(()=>getSpousePetDamageMult(),1);
-  const spouse=safe(()=>getEquippedSpouse(),null);
-
-  set('detailAtkChar',fmt(num(p.atk))); set('detailAtkEquipBase','+'+fmt(b.atk)); set('detailBaseAtk',fmt(baseAtk));
-  set('detailAtkResearch','+'+atkResearch.toFixed(1)+'%'); set('detailAtkGrowth','+'+atkGrowth.toFixed(1)+'%'); set('detailAtkPet','+'+atkPet.toFixed(1)+'%'); set('detailAtkEquipPct','+'+atkEquip.toFixed(1)+'%');
-  set('detailAtkMult','×'+atkMult.toFixed(4)); set('detailAtkOrigin','×'+originMult.toFixed(4)); set('detailFinalAtk',fmt(finalAtk));
-
-  set('detailHpChar',fmt(num(p.maxHp))); set('detailHpEquipBase','+'+fmt(b.hp)); set('detailBaseHp',fmt(baseHp));
-  set('detailHpGrowth','+'+hpGrowth.toFixed(1)+'%'); set('detailHpPet','+'+hpPet.toFixed(1)+'%'); set('detailHpEquipPct','+'+hpEquip.toFixed(1)+'%');
-  set('detailHpMult','×'+hpMult.toFixed(4)); set('detailHpOrigin','×'+originMult.toFixed(4)); set('detailFinalHp',fmt(finalHp));
-
-  set('detailCritRate',critRate.toFixed(1)+'%'); set('detailCritDmg',critDmg.toFixed(1)+'%');
-  set('detailGoldBonus','+'+Math.round(goldBonus)+'%'); set('detailExpBonus','+'+Math.round(expBonus)+'%'); set('detailBossDmg','+'+Math.round(bossDmg)+'%');
-  set('detailSpousePetDmg','+'+Math.round(spousePetDmg)+'% · ×'+spouseMult.toFixed(2)+(spouse?' · '+spouse.name:' · 미장착'));
-  const focusAtkFixed=Math.max(0,Math.round(baseAtk*(focusAtkMult-1)));
-  const focusHpFixed=Math.max(0,Math.round(baseHp*(focusHpMult-1)));
-  set('detailAtkFocus','+'+fmt(focusAtkFixed));
-  set('detailHpFocus','+'+fmt(focusHpFixed));
-  set('detailPetCount',(S.equippedPets||[]).length+' / 12');
-  set('detailArtifactCount',getEquippedArtifactIds().length+' / 5');
-  set('detailFocusAtkLv','Lv.'+num(S.focusUpgrades?.atk)+' · +'+focusAtkPct+'%');
-  set('detailFocusHpLv','Lv.'+num(S.focusUpgrades?.hp)+' · +'+focusHpPct+'%');
-  set('detailProtectionTickets',num(S.breakProtectionTickets)+'개');
-  set('detailOriginLv','Lv.'+num(S.originCoreLv)+' / 50');
-  set('detailStage',fmt(S.stage));
-  set('detailMonsterHp',fmt(num(S.monster?.hp)));
-  set('detailMonsterAtk',fmt(num(S.monster?.atk)));
-  const artifactSyn=safe(()=>getArtifactSynergy(),{names:[]});
-  set('detailArtifactSynergyCount',(artifactSyn.names||[]).length+'개 · '+((artifactSyn.names||[]).join(', ')||'없음'));
-  set('detailApocHitState',String(num(S.artifactApocBossHits)));
-  set('detailApocCritState',String(num(S.artifactStarCritCharge))+' / 3');
-  set('detailApocStackState',String(num(S.artifactApocStacks))+' / 2');
-  set('detailApocKillState',String(num(S.artifactApocKillCount))+(S.artifactApocKillReady?' · 다음 공격 준비':''));
-  const dsNow=S.damageStats||{player:0,pets:{},artifacts:{}};
-  const artifactDirectTotal=Object.values(dsNow.artifacts||{}).reduce((x,v)=>x+num(v),0);
-  set('detailArtifactDirectDamage',fmt(artifactDirectTotal));
-  set('detailDamageTotal',fmt(num(dsNow.player)+Object.values(dsNow.pets||{}).reduce((x,v)=>x+num(v),0)+Object.values(dsNow.artifacts||{}).reduce((x,v)=>x+num(v),0)));
-}
 
 /* 펫 12마리 전투 필드 연출 */
 
-function megaEquipShape(slot,g,c){
-  const glow=`filter="drop-shadow(0 0 7px ${c})"`;
-  const n=g-22;
-  const motifs=[
-    // 22 초월신: 쌍날개
-    {w:`<g ${glow}><path d="M43 40L62 8L69 12L51 44Z" fill="${c}"/><path d="M45 36L31 20L35 18L50 33M57 20L72 5L75 9L61 27" fill="none" stroke="#fff" stroke-width="2"/><circle cx="69" cy="10" r="3" fill="#fff"/></g>`,h:`<path d="M8 11Q28 -8 48 11V25H8Z" fill="${c}" ${glow}/><path d="M10 10L2 -2L20 6L28 -13L36 6L54 -2L46 10" fill="none" stroke="#fff" stroke-width="2"/>`,a:`<path d="M9 19H47L41 62H15Z" fill="${c}" ${glow}/><path d="M12 24L-4 8L10 50M44 24L60 8L46 50" fill="${c}"/><path d="M28 20V60M15 38H41" stroke="#fff" stroke-width="2"/>`,g:`<path d="M12 27L20 18L28 27L20 36Z M36 41L44 32L52 41L44 50Z" fill="${c}" ${glow}/><path d="M15 27H25M39 41H49" stroke="#fff" stroke-width="2"/>`,x:`<g class="rot-rune"><circle cx="28" cy="45" r="39" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="4,7" ${glow}/><path d="M28 5L35 35L65 45L35 55L28 85L21 55L-9 45L21 35Z" fill="none" stroke="#fff" stroke-width="2"/></g>`},
-    // 23 창조신: 창조의 왕관
-    {w:`<path d="M41 41L65 0L73 6L50 45Z" fill="${c}" ${glow}/><path d="M50 32L65 12M55 20L69 26" stroke="#fff" stroke-width="2"/><circle cx="65" cy="5" r="5" fill="none" stroke="#fff"/>`,h:`<path d="M7 18Q28 -12 49 18V25H7Z" fill="${c}" ${glow}/><path d="M8 17L5 -5L19 8L28 -16L37 8L51 -5L48 17" fill="${c}" stroke="#fff" stroke-width="1.5"/>`,a:`<path d="M7 18H49L42 63H14Z" fill="${c}" ${glow}/><path d="M7 24L-7 6L11 48M49 24L63 6L45 48" fill="${c}"/><path d="M28 18V63M14 37H42M18 50H38" stroke="#fff" stroke-width="2"/>`,g:`<circle cx="12" cy="26" r="10" fill="${c}" ${glow}/><circle cx="44" cy="40" r="10" fill="${c}" ${glow}/><path d="M5 26L12 19L19 26L12 33M37 40L44 33L51 40L44 47" fill="none" stroke="#fff"/>`,x:`<g class="rot-rune"><circle cx="28" cy="45" r="40" fill="none" stroke="${c}" stroke-width="3" ${glow}/><path d="M28 7L34 25L53 25L38 36L44 55L28 43L12 55L18 36L3 25L22 25Z" fill="none" stroke="#fff" stroke-width="2"/><circle cx="28" cy="45" r="7" fill="${c}"/></g>`},
-    // 24 무한계: 무한 루프
-    {w:`<path d="M42 41L67 -2L76 5L51 46Z" fill="${c}" ${glow}/><path d="M47 35Q60 18 69 4M52 42Q65 25 73 12" stroke="#fff" stroke-width="2" fill="none"/>`,h:`<path d="M7 10Q28 -15 49 10V25H7Z" fill="${c}" ${glow}/><path d="M13 13Q28 0 43 13Q28 26 13 13Z" fill="none" stroke="#fff" stroke-width="2"/>`,a:`<path d="M8 18H48L41 64H15Z" fill="${c}" ${glow}/><path d="M12 27Q28 13 44 27Q28 41 12 27M12 45Q28 31 44 45Q28 59 12 45" fill="none" stroke="#fff" stroke-width="2"/>`,g:`<path d="M4 26Q12 14 20 26Q12 38 4 26ZM36 40Q44 28 52 40Q44 52 36 40Z" fill="none" stroke="${c}" stroke-width="4" ${glow}/><circle cx="12" cy="26" r="3" fill="#fff"/><circle cx="44" cy="40" r="3" fill="#fff"/>`,x:`<g class="rot-rune"><circle cx="28" cy="45" r="39" fill="none" stroke="${c}" stroke-width="3" ${glow}/><path d="M9 45C9 25 47 25 47 45C47 65 9 65 9 45M28 26C48 26 48 64 28 64C8 64 8 26 28 26" fill="none" stroke="#fff" stroke-width="2"/></g>`},
-    // 25 혼돈계: 깨진 왕관
-    {w:`<path d="M41 42L63 -5L75 3L51 46Z" fill="${c}" ${glow}/><path d="M45 35L58 28L52 18L68 9M52 42L69 31" stroke="#fff" stroke-width="2" fill="none"/>`,h:`<path d="M6 18L12 -6L24 8L29 -15L36 7L51 -5L47 22Z" fill="${c}" ${glow}/><path d="M13 15L43 15M20 8L35 22" stroke="#fff" stroke-width="2"/>`,a:`<path d="M9 18L48 23L40 64L13 58Z" fill="${c}" ${glow}/><path d="M10 28L24 34L15 48L34 43L43 55" fill="none" stroke="#fff" stroke-width="2"/><path d="M28 20L24 61" stroke="#fff"/>`,g:`<path d="M4 20L15 17L20 28L10 35Z M36 34L47 31L52 42L42 49Z" fill="${c}" ${glow}/><path d="M7 25L17 28M39 39L49 42" stroke="#fff" stroke-width="2"/>`,x:`<g class="rot-rune"><path d="M28 4L39 23L67 24L47 43L55 72L28 56L1 72L9 43L-11 24L17 23Z" fill="none" stroke="${c}" stroke-width="3" ${glow}/><path d="M28 15L35 35L55 45L35 49L28 68L21 49L1 45L21 35Z" fill="none" stroke="#fff"/></g>`},
-    // 26 영원계: 왕좌의 갑주
-    {w:`<path d="M40 43L62 -8L78 0L52 47Z" fill="${c}" ${glow}/><path d="M45 36L72 2M50 43L70 29" stroke="#fff" stroke-width="2"/><circle cx="70" cy="2" r="4" fill="#fff"/>`,h:`<path d="M5 12Q28 -18 51 12V26H5Z" fill="${c}" ${glow}/><path d="M8 12L8 -6L19 4L28 -16L37 4L48 -6L48 12" fill="none" stroke="#fff" stroke-width="2"/><circle cx="28" cy="12" r="4" fill="#fff"/>`,a:`<path d="M7 17H49L43 64H13Z" fill="${c}" ${glow}/><path d="M8 25L-7 8L10 51M48 25L63 8L46 51" fill="${c}"/><path d="M28 18V64M14 36H42M18 50H38" stroke="#fff" stroke-width="2"/><circle cx="28" cy="39" r="5" fill="#fff"/>`,g:`<circle cx="12" cy="26" r="11" fill="${c}" ${glow}/><circle cx="44" cy="40" r="11" fill="${c}" ${glow}/><circle cx="12" cy="26" r="4" fill="#fff"/><circle cx="44" cy="40" r="4" fill="#fff"/>`,x:`<g class="rot-rune"><circle cx="28" cy="45" r="41" fill="none" stroke="${c}" stroke-width="4" ${glow}/><circle cx="28" cy="45" r="31" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M28 4V86M-13 45H69" stroke="${c}" stroke-width="2"/></g>`},
-    // 27 초공간: 차원문
-    {w:`<path d="M42 42L65 -10L78 -2L52 46Z" fill="${c}" ${glow}/><path d="M44 38L74 -2M49 43L75 19" stroke="#00eaff" stroke-width="2"/><path d="M67 -8L73 -15L79 -4" fill="none" stroke="#fff"/>`,h:`<path d="M5 15Q28 -20 51 15V27H5Z" fill="${c}" ${glow}/><path d="M8 14L28 -12L48 14M15 14L28 3L41 14" fill="none" stroke="#00eaff" stroke-width="2"/>`,a:`<path d="M7 17H49L43 64H13Z" fill="${c}" ${glow}/><path d="M28 17V64M13 37H43" stroke="#00eaff" stroke-width="3"/><ellipse cx="28" cy="40" rx="11" ry="15" fill="none" stroke="#fff" stroke-width="2"/>`,g:`<circle cx="12" cy="26" r="12" fill="none" stroke="${c}" stroke-width="4" ${glow}/><circle cx="44" cy="40" r="12" fill="none" stroke="${c}" stroke-width="4" ${glow}/><path d="M4 26H20M36 40H52" stroke="#fff"/>`,x:`<g class="rot-rune"><ellipse cx="28" cy="45" rx="39" ry="26" fill="none" stroke="${c}" stroke-width="4" ${glow}/><ellipse cx="28" cy="45" rx="26" ry="39" fill="none" stroke="#00eaff" stroke-width="2"/><circle cx="28" cy="45" r="6" fill="#fff"/></g>`},
-    // 28 근원: 별의 핵
-    {w:`<path d="M41 42L65 -9L77 -1L51 47Z" fill="${c}" ${glow}/><path d="M66 1L70 8L78 9L72 14L74 22L66 17L59 22L61 14L55 9L63 8Z" fill="#fff"/>`,h:`<path d="M5 15Q28 -18 51 15V27H5Z" fill="${c}" ${glow}/><path d="M28 -10L33 8L51 13L33 18L28 36L23 18L5 13L23 8Z" fill="none" stroke="#fff" stroke-width="2"/>`,a:`<path d="M7 18H49L43 64H13Z" fill="${c}" ${glow}/><path d="M28 19L34 34L49 40L34 46L28 62L22 46L7 40L22 34Z" fill="none" stroke="#fff" stroke-width="2"/>`,g:`<path d="M12 13L15 22L24 25L15 28L12 37L9 28L0 25L9 22Z M44 27L47 36L56 39L47 42L44 51L41 42L32 39L41 36Z" fill="${c}" ${glow}/><circle cx="12" cy="25" r="2" fill="#fff"/><circle cx="44" cy="39" r="2" fill="#fff"/>`,x:`<g class="rot-rune"><circle cx="28" cy="45" r="39" fill="none" stroke="${c}" stroke-width="3" ${glow}/><path d="M28 5L36 32L64 45L36 58L28 85L20 58L-8 45L20 32Z" fill="none" stroke="#fff" stroke-width="2"/><circle cx="28" cy="45" r="9" fill="${c}"/></g>`},
-    // 29 절대근원: 절대의 날개
-    {w:`<path d="M40 43L64 -11L79 -2L52 48Z" fill="${c}" ${glow}/><path d="M47 38L31 23L38 20L53 31M57 20L75 4L79 10L62 28" fill="none" stroke="#fff" stroke-width="2.5"/>`,h:`<path d="M4 15Q28 -21 52 15V28H4Z" fill="${c}" ${glow}/><path d="M7 14L0 -7L20 7L28 -18L36 7L56 -7L49 14" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="28" cy="13" r="5" fill="#fff"/>`,a:`<path d="M6 16H50L44 65H12Z" fill="${c}" ${glow}/><path d="M7 23L-10 4L10 51M49 23L66 4L46 51" fill="${c}"/><path d="M28 17V65M12 37H44M17 51H39" stroke="#fff" stroke-width="2.5"/><circle cx="28" cy="40" r="6" fill="#fff"/>`,g:`<circle cx="12" cy="26" r="12" fill="${c}" ${glow}/><circle cx="44" cy="40" r="12" fill="${c}" ${glow}/><path d="M3 26L12 17L21 26L12 35ZM35 40L44 31L53 40L44 49Z" fill="none" stroke="#fff" stroke-width="2"/>`,x:`<g class="rot-rune"><circle cx="28" cy="45" r="42" fill="none" stroke="${c}" stroke-width="4" ${glow}/><path d="M28 1L36 29L64 45L36 61L28 89L20 61L-8 45L20 29Z" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="28" cy="45" r="10" fill="none" stroke="#00eaff" stroke-width="2"/></g>`},
-    // 30 무한신격: 신격의 왕관
-    {w:`<path d="M39 44L64 -12L80 -2L53 49Z" fill="${c}" ${glow}/><path d="M44 36L60 23L53 13L70 8L67 -2L77 8" fill="none" stroke="#fff" stroke-width="2.5"/>`,h:`<path d="M3 16Q28 -23 53 16V29H3Z" fill="${c}" ${glow}/><path d="M5 14L-2 -9L17 6L28 -21L39 6L58 -9L51 14L42 23H14Z" fill="${c}" stroke="#fff"/><circle cx="28" cy="13" r="5" fill="#fff"/>`,a:`<path d="M5 15H51L44 66H12Z" fill="${c}" ${glow}/><path d="M5 23L-12 2L9 52M51 23L68 2L47 52" fill="${c}"/><path d="M28 15V66M12 36H44M17 51H39" stroke="#fff" stroke-width="2.5"/><path d="M18 43L28 33L38 43L28 53Z" fill="none" stroke="#00eaff"/>`,g:`<circle cx="12" cy="26" r="13" fill="${c}" ${glow}/><circle cx="44" cy="40" r="13" fill="${c}" ${glow}/><path d="M12 16V36M2 26H22M44 30V50M34 40H54" stroke="#fff" stroke-width="2"/>`,x:`<g class="rot-rune"><circle cx="28" cy="45" r="43" fill="none" stroke="${c}" stroke-width="4" ${glow}/><circle cx="28" cy="45" r="31" fill="none" stroke="#fff" stroke-width="2"/><path d="M28 0L34 34L69 45L34 56L28 90L22 56L-13 45L22 34Z" fill="none" stroke="#00eaff" stroke-width="2"/><circle cx="28" cy="45" r="8" fill="#fff"/></g>`},
-    // 31 최종차원: 최종 붕괴
-    {w:`<path d="M38 45L63 -15L82 -3L54 50Z" fill="${c}" ${glow}/><path d="M43 39L22 18L31 15L50 31M57 25L77 5L82 12L64 34" fill="none" stroke="#fff" stroke-width="3"/><circle cx="69" cy="3" r="6" fill="#fff"/>`,h:`<path d="M2 17Q28 -26 54 17V30H2Z" fill="${c}" ${glow}/><path d="M4 15L-5 -12L17 4L28 -24L39 4L61 -12L52 15L42 27H14Z" fill="none" stroke="#fff" stroke-width="3"/><circle cx="28" cy="14" r="6" fill="#fff"/>`,a:`<path d="M4 14H52L45 67H11Z" fill="${c}" ${glow}/><path d="M4 22L-14 0L8 54M52 22L70 0L48 54" fill="${c}"/><path d="M28 14V67M11 36H45M16 52H40" stroke="#fff" stroke-width="3"/><circle cx="28" cy="40" r="7" fill="#fff"/><circle cx="28" cy="40" r="13" fill="none" stroke="#00eaff" stroke-width="2"/>`,g:`<circle cx="12" cy="26" r="14" fill="${c}" ${glow}/><circle cx="44" cy="40" r="14" fill="${c}" ${glow}/><path d="M2 26L22 26M12 16L12 36M34 40L54 40M44 30L44 50" stroke="#fff" stroke-width="3"/>`,x:`<g class="rot-rune"><circle cx="28" cy="45" r="44" fill="none" stroke="${c}" stroke-width="5" ${glow}/><circle cx="28" cy="45" r="34" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="2,3"/><path d="M28 -2L37 32L75 45L37 58L28 92L19 58L-19 45L19 32Z" fill="none" stroke="#00eaff" stroke-width="2.5"/><circle cx="28" cy="45" r="10" fill="#fff"/></g>`}
-  ];
-  const m=motifs[Math.min(n,motifs.length-1)];
-  return m[slot==='accessory'?'x':slot] || '';
-}
-function renderStickmanForm(){
-  ['weapon','helmet','armor','gloves','accessory','transcend','ultimate'].forEach(k=>{
-    const el=document.getElementById(`vis-${k}`); if(el) el.innerHTML='';
-  });
-  const stickSvg=document.getElementById('stickmanSvg');
-  stickSvg.classList.remove('ultimate-stage','absolute-stage');
-  const equippedGrades=Object.values(S.equip).filter(Boolean).map(it=>it.grade);
-  const highestEquippedGrade=equippedGrades.length?Math.max(...equippedGrades):-1;
-  if(highestEquippedGrade>=21) stickSvg.classList.add('absolute-stage');
-  else if(highestEquippedGrade>=20) stickSvg.classList.add('ultimate-stage');
-  let totalTranscend=0;
-  const glow=(c)=>`filter="drop-shadow(0 0 5px ${c})"`;
 
-  // 5개 장비 각각 독립적인 실루엣을 가지며, 희귀(3)까지는 절제된 외형.
-  if(S.equip.weapon){
-    const g=S.equip.weapon.grade,c=GRADES[g].color; totalTranscend+=S.equip.weapon.transcend||0;
-    let x='';
-    if(g>=22) x=megaEquipShape('weapon',g,c);
-    else if(g<=2) x=`<line x1="44" y1="40" x2="56" y2="17" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
-    else if(g===3) x=`<line x1="44" y1="40" x2="58" y2="12" stroke="${c}" stroke-width="4"/><path d="M47 34l8 4" stroke="${c}" stroke-width="2"/>`;
-    else if(g<=7) x=`<path d="M43 40L58 7L62 10L48 42Z" fill="${c}"/><path d="M45 37L58 10" stroke="#fff" stroke-width="1" opacity=".7"/>`;
-    else if(g<=11) x=`<path d="M43 40L60 4L65 8L49 43Z" fill="${c}" ${glow(c)}/><path d="M56 9l7 3M53 15l7 3" stroke="#fff" stroke-width="1.2"/>`;
-    else if(g<=15) x=`<path d="M42 41L62 0L69 5L49 44Z" fill="${c}" ${glow(c)}/><path d="M49 31L66 5" stroke="#fff" stroke-width="2"/><circle cx="65" cy="5" r="3" fill="#fff"/>`;
-    else if(g<=18) x=`<path d="M41 41L64 -3L73 3L50 45Z" fill="${c}" ${glow(c)}/><path d="M47 35L69 3M52 25L61 29" stroke="#fff" stroke-width="1.5"/><circle cx="69" cy="3" r="4" fill="#00eaff"/>`;
-    else x=`<path d="M40 42L66 -9L77 -1L51 46Z" fill="${c}" ${glow(c)}/><path d="M45 37L72 0M49 29L68 36" stroke="#fff" stroke-width="2"/><path d="M67 -8L72 -16L77 -5" fill="none" stroke="#fff" stroke-width="1.5"/>`;
-    document.getElementById('vis-weapon').innerHTML=x;
-  }
-  if(S.equip.helmet){
-    const g=S.equip.helmet.grade,c=GRADES[g].color; totalTranscend+=S.equip.helmet.transcend||0; let x='';
-    if(g>=22) x=megaEquipShape('helmet',g,c);
-    else if(g<=2) x=`<path d="M18 15Q28 7 38 15L38 18H18Z" fill="${c}"/>`;
-    else if(g===3) x=`<path d="M17 10Q28 3 39 10V18H17Z" fill="${c}" stroke="${c}"/>`;
-    else if(g<=7) x=`<path d="M15 8H41V19H15Z" fill="${c}"/><path d="M15 9L20 3L24 9M32 9L36 3L41 9" fill="${c}"/>`;
-    else if(g<=11) x=`<path d="M14 8Q28 -2 42 8V20H14Z" fill="${c}" ${glow(c)}/><path d="M19 8Q28 2 37 8" stroke="#fff" stroke-width="1.5"/>`;
-    else if(g<=15) x=`<path d="M12 9Q28 -7 44 9V21H12Z" fill="${c}" ${glow(c)}/><path d="M16 8L12 1L23 5M40 8L44 1L33 5" stroke="#fff" stroke-width="1.5"/>`;
-    else if(g<=18) x=`<path d="M10 10Q28 -12 46 10V22H10Z" fill="${c}" ${glow(c)}/><path d="M15 9L8 -1L22 5M41 9L48 -1L34 5" stroke="#00eaff" stroke-width="2"/>`;
-    else x=`<path d="M8 10Q28 -17 48 10V23H8Z" fill="${c}" ${glow(c)}/><path d="M12 8L4 -5L20 4L28 -13L36 4L52 -5L44 8" fill="none" stroke="#fff" stroke-width="2"/><circle cx="28" cy="12" r="4" fill="#fff"/>`;
-    document.getElementById('vis-helmet').innerHTML=x;
-  }
-  if(S.equip.armor){
-    const g=S.equip.armor.grade,c=GRADES[g].color; totalTranscend+=S.equip.armor.transcend||0; let x='';
-    if(g>=22) x=megaEquipShape('armor',g,c);
-    else if(g<=2) x=`<rect x="23" y="27" width="10" height="22" rx="2" fill="${c}"/>`;
-    else if(g===3) x=`<path d="M20 26H36L33 52H23Z" fill="${c}"/>`;
-    else if(g<=7) x=`<path d="M19 25H37L34 53H22Z" fill="${c}"/><path d="M20 28L12 23L19 37M36 28L44 23L37 37" fill="${c}"/>`;
-    else if(g<=11) x=`<path d="M17 24H39L35 55H21Z" fill="${c}" ${glow(c)}/><path d="M17 27L8 20L18 39M39 27L48 20L38 39" fill="${c}"/> <path d="M28 27V52M21 39H35" stroke="#fff" stroke-width="1.4"/>`;
-    else if(g<=15) x=`<path d="M15 22H41L37 57H19Z" fill="${c}" ${glow(c)}/><path d="M16 26L5 17L15 43M40 26L51 17L41 43" fill="${c}"/><path d="M28 24V55M19 39H37" stroke="#fff" stroke-width="2"/>`;
-    else if(g<=18) x=`<path d="M13 21H43L38 59H18Z" fill="${c}" ${glow(c)}/><path d="M15 24L1 13L13 48M41 24L55 13L43 48" fill="${c}" opacity=".9"/><path d="M28 22V57M18 38H38M21 48H35" stroke="#00eaff" stroke-width="1.8"/><circle cx="28" cy="39" r="4" fill="#fff"/>`;
-    else x=`<path d="M10 20H46L40 61H16Z" fill="${c}" ${glow(c)}/><path d="M13 23L-3 9L11 51M43 23L59 9L45 51" fill="${c}"/><path d="M28 20V59M16 37H40M19 48H37" stroke="#fff" stroke-width="2"/><circle cx="28" cy="39" r="5" fill="#fff"/><circle cx="28" cy="39" r="9" fill="none" stroke="#00eaff"/>`;
-    document.getElementById('vis-armor').innerHTML=x;
-  }
-  if(S.equip.gloves){
-    const g=S.equip.gloves.grade,c=GRADES[g].color; totalTranscend+=S.equip.gloves.transcend||0; let r=g<=2?4:g===3?5:g<=7?6:g<=11?7:g<=15?8:g<=18?9:10;
-    if(g>=22){ document.getElementById('vis-gloves').innerHTML=megaEquipShape('gloves',g,c); } else {
-    const extra=g<=3?'':`<path d="M${12-r} 26L12 ${18-r}L${12+r} 26M${44-r} 40L44 ${32-r}L${44+r} 40" stroke="#fff" stroke-width="1.2"/>`;
-    document.getElementById('vis-gloves').innerHTML=`<circle cx="12" cy="26" r="${r}" fill="${c}" ${g>=8?glow(c):''}/><circle cx="44" cy="40" r="${r}" fill="${c}" ${g>=8?glow(c):''}/>${extra}${g>=16?`<circle cx="12" cy="26" r="${r+3}" fill="none" stroke="#00eaff" stroke-dasharray="2,2"/><circle cx="44" cy="40" r="${r+3}" fill="none" stroke="#00eaff" stroke-dasharray="2,2"/>`:''}`;
-    }
-  }
-  if(S.equip.accessory){
-    const g=S.equip.accessory.grade,c=GRADES[g].color; totalTranscend+=S.equip.accessory.transcend||0; let x='';
-    if(g>=22) x=megaEquipShape('accessory',g,c);
-    else if(g<=2) x=`<circle cx="28" cy="39" r="13" fill="none" stroke="${c}" stroke-width="1" stroke-dasharray="3,3"/>`;
-    else if(g===3) x=`<circle cx="28" cy="38" r="15" fill="none" stroke="${c}" stroke-width="1.5"/>`;
-    else if(g<=7) x=`<ellipse cx="28" cy="45" rx="20" ry="13" fill="none" stroke="${c}" stroke-width="2"/> <circle cx="28" cy="32" r="3" fill="${c}"/>`;
-    else if(g<=11) x=`<g class="rot-rune"><circle cx="28" cy="45" r="26" fill="none" stroke="${c}" stroke-width="2" stroke-dasharray="7,4"/><circle cx="28" cy="45" r="4" fill="${c}"/></g>`;
-    else if(g<=15) x=`<g class="rot-rune"><circle cx="28" cy="45" r="31" fill="none" stroke="${c}" stroke-width="2.5" stroke-dasharray="8,3"/><path d="M28 11L34 27L51 27L37 37L42 54L28 44L14 54L19 37L5 27L22 27Z" fill="none" stroke="${c}" stroke-width="1.5"/></g>`;
-    else if(g<=18) x=`<g class="rot-rune"><circle cx="28" cy="45" r="35" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="10,4" ${glow(c)}/><circle cx="28" cy="45" r="9" fill="none" stroke="#fff"/><circle cx="28" cy="45" r="3" fill="#fff"/></g>`;
-    else x=`<g class="rot-rune"><circle cx="28" cy="45" r="39" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="12,3" ${glow(c)}/><circle cx="28" cy="45" r="28" fill="none" stroke="#00eaff" stroke-width="1.5" stroke-dasharray="3,5"/><path d="M28 5L34 34L63 45L34 56L28 85L22 56L-7 45L22 34Z" fill="none" stroke="#fff" stroke-width="1.5"/></g>`;
-    document.getElementById('vis-accessory').innerHTML=x;
-  }
-  // 기존 초월/최상위 외형 연출 유지
-  if(highestEquippedGrade>=22){
-    const auraColors=['#00ffd5','#7cff00','#00aaff','#ff4dff','#ffffff','#5effff','#ff9d00','#ff3158','#a875ff','#ffe66d'];
-    const ac=auraColors[Math.min(9,highestEquippedGrade-22)];
-    document.getElementById('vis-ultimate').innerHTML=`<g class="ultimate-aura"><circle cx="28" cy="45" r="44" fill="none" stroke="${ac}" stroke-width="2.5" stroke-dasharray="2,4"/><circle cx="28" cy="45" r="36" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="8,3"/><circle cx="28" cy="45" r="10" fill="${ac}" opacity=".75"/></g>`;
-  } else if(highestEquippedGrade===20){
-    document.getElementById('vis-ultimate').innerHTML=`<g class="ultimate-aura"><circle cx="28" cy="45" r="42" fill="none" stroke="#e55039" stroke-width="1.5" stroke-dasharray="3,5"/><circle cx="28" cy="45" r="37" fill="none" stroke="#ff6b4a"/></g><path d="M18 11L22 2L27 11M38 11L34 2L29 11" fill="#e55039" stroke="#ffb199"/><path d="M18 29L8 23L13 34L7 40L20 38M38 29L48 23L43 34L49 40L36 38" fill="#e55039"/><circle cx="28" cy="39" r="4" fill="#fff"/>`;
-  } else if(highestEquippedGrade>=21){
-    document.getElementById('vis-ultimate').innerHTML=`<g class="ultimate-aura"><circle cx="28" cy="45" r="44" fill="none" stroke="#e84393" stroke-width="2" stroke-dasharray="2,4"/><circle cx="28" cy="45" r="38" fill="none" stroke="#7d5fff" stroke-width="1.5" stroke-dasharray="8,3"/></g><path d="M18 11L15 -1L24 7L28 -5L32 7L41 -1L38 11" fill="#fff" stroke="#e84393"/><path d="M18 27L4 17L11 31L2 38L18 36L11 48L23 43M38 27L52 17L45 31L54 38L38 36L45 48L33 43" fill="#7d5fff" stroke="#e84393"/><circle cx="28" cy="39" r="5" fill="#fff"/>`;
-  }
-  if(totalTranscend>0){
-    const maxTranscend=Math.max(...Object.values(S.equip).filter(Boolean).map(it=>it.transcend||0));
-    let tSvg=`<circle cx="28" cy="45" r="42" fill="none" stroke="#00ffff" stroke-width="2" class="trans-aura-svg" stroke-dasharray="6,3"/>`;
-    if(maxTranscend>=2)tSvg+=`<circle cx="28" cy="45" r="36" fill="none" stroke="#7d5fff" stroke-width="1.5" stroke-dasharray="3,6" class="rot-rune"/>`;
-    if(maxTranscend>=3)tSvg+=`<circle cx="28" cy="4" r="3" fill="#fff"/><circle cx="28" cy="86" r="3" fill="#ff00ea"/>`;
-    if(maxTranscend>=4)tSvg+=`<path d="M10 30Q-2 45 10 60M46 30Q58 45 46 60" fill="none" stroke="#00ffff" stroke-width="2.5"/>`;
-    if(maxTranscend>=5)tSvg+=`<polygon points="28,-4 32,8 45,8 35,16 39,29 28,21 17,29 21,16 11,8 24,8" fill="none" stroke="#fff" stroke-width="1.5"/><circle cx="28" cy="39" r="6" fill="#fff"/>`;
-    document.getElementById('vis-transcend').innerHTML=tSvg;
-  }
-}
 
-function renderTopStats(){
-  document.getElementById('lvVal').textContent = S.player.level;
-  document.getElementById('goldVal').textContent = fmt(S.gold);
-  document.getElementById('ssVal').textContent = fmt(S.soulStones);
-  document.getElementById('essenceVal').textContent = fmt(S.essence);
-  document.getElementById('maxStageVal').textContent = S.maxStage;
-  document.getElementById('atkVal').textContent = fmt(calcAtk());
-  document.getElementById('hpVal').textContent = `${Math.max(0,Math.floor(S.player.hp))}/${fmt(calcMaxHp())}`;
-  const need = expNeeded(S.player.level);
-  document.getElementById('expBar').style.width = Math.min(100, (S.player.exp/need)*100)+'%';
-  const burningEl=document.getElementById('burningEventBanner');if(burningEl){const h=new Date().getHours();burningEl.classList.toggle('show',h>=17&&h<21);}
-  document.getElementById('lvText').textContent = `EXP ${Math.floor(S.player.exp)} / ${fmt(need)}`;
-  const stick = document.getElementById('stickmanSvg');
-  if(S.player.hp<=0) stick.classList.add('down'); else stick.classList.remove('down');
-}
 
-function updateHpBars(){
-  const maxHp = calcMaxHp();
-  document.getElementById('playerHpBar').style.width = Math.max(0,(S.player.hp/maxHp)*100)+'%';
-  if(S.monster){
-    const pct = Math.max(0,(S.monster.hp/S.monster.maxHp)*100);
-    document.getElementById('monsterHpBar').style.width = pct + '%';
-    if(S.monster.isBoss){
-      document.getElementById('bossHpFill').style.width = pct + '%';
-      document.getElementById('bossOverlayNum').textContent = `${Math.max(0, Math.floor(S.monster.hp))} / ${fmt(S.monster.maxHp)}`;
-    }
-  }
-}
 
-function renderEquipSlots(){
-  const slots = [
-    ['weapon','eqWeaponName'],
-    ['helmet','eqHelmetName'],
-    ['armor','eqArmorName'],
-    ['gloves','eqGlovesName'],
-    ['accessory','eqAccName']
-  ];
-  slots.forEach(([slot, elId])=>{
-    const el = document.getElementById(elId);
-    const it = S.equip[slot];
-    if(it){
-      el.textContent = it.name.replace(/^\[[^\]]+\]\s*/,'') + (it.enhance>0?` +${it.enhance}`:'');
-      el.style.color = GRADES[it.grade].color;
-    } else {
-      el.textContent = '없음'; el.style.color = 'var(--sub)';
-    }
-  });
-}
 
-function maxGradeOwned(slotKind){
-  let max = -1;
-  if(S.equip[slotKind]) max = Math.max(max, S.equip[slotKind].grade);
-  S.bagEquip.forEach(it=>{ if(it.kind===slotKind) max = Math.max(max, it.grade); });
-  return max;
-}
+
+
+
+
+
+
+
+
+
+
+
 
 /* BAG SYSTEM */
-function switchBagTab(tab){
-  currentBagTab = tab;
-  document.getElementById('tabBagJunk').classList.toggle('active', tab==='junk');
-  document.getElementById('tabBagEquip').classList.toggle('active', tab==='equip');
-  
-  document.getElementById('btnBatchJunkSell').style.display = tab==='junk'?'block':'none';
-  document.getElementById('btnBatchEquipDismantle').style.display = tab==='equip'?'block':'none';
-  
-  renderBag();
-}
 
-function renderBag(){
-  document.getElementById('junkCount').textContent = S.bagJunk.length;
-  document.getElementById('equipCount').textContent = S.bagEquip.length;
 
-  const grid = document.getElementById('bagGrid');
-  const empty = document.getElementById('bagEmpty');
-  grid.innerHTML='';
 
-  const targetList = currentBagTab === 'junk' ? S.bagJunk : S.bagEquip;
 
-  if(targetList.length === 0){ 
-    empty.style.display = 'block'; 
-    return; 
-  }
-  empty.style.display = 'none';
 
-  targetList.forEach(it=>{
-    const div = document.createElement('div');
-    div.className='bagItem';
-    const g = GRADES[it.grade] || GRADES[0];
-    div.style.borderColor = g.color;
-    const enhanceTag = it.enhance > 0 ? `+${it.enhance}` : '';
-    const optTxt = (it.options||[]).slice(0,2).map(o=>`${o.name}+${o.value}%`).join(' · ');
-    div.innerHTML = `<div class="ic">${slotIcon(it)}</div>
-      <div class="gname" style="color:${g.color}">${it.name}${enhanceTag ? ' ' + enhanceTag : ''}</div>
-      ${optTxt ? `<div style="font-size:7px;color:var(--sub);line-height:1.1;">${optTxt}</div>` : ''}`;
-    div.onclick = ()=> openItemSheet(it.id);
-    grid.appendChild(div);
-  });
-}
 
 function findOwnedItemById(id){
   if(!id) return null;
@@ -3851,10 +2992,8 @@ function openModal(name){
   if(name==='preset') { renderPresetModal(); }
 }
 
-function renderEquipSetBook(){
-  const el=document.getElementById('equipSetBook'); if(!el) return;
-  el.innerHTML=EQUIP_SETS.map(set=>`<div class="codexCard"><div class="codexTitle">⚔️ ${set.name}</div><div class="codexPieces">대상 등급: ${GRADES[set.grades[0]].name} ~ ${GRADES[set.grades[1]].name}</div>${Object.entries(set.effects).map(([n,e])=>`<div class="codexEffect"><b>${n}세트</b> · ${Object.entries(e).map(([k,v])=>`${k} +${v}%`).join(' · ')}</div>`).join('')}</div>`).join('');
-}
+
+
 
 function closeModal(name){ document.getElementById(name+'ModalBg').classList.remove('show'); }
 
@@ -3889,189 +3028,49 @@ function dismantleAllUnequipped(){
   }
 }
 
-function getOptionRerollCost(it){
-  return Math.floor(350 * Math.pow(1.28, it.grade) * (1 + (it.transcend||0)*0.15));
-}
-function rerollSingleOption(source, id, index){
-  let it = source==='equip' ? S.equip[id] : S.bagEquip.find(x=>x.id===id);
-  if(!it || !it.options || !it.options[index]) return;
-  const cost=getOptionRerollCost(it);
-  if(S.gold < cost){ toast(`💰 골드가 부족합니다! 필요: ${fmt(cost)}`); return; }
-  const currentKey=it.options[index].key;
-  const pool=EQUIP_OPTION_POOL.filter(x=>x.key!==currentKey);
-  const opt=pick(pool);
-  it.options[index]={key:opt.key,name:opt.name,value:Math.floor(rand(opt.min,opt.max+1))};
-  S.gold-=cost;
-  closeItemSheet(); renderAll(); saveGame();
-  toast(`✨ 옵션 변경 완료! 💰-${fmt(cost)}`);
-}
-function renderOptionRows(it, source, id){
-  const cost=getOptionRerollCost(it);
-  return (it.options||[]).map((o,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin:4px 0;"><span>✨ ${o.name} +${o.value}%</span><button class="optRerollBtn" onclick="rerollSingleOption('${source}','${id}',${i})">🔄 ${fmt(cost)}💰</button></div>`).join('');
-}
+
+
+
+
+
+
 
 /* ARSENAL / MU-GU — 장비 착용 + 졸라맨 외형 + 실시간 배율 */
-function renderArsenal(){
-  const slots=[['weapon','⚔️','무기'],['helmet','🪖','투구'],['armor','🛡️','갑옷'],['gloves','🥊','장갑'],['accessory','💍','장신구']];
-  const box=document.getElementById('arsenalSlots'); if(!box) return;
-  box.innerHTML=slots.map(([k,ic,n])=>{ const it=S.equip[k]; const g=it?GRADES[it.grade]:null; const v=it?itemStatValue(it):0; const exact=it?({weapon:`공격력 +${fmt(v)}`,helmet:`최대 HP +${fmt(Math.round(v*1.55))}`,armor:`최대 HP +${fmt(Math.round(v*2.65))}`,gloves:`공격력 +${fmt(Math.round(v*.3))} · 최대 HP +${fmt(Math.round(v*.25))}`,accessory:`공격력 +${fmt(Math.round(v*.45))} · 최대 HP +${fmt(v)}`}[k]):'장착되지 않음'; return `<div class="arsenalSlot ${it?'equipped':''}" onclick="openEquippedSheet('${k}')"><div class="aic">${ic}</div><div class="aname" style="color:${g?g.color:'var(--sub)'}">${it?it.name:n}</div><div class="arsenalExact">${exact}</div><div class="aval">${it?'장비 자체 수치 '+fmt(v):'미장착'}</div></div>`; }).join('');
-  const b=equippedBonus();
-  const atk=calcAtk(),hp=calcMaxHp();
-  const baseAtk=S.player.atk,baseHp=S.player.maxHp;
-  const equipBreakdown=Object.entries(S.equip).filter(([_,it])=>it).map(([slot,it])=>{const v=itemStatValue(it);const n={weapon:'무기',helmet:'투구',armor:'갑옷',gloves:'장갑',accessory:'장신구'}[slot];const q={weapon:`공격력 +${fmt(v)}`,helmet:`최대 HP +${fmt(Math.round(v*1.55))}`,armor:`최대 HP +${fmt(Math.round(v*2.65))}`,gloves:`공격력 +${fmt(Math.round(v*.3))} · 최대 HP +${fmt(Math.round(v*.25))}`,accessory:`공격력 +${fmt(Math.round(v*.45))} · 최대 HP +${fmt(v)}`}[slot];return `<div><span>${n}</span><b>${q}</b></div>`;}).join('');
-  document.getElementById('arsenalSummary').innerHTML=`<div style="font-weight:900">⚔️ 무구가 실제로 더하는 능력치</div><div class="arsenalPower">${equipBreakdown||'<div><span>장착 장비</span><b>없음</b></div>'}<div><span>장비 합산</span><b>공격력 +${fmt(b.atk)} · 최대 HP +${fmt(b.hp)}</b></div><div><span>최종 능력치</span><b>공격력 ${fmt(atk)} · 최대 HP ${fmt(hp)}</b></div></div>`;
-  const preview=document.getElementById('arsenalPreview');
-  const original=document.getElementById('stickmanSvg');
-  if(preview && original){ const clone=original.cloneNode(true); clone.id='arsenalStickmanSvg'; clone.classList.remove('down','attack','hurt'); preview.innerHTML=''; preview.appendChild(clone); }
-  const totalEquipPower=Object.values(S.equip).filter(Boolean).reduce((n,it)=>n+itemStatValue(it),0);
-  const info=document.getElementById('arsenalEquipInfo');
-  info.innerHTML=`<div style="font-weight:900;margin-bottom:5px">📈 무구 총 전투력 <b style="color:var(--gold)">${fmt(totalEquipPower)}</b></div><div class="arsenalMeter">${[['공격','atk',b.atk],['체력','hp',b.hp]].map(([n,k,v])=>{const max=Math.max(1,k==='atk'?baseAtk:baseHp);return `<div class="arsenalMeterRow"><span>${n} 기여</span><div class="arsenalMeterTrack"><div class="arsenalMeterFill" style="width:${Math.min(100,(v/(max+v))*100)}%"></div></div><b>+${fmt(v)}</b></div>`}).join('')}</div>`;
-  const bag=document.getElementById('arsenalBagEquip');
-  const equipItems=S.bagEquip||[];
-  bag.innerHTML= equipItems.length ? `<div style="font-size:11px;font-weight:800;margin:8px 0">🎒 대기 중인 장비 — 눌러서 장착</div>`+equipItems.slice(0,30).map(it=>{const g=GRADES[it.grade];return `<div class="petCard" style="cursor:pointer" onclick="doEquipFromArsenal('${it.id}')"><div class="petInfo"><div class="petIc">${slotIcon(it)}</div><div><div style="font-size:11px;color:${g.color};font-weight:800">${it.name} +${it.enhance||0}</div><div style="font-size:9px;color:var(--sub)">능력치 ${fmt(itemStatValue(it))}</div></div></div><button class="batchBtn" style="background:var(--accent);color:#fff">장착</button></div>`}).join('') : '<div style="text-align:center;color:var(--sub);font-size:10px;padding:12px">가방에 장착 가능한 장비가 없습니다.</div>';
-}
-function doEquipFromArsenal(id){ doEquip(id); renderArsenal(); }
+
+
+
+
 
 /* ITEM ACTION SHEET */
-function getItemById(id){
-  return S.bagJunk.find(x=>x.id===id) || S.bagEquip.find(x=>x.id===id);
-}
 
-function openItemSheet(id){
-  const it=getItemById(id); if(!it)return;
-  const isJunk=it.kind==='junk';
-  const canDismantleEquip=!isJunk&&(it.grade>=6||it.grade<maxGradeOwned(it.kind));
-  const sellVal=isJunk?getJunkSellValue(it):Math.round(150*GRADES[it.grade].mult);
-  const ssVal=isJunk?0:(it.grade+1)*3;
-  const artifactVal=!isJunk&&it.grade>=6?8+(it.grade-6)*7:0;
-  const essenceVal=isJunk?(it.grade+1)*2:0;
-  const g=GRADES[it.grade];
-  const synthMatches=!isJunk?S.bagEquip.filter(x=>x.id!==it.id&&x.kind===it.kind&&x.grade===it.grade).length:0;
-  const synthCost=!isJunk?Math.floor(Math.pow(it.grade+1,2)*100):0;
-  const canSynthesize=!isJunk&&it.enhance<20&&synthMatches>=2;
-  document.getElementById('itemSheet').innerHTML=`
-    <h4 style="color:${g.color}">${it.name}</h4>
-    <div class="desc">${isJunk?'[잡템] 재료 아이템':(slotIcon(it)+' 장비 · 강화 +'+it.enhance)}</div>
-    ${!isJunk?`<div class="eqSetHighlight"><div class="eqSetHead"><span>🛡️ 장비 세트</span></div><div class="eqSetEffect active">${getSetInfo(it).replace(/\\n/g,'<br>')}</div></div>`:''}
-    ${!isJunk?`<button class="btn-equip" onclick="doEquip('${it.id}')">장착하기</button>`:''}
-    ${!isJunk?`<button class="btn-synth" ${canSynthesize?'':'disabled'} onclick="synthesizeEquip('${it.id}')">🔺 같은 등급·종류 3개 합성 강화 · +1 (💎 ${fmt(synthCost)})${canSynthesize?'':' · 재료 2개 필요 / +20까지'}</button>`:''}
-    ${isJunk?`<button class="btn-dismantle" onclick="doDismantleJunk('${it.id}')">분해하기 (🌿 생명의 정수 +${essenceVal})</button>`:`
-    <button class="${canDismantleEquip?'btn-dismantle':'btn-disabled'}" ${canDismantleEquip?'':'disabled'} onclick="doDismantle('${it.id}')">분해하기 (💎 영혼석 +${ssVal}${artifactVal?` · 🌌 유물의 파편 +${artifactVal}`:''}) ${canDismantleEquip?'':'· 더 높은 등급 보유 시 가능'}</button>`}
-    <button class="btn-sell" onclick="doSell('${it.id}')">판매하기 (💰 +${fmt(sellVal)})</button>
-    <button class="btn-cancel" onclick="closeItemSheet()">닫기</button>`;
-  document.getElementById('itemSheetBg').classList.add('show');
-}
 
-function closeItemSheet(){ document.getElementById('itemSheetBg').classList.remove('show'); }
 
-function openEquippedSheet(slot){
-  const it=S.equip[slot]; if(!it){toast('장착된 장비가 없습니다');return;}
-  const g=GRADES[it.grade];
-  document.getElementById('itemSheet').innerHTML=`
-    <h4 style="color:${g.color}">${it.name} ${it.enhance>0?('+'+it.enhance):''}</h4>
-    <div class="desc">현재 장착 중인 장비입니다.</div>
-    <div class="eqSetHighlight"><div class="eqSetHead"><span>🛡️ 장비 세트</span></div><div class="eqSetEffect active">${getSetInfo(it).replace(/\\n/g,'<br>')}</div></div>
-    <button class="btn-cancel" onclick="doUnequip('${slot}')">해제하기</button>
-    <button class="btn-cancel" onclick="closeItemSheet()">닫기</button>`;
-  document.getElementById('itemSheetBg').classList.add('show');
-}
 
-function doEquip(id){
-  const idx = S.bagEquip.findIndex(x=>x.id===id);
-  if(idx<0) return;
-  const it = S.bagEquip[idx];
-  const old = S.equip[it.kind];
-  S.equip[it.kind] = it;
-  S.bagEquip.splice(idx,1);
-  if(old) S.bagEquip.push(old);
-  closeItemSheet(); renderAll(); saveGame();
-  toast(`${it.name} 장착 완료!`);
-}
 
-function doUnequip(slot){
-  const it = S.equip[slot];
-  if(!it) return;
-  S.equip[slot]=null;
-  S.bagEquip.push(it);
-  closeItemSheet(); renderAll(); saveGame();
-}
 
-function synthesizeEquip(id){
-  const idx = S.bagEquip.findIndex(x=>x.id===id);
-  if(idx < 0) return;
-  const target = S.bagEquip[idx];
-  if(target.enhance >= 20){ toast('이 장비는 일반 강화 한계(+20)에 도달했습니다.'); return; }
 
-  const materials = S.bagEquip.filter(x => x.id !== id && x.kind === target.kind && x.grade === target.grade).slice(0,2);
-  if(materials.length < 2){ toast('같은 등급·같은 종류의 장비 2개가 더 필요합니다.'); return; }
 
-  const cost = Math.floor(Math.pow(target.grade + 1, 2) * 100);
-  if(S.soulStones < cost){ toast(`💎 영혼석이 부족합니다! 합성 강화 필요: ${fmt(cost)}`); return; }
 
-  S.soulStones -= cost;
-  const ids = new Set(materials.map(x=>x.id));
-  S.bagEquip = S.bagEquip.filter(x=>!ids.has(x.id));
-  target.enhance++;
-  closeItemSheet();
-  renderAll(); saveGame();
-  toast(`🔺 합성 강화 성공! ${target.name} +${target.enhance}`);
-}
 
-function doDismantle(id){
-  const idx = S.bagEquip.findIndex(x=>x.id===id);
-  if(idx<0) return;
 
-  const it = S.bagEquip[idx];
-  const maxGrade = maxGradeOwned(it.kind);
 
-  // 일괄/자동과 완전히 같은 규칙:
-  // 같은 종류의 현재 최고등급보다 낮은 장비만 분해 가능.
-  if(it.grade >= maxGrade){
-    toast('현재 같은 종류의 최고등급 장비는 분해할 수 없습니다.');
-    return;
-  }
 
-  const gain = dismantleEquipItemObject(it);
-  const ss = gain.ss;
-  const artifactGain = gain.artifactGain;
-  S.bagEquip.splice(idx,1);
-  closeItemSheet(); renderAll(); saveGame();
-  toast(`분해 완료! 영혼석 +${ss}💎${artifactGain?` · 유물의 파편 +${artifactGain}`:''}`);
-}
 
-function doDismantleJunk(id){
-  const idx = S.bagJunk.findIndex(x=>x.id===id);
-  if(idx<0) return;
-  const it = S.bagJunk[idx];
-  const ess = (it.grade+1)*2;
-  S.essence += ess;
-  S.bagJunk.splice(idx,1);
-  closeItemSheet(); renderAll(); saveGame();
-  toast(`잡템 분해 완료! 생명의 정수 +${ess}🌿`);
-}
 
-function doSell(id){
-  let idx = S.bagJunk.findIndex(x=>x.id===id);
-  if(idx >= 0){
-    const it = S.bagJunk[idx];
-    const val = getJunkSellValue(it);
-    S.gold += val;
-    S.bagJunk.splice(idx, 1);
-    closeItemSheet(); renderAll(); saveGame();
-    toast(`판매 완료! 💰 +${fmt(val)}`);
-    return;
-  }
-  
-  idx = S.bagEquip.findIndex(x=>x.id===id);
-  if(idx >= 0){
-    const it = S.bagEquip[idx];
-    const val = Math.round(150 * GRADES[it.grade].mult);
-    S.gold += val;
-    S.bagEquip.splice(idx, 1);
-    closeItemSheet(); renderAll(); saveGame();
-    toast(`판매 완료! 💰 +${fmt(val)}`);
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* GROWTH SKILL TREES — 펫은 소소한 보상 / 플레이어는 보통 보상 */
 const PET_GROWTH_TREE = [
@@ -4094,120 +3093,34 @@ const PLAYER_GROWTH_TREE = [
   {id:'pExp',icon:'📘',name:'성장 진화',stat:'expPct',step:2,max:100,desc:'전투 경험치 +2%씩'}
 ];
 
-function getPlayerGrowthPoints(){ return Math.max(0,(S.player.level||1)-1); }
-function growthLevel(id){ return Math.max(0, Number((S.growthSkills||{})[id]||0)); }
-function growthSpent(tree){ return tree.reduce((n,x)=>n+growthLevel(x.id),0); }
-function growthBonus(stat){
-  let total=0;
-  [...PET_GROWTH_TREE,...PLAYER_GROWTH_TREE].forEach(n=>{if(n.stat===stat) total += growthLevel(n.id)*n.step;});
-  return total;
-}
-function buyGrowthNode(id, treeName){
-  const tree = treeName==='pet' ? PET_GROWTH_TREE : PLAYER_GROWTH_TREE;
-  const node = tree.find(x=>x.id===id); if(!node) return;
-  const spent = growthSpent(tree);
-  const available = treeName==='pet' ? getPetGrowthPoints() : getPlayerGrowthPoints();
-  const lv = growthLevel(id);
-  if(lv>=node.max){ toast('🌳 이 성장 노드는 최대 레벨입니다.'); return; }
-  if(spent>=available){ toast('🌳 성장 포인트가 부족합니다.'); return; }
-  S.growthSkills[id]=lv+1;
-  if(treeName==='pet') S.petGrowthSpent=spent+1; else S.playerGrowthSpent=spent+1;
-  renderGrowthTree(); renderAll(); saveGame();
-  toast(`${node.icon} ${node.name} Lv.${lv+1} 달성!`);
-}
+
+
+
+
+
+
+
+
+
+
 function growthResetCost(treeName){
   const tree = treeName==='pet' ? PET_GROWTH_TREE : PLAYER_GROWTH_TREE;
   const spent = growthSpent(tree);
   return Math.floor(1000 + spent * 250);
 }
-function resetGrowthTree(treeName){
-  const tree = treeName==='pet' ? PET_GROWTH_TREE : PLAYER_GROWTH_TREE;
-  const label = treeName==='pet' ? '펫 성장 스킬트리' : '플레이어 성장 스킬트리';
-  const spent = growthSpent(tree);
-  if(spent<=0){ toast('🌳 초기화할 스킬 포인트가 없습니다.'); return; }
-  const cost = growthResetCost(treeName);
-  if((S.gold||0) < cost){ toast(`💰 골드가 부족합니다. 초기화 비용 ${fmt(cost)}G`); return; }
-  if(!confirm(`'${label}'을(를) 초기화할까요?\n사용 골드: ${fmt(cost)}G\n투자한 포인트 ${spent}개가 모두 반환됩니다.`)) return;
-  S.gold -= cost;
-  tree.forEach(n=>{ S.growthSkills[n.id]=0; });
-  if(treeName==='pet') S.petGrowthSpent=0; else S.playerGrowthSpent=0;
-  renderGrowthTree(); renderAll(); saveGame();
-  toast(`🌳 ${label} 초기화 완료! ${spent} 포인트 반환`);
-}
 
-function buyGrowthNode10(id,type,e){
-  if(e){ e.preventDefault(); e.stopPropagation(); }
-  const tree=type==='pet'?PET_GROWTH_TREE:PLAYER_GROWTH_TREE;
-  const node=tree.find(n=>n.id===id);
-  if(!node) return;
-  let count=0;
-  while(count<10){
-    const spent=growthSpent(tree);
-    const available=type==='pet'?getPetGrowthPoints():getPlayerGrowthPoints();
-    const lv=growthLevel(id);
-    if(lv>=node.max || spent>=available) break;
-    S.growthSkills[id]=lv+1;
-    count++;
-  }
-  if(count>0){
-    renderGrowthTree();
-    renderAll();
-    saveGame();
-    toast(`${node.icon} ${node.name} +${count}단계 강화!`);
-  }else{
-    toast('🌳 성장 포인트가 부족합니다.');
-  }
-}
-function buyTree10(type,e){
-  if(e){ e.preventDefault(); e.stopPropagation(); }
-  const tree=type==='pet'?PET_GROWTH_TREE:PLAYER_GROWTH_TREE;
-  const target=tree.find(n=>growthLevel(n.id)<n.max);
-  if(!target){ toast('🌳 모든 성장 스킬이 최대 레벨입니다.'); return; }
-  buyGrowthNode10(target.id,type,e);
-}
-function renderGrowthTree(){
-  const petPts=getPetGrowthPoints(), playerPts=getPlayerGrowthPoints();
-  const petSpent=growthSpent(PET_GROWTH_TREE), playerSpent=growthSpent(PLAYER_GROWTH_TREE);
-  const petEl=document.getElementById('petGrowthTree'), playerEl=document.getElementById('playerGrowthTree');
-  if(!petEl||!playerEl) return;
-  renderFocusUpgrades();
-  renderOriginGrowth();
-  document.getElementById('petGrowthPointText').textContent=`${Math.max(0,petPts-petSpent)} / ${petPts}`;
-  document.getElementById('playerGrowthPointText').textContent=`${Math.max(0,playerPts-playerSpent)} / ${playerPts}`;
-  const branch=(tree,type)=>tree.map((n,i)=>{
-    const lv=growthLevel(n.id), max=n.max;
-    const total=(lv*n.step);
-    const can=(type==='pet'?petPts-petSpent:playerPts-playerSpent)>0 && lv<max;
-    return `<div class="growthNode ${lv>=max?'maxed':''}">
-      <div class="growthNodeIcon">${n.icon}</div>
-      <div><div class="growthNodeName">${n.name}</div><div class="growthNodeDesc">${n.desc} · 현재 +${Number(total.toFixed(1))}%</div><div class="growthNodeLv">Lv.${lv} / ${max}</div></div>
-      <div class="growthBuyGroup">
-        <button class="growthBuy" ${can?'':'disabled'} onclick="buyGrowthNode('${n.id}','${type}')">+1</button>
-        <button class="growthBuy growthBuy10" ${can?'':'disabled'} onclick="buyGrowthNode10('${n.id}','${type}',event)">+10</button>
-      </div>
-    </div>`;
-  }).join('');
-  petEl.innerHTML='<div class="growthBranch"><div class="growthBranchTitle growthPetTag">🐾 소소한 성장 — 5개 계열 × 100단계 <span class="treeQuickActions"><button class="growthBulk10" onclick="buyTree10(\'pet\',event)">+10 추가</button><button class="growthReset" onclick="resetGrowthTree(\'pet\')">💰 초기화 <span>'+fmt(growthResetCost('pet'))+'G</span></button></span></div><div class="growthNodes">'+branch(PET_GROWTH_TREE,'pet')+'</div></div>';
-  playerEl.innerHTML='<div class="growthBranch"><div class="growthBranchTitle growthPlayerTag">🧍 메인 성장 — 6개 계열 × 100단계 <span class="treeQuickActions"><button class="growthBulk10" onclick="buyTree10(\'player\',event)">+10 추가</button><button class="growthReset" onclick="resetGrowthTree(\'player\')">💰 초기화 <span>'+fmt(growthResetCost('player'))+'G</span></button></span></div><div class="growthNodes">'+branch(PLAYER_GROWTH_TREE,'player')+'</div></div>';
-  const summary=document.getElementById('growthSummary');
-  if(summary) summary.innerHTML=`🐾 펫 추가레벨 <b>${petPts}</b> → 남은 펫 포인트 <b>${Math.max(0,petPts-petSpent)}</b>　|　🧍 플레이어 Lv.${S.player.level} → 남은 플레이어 포인트 <b>${Math.max(0,playerPts-playerSpent)}</b><br><span style="color:var(--sub);font-size:9px">펫 트리는 작은 보너스, 플레이어 트리는 체감되는 일반 성장 보너스입니다.</span>`;
-}
-function switchGrowthTree(type){
-  const pet=document.getElementById('petGrowthScreen'), player=document.getElementById('playerGrowthScreen'), focus=document.getElementById('focusUpgradePanel'), origin=document.getElementById('originGrowthPanel');
-  const pt=document.getElementById('growthTabPet'), pl=document.getElementById('growthTabPlayer'), ft=document.getElementById('growthTabFocus'), ot=document.getElementById('growthTabOrigin');
-  if(!pet||!player||!focus||!origin) return;
-  pet.style.display=type==='pet'?'block':'none';
-  player.style.display=type==='player'?'block':'none';
-  focus.style.display=type==='focus'?'block':'none';
-  origin.style.display=type==='origin'?'block':'none';
-  pt.classList.toggle('active',type==='pet');
-  pl.classList.toggle('active',type==='player');
-  ft.classList.toggle('active',type==='focus');
-  ot.classList.toggle('active',type==='origin');
-  if(type==='focus') renderFocusUpgrades();
-  if(type==='origin') renderOriginGrowth();
-}
-function openGrowthModal(){ renderGrowthTree(); switchGrowthTree('pet'); document.getElementById('growthModalBg').classList.add('show'); }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* AUDIO ENGINE — 외부 음원 없이 WebAudio로 모바일용 효과음/BGM 생성 */
@@ -4254,15 +3167,8 @@ function stopAmbientBgm(){
 }
 // 배경음 제거: 이 게임 버전에서는 BGM을 생성하지 않는다.
 function startAmbientBgm(){ stopAmbientBgm(); }
-function playGachaFx(kind, icon, label, sub){
-  if(!appSettings.gachaFx || appSettings.reducedFx) return;
-  const box=document.getElementById('gachaFxOverlay'); if(!box)return;
-  box.className='gachaFxOverlay show '+kind;
-  document.getElementById('gachaFxCore').textContent=icon;
-  document.getElementById('gachaFxLabel').innerHTML=`${label}<small>${sub||''}</small>`;
-  sfx(kind==='pet'?'pet':'gacha');
-  setTimeout(()=>box.className='gachaFxOverlay '+kind,1000);
-}
+
+
 function playForgeFx(icon,label='FORGE!'){
   if(!appSettings.enhanceFx || appSettings.reducedFx) return 0;
   const box=document.getElementById('forgeHammerOverlay'); if(!box)return 0;
@@ -4276,411 +3182,51 @@ function playForgeFx(icon,label='FORGE!'){
 document.addEventListener('pointerdown',()=>{ensureAudio();},{once:true});
 
 /* MYSTERY BOX */
-function boxCost(){ return Math.floor(150 + (S.mbox.pulls * 2.5)); }
-function updateBoxCost(){
-  document.getElementById('boxCost').textContent = fmt(boxCost());
-  document.getElementById('pullCountVal').textContent = S.mbox.pulls;
-  const auto = document.getElementById('autoEquipDismantle');
-  if(auto) auto.checked = !!S.autoEquipDismantle;
-}
 
-function toggleAutoEquipDismantle(enabled){
-  S.autoEquipDismantle = !!enabled;
-  saveGame();
-  toast(S.autoEquipDismantle ? '⚙️ 자동 장비 분해 ON — 같은 종류의 최고등급보다 낮은 장비만 분해합니다.' : '⚙️ 자동 장비 분해 OFF');
-}
 
-function dismantleEquipItemObject(item){
-  if(!item) return null;
-  const ss = (item.grade + 1) * 3;
-  const artifactGain = item.grade >= 6 ? 8 + (item.grade - 6) * 7 : 0;
-  S.soulStones += ss;
-  if(artifactGain) S.artifactShards = (S.artifactShards || 0) + artifactGain;
-  return {ss, artifactGain};
-}
 
-function dismantleLowerGradeEquipments(){
-  // 장착 장비 + 가방 장비 전체에서 종류별 최고등급을 계산한다.
-  // 규칙: 같은 종류에서 최고등급보다 낮은 가방 장비만 분해한다.
-  // 최고등급과 같은 장비는 몇 개든 보존하며, 장착 장비는 절대 분해하지 않는다.
-  const maxByKind = {};
 
-  Object.values(S.equip).forEach(it=>{
-    if(it) maxByKind[it.kind] = Math.max(maxByKind[it.kind] ?? -1, it.grade);
-  });
-  S.bagEquip.forEach(it=>{
-    maxByKind[it.kind] = Math.max(maxByKind[it.kind] ?? -1, it.grade);
-  });
 
-  let count = 0, totalSs = 0, totalArtifactShards = 0;
 
-  for(let i=S.bagEquip.length-1; i>=0; i--){
-    const it = S.bagEquip[i];
-    const maxGrade = maxByKind[it.kind] ?? -1;
 
-    if(it.grade < maxGrade){
-      const gain = dismantleEquipItemObject(it);
-      totalSs += gain.ss;
-      totalArtifactShards += Math.floor(Number(gain.artifactGain));
-      count++;
-      S.bagEquip.splice(i,1);
-    }
-  }
 
-  return {count, totalSs, totalArtifactShards};
-}
 
-function autoProcessEquip(item){
-  if(!item || !S.autoEquipDismantle) return false;
 
-  // 새 장비 하나만 검사하지 않고, 현재 보유 장비 전체를
-  // "종류별 최고등급보다 낮은 장비" 규칙으로 정리한다.
-  const result = dismantleLowerGradeEquipments();
 
-  if(result.count === 0) return false;
-  return {
-    ss: result.totalSs,
-    artifactGain: result.totalArtifactShards,
-    count: result.count
-  };
-}
 
-function getBoxProbabilities(){
-  const pulls = S.mbox.pulls;
-  const weights = [];
 
-  for(let g = 0; g < GRADES.length; g++){
-    let baseWeight = Math.pow(0.33, g);
-    // 고등급 가속: 누적 뽑기가 늘수록 높은 등급에 추가 가중치를 주어
-    // 절대극(21등급)이 약 1,000만 회에서 0.01% 부근에 도달하도록 조정합니다.
-    let pullBonus = 1 + (pulls * 0.100 * Math.pow(g, 1.4));
-    const highGradeBoost = Math.pow(1 + (pulls / 1000000), (4.7463674428 * g / 21));
-    weights.push(baseWeight * pullBonus * highGradeBoost);
-  }
 
-  const total = weights.reduce((a,b)=>a+b,0);
-  return { weights, total };
-}
 
-function toggleRateTable(){
-  const wrap = document.getElementById('rateTableWrap');
-  if(wrap.style.display==='none'){
-    const { weights, total } = getBoxProbabilities();
-    let rows = '';
-    for(let g=0; g<GRADES.length; g++){
-      const prob = ((weights[g]/total)*100).toFixed(3);
-      rows += `<tr>
-        <td style="color:${GRADES[g].color}; font-weight:700;">${GRADES[g].name}</td>
-        <td>x${GRADES[g].mult}</td>
-        <td>${prob}%</td>
-      </tr>`;
-    }
-    wrap.innerHTML = `<table class="rateTable">
-      <thead><tr><th>등급</th><th>능력치 배율</th><th>현재 확률</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
-    wrap.style.display = 'block';
-  } else {
-    wrap.style.display = 'none';
-  }
-}
 
-function openMysteryBox(){
-  const cost = boxCost();
-  if(S.gold < cost){ toast('골드가 부족합니다!'); return; }
-  
-  S.gold -= cost;
-  S.mbox.pulls++;
 
-  const { weights, total } = getBoxProbabilities();
-  let r = Math.random()*total, grade = 0;
-  for(let g = 0; g < GRADES.length; g++){
-    r -= weights[g];
-    if(r <= 0){ grade = g; break; }
-  }
-  
-  const slot = pick(['weapon','helmet','armor','gloves','accessory']);
-  const item = makeEquip(slot, grade, S.stage);
-  S.bagEquip.push(item);
-  const autoGain = autoProcessEquip(item);
-  const g = GRADES[grade];
-  playGachaFx('equip', slotIcon(slot), 'EQUIPMENT SUMMON', `${g.name} · ${item.name}`);
-  document.getElementById('boxResultWrap').innerHTML = `
-    <div id="boxResult" style="text-align:center; padding:12px 0;">
-      <div style="font-size:44px;">${slotIcon(slot)}</div>
-      <div style="font-size:14px; font-weight:800; margin-top:4px; color:${g.color}">${item.name}</div>
-    </div>`;
-  updateBoxCost();
-  renderAll(); saveGame();
-  toast(autoGain ? `🎁 [${g.name}] ${item.name} 획득 → ⚙️ 하위등급 자동 분해! 영혼석 +${autoGain.ss}${autoGain.artifactGain?` · 유물의 파편 +${autoGain.artifactGain}`:''}` : `🎁 [${g.name}] 등급 장비 획득!`);
-}
 
-function openMysteryBox100(){
-  const count = 100;
-  let totalCost = 0;
-  let tempPulls = S.mbox.pulls;
 
-  for(let i=0; i<count; i++){
-    totalCost += Math.floor(150 + (tempPulls * 2.5));
-    tempPulls++;
-  }
 
-  if(S.gold < totalCost){
-    toast(`💰 골드가 부족합니다! 100회 필요: ${fmt(totalCost)}`);
-    return;
-  }
 
-  S.gold -= totalCost;
-  const counts = Array(GRADES.length).fill(0);
-  let best = null;
 
-  for(let i=0; i<count; i++){
-    S.mbox.pulls++;
 
-    const { weights, total } = getBoxProbabilities();
-    let r = Math.random()*total, grade = 0;
-    for(let g=0; g<GRADES.length; g++){
-      r -= weights[g];
-      if(r <= 0){ grade = g; break; }
-    }
 
-    const slot = pick(['weapon','helmet','armor','gloves','accessory']);
-    const item = makeEquip(slot, grade, S.stage);
-    S.bagEquip.push(item);
-    counts[grade]++;
 
-    if(!best || grade > best.grade) best = { grade, slot, item };
-  }
 
-  let autoCount = 0, autoSs = 0, autoArtifact = 0;
-  if(S.autoEquipDismantle){
-    // 단일 뽑기/일괄분해와 같은 중앙 규칙으로 정리한다.
-    const result = dismantleLowerGradeEquipments();
-    autoCount = result.count;
-    autoSs = result.totalSs;
-    autoArtifact = result.totalArtifactShards;
-  }
 
-  const batch = document.getElementById('boxBatchResult');
-  batch.style.display = 'block';
-  batch.innerHTML = `
-    <div style="background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:10px;">
-      <div style="font-weight:800; margin-bottom:7px;">🎉 100회 뽑기 결과</div>
-      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px;">
-        ${GRADES.map((g,i)=>`
-          <div style="padding:5px; border-radius:7px; background:rgba(255,255,255,.04); text-align:center;">
-            <span style="color:${g.color}; font-weight:700;">${g.name}</span>
-            <b style="margin-left:3px;">${counts[i]}</b>
-          </div>`).join('')}
-      </div>
-      <div style="margin-top:8px; font-size:10.5px; color:var(--sub); text-align:center;">
-        총 비용 💰${fmt(totalCost)} · 누적 ${S.mbox.pulls}회
-        ${S.autoEquipDismantle && autoCount ? `<div style="margin-top:4px;color:#ffd166;">⚙️ 자동 분해 ${autoCount}개 · 영혼석 +${autoSs}${autoArtifact?` · 유물의 파편 +${autoArtifact}`:''}</div>` : S.autoEquipDismantle ? '<div style="margin-top:4px;color:#8bd7a5;">⚙️ 자동 분해: 해당 없음</div>' : ''}
-      </div>
-    </div>`;
 
-  const g = GRADES[best.grade];
-  document.getElementById('boxResultWrap').innerHTML = `
-    <div id="boxResult" style="text-align:center; padding:12px 0;">
-      <div style="font-size:38px;">${slotIcon(best.slot)}</div>
-      <div style="font-size:13px; font-weight:800; margin-top:4px; color:${g.color}">
-        최고 등급: ${best.item.name}
-      </div>
-    </div>`;
 
-  updateBoxCost();
-  renderAll();
-  saveGame();
-  toast(`🎁 100회 뽑기 완료! 최고 등급: [${g.name}]`);
-}
 
-function openMysteryBox10000(){
-  const count = 10000;
-  let totalCost = 0;
-  let tempPulls = S.mbox.pulls;
 
-  for(let i=0; i<count; i++){
-    totalCost += Math.floor(150 + (tempPulls * 2.5));
-    tempPulls++;
-  }
 
-  if(S.gold < totalCost){
-    toast(`💰 골드가 부족합니다! 1만회 필요: ${fmt(totalCost)}`);
-    return;
-  }
 
-  S.gold -= totalCost;
-  const counts = Array(GRADES.length).fill(0);
-  let best = null;
 
-  for(let i=0; i<count; i++){
-    S.mbox.pulls++;
-    const { weights, total } = getBoxProbabilities();
-    let r = Math.random()*total, grade = 0;
-    for(let g=0; g<GRADES.length; g++){
-      r -= weights[g];
-      if(r <= 0){ grade = g; break; }
-    }
-    const slot = pick(['weapon','helmet','armor','gloves','accessory']);
-    const item = makeEquip(slot, grade, S.stage);
-    S.bagEquip.push(item);
-    counts[grade]++;
-    if(!best || grade > best.grade) best = { grade, slot, item };
-  }
-
-  let autoCount = 0, autoSs = 0, autoArtifact = 0;
-  if(S.autoEquipDismantle){
-    const result = dismantleLowerGradeEquipments();
-    autoCount = result.count;
-    autoSs = result.totalSs;
-    autoArtifact = result.totalArtifactShards;
-  }
-
-  const batch = document.getElementById('boxBatchResult');
-  batch.style.display = 'block';
-  batch.innerHTML = `
-    <div style="background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:10px;">
-      <div style="font-weight:800; margin-bottom:7px;">🎉 1만회 뽑기 결과</div>
-      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px;">
-        ${GRADES.map((g,i)=>`
-          <div style="padding:5px; border-radius:7px; background:rgba(255,255,255,.04); text-align:center;">
-            <span style="color:${g.color}; font-weight:700;">${g.name}</span>
-            <b style="margin-left:3px;">${counts[i]}</b>
-          </div>`).join('')}
-      </div>
-      <div style="margin-top:8px; font-size:10.5px; color:var(--sub); text-align:center;">
-        총 비용 💰${fmt(totalCost)} · 누적 ${S.mbox.pulls}회
-        ${S.autoEquipDismantle && autoCount ? `<div style="margin-top:4px;color:#ffd166;">⚙️ 자동 분해 ${autoCount}개 · 영혼석 +${autoSs}${autoArtifact?` · 유물의 파편 +${autoArtifact}`:''}</div>` : S.autoEquipDismantle ? '<div style="margin-top:4px;color:#8bd7a5;">⚙️ 자동 분해: 해당 없음</div>' : ''}
-      </div>
-    </div>`;
-
-  const g = GRADES[best.grade];
-  document.getElementById('boxResultWrap').innerHTML = `
-    <div id="boxResult" style="text-align:center; padding:12px 0;">
-      <div style="font-size:38px;">${slotIcon(best.slot)}</div>
-      <div style="font-size:13px; font-weight:800; margin-top:4px; color:${g.color}">
-        최고 등급: ${best.item.name}
-      </div>
-    </div>`;
-
-  updateBoxCost();
-  renderAll();
-  saveGame();
-  toast(`🎁 1만회 뽑기 완료! 최고 등급: [${g.name}]`);
-}
-
-function openMysteryBox1000(){
-  const count = 1000;
-  let totalCost = 0;
-  let tempPulls = S.mbox.pulls;
-
-  for(let i=0; i<count; i++){
-    totalCost += Math.floor(150 + (tempPulls * 2.5));
-    tempPulls++;
-  }
-
-  if(S.gold < totalCost){
-    toast(`💰 골드가 부족합니다! 1000회 필요: ${fmt(totalCost)}`);
-    return;
-  }
-
-  S.gold -= totalCost;
-  const counts = Array(GRADES.length).fill(0);
-  let best = null;
-
-  for(let i=0; i<count; i++){
-    S.mbox.pulls++;
-
-    const { weights, total } = getBoxProbabilities();
-    let r = Math.random()*total, grade = 0;
-    for(let g=0; g<GRADES.length; g++){
-      r -= weights[g];
-      if(r <= 0){ grade = g; break; }
-    }
-
-    const slot = pick(['weapon','helmet','armor','gloves','accessory']);
-    const item = makeEquip(slot, grade, S.stage);
-    S.bagEquip.push(item);
-    counts[grade]++;
-
-    if(!best || grade > best.grade) best = { grade, slot, item };
-  }
-
-  let autoCount = 0, autoSs = 0, autoArtifact = 0;
-  if(S.autoEquipDismantle){
-    // 단일 뽑기/일괄분해와 같은 중앙 규칙으로 정리한다.
-    const result = dismantleLowerGradeEquipments();
-    autoCount = result.count;
-    autoSs = result.totalSs;
-    autoArtifact = result.totalArtifactShards;
-  }
-
-  const batch = document.getElementById('boxBatchResult');
-  batch.style.display = 'block';
-  batch.innerHTML = `
-    <div style="background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:10px;">
-      <div style="font-weight:800; margin-bottom:7px;">🎉 1000회 뽑기 결과</div>
-      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px;">
-        ${GRADES.map((g,i)=>`
-          <div style="padding:5px; border-radius:7px; background:rgba(255,255,255,.04); text-align:center;">
-            <span style="color:${g.color}; font-weight:700;">${g.name}</span>
-            <b style="margin-left:3px;">${counts[i]}</b>
-          </div>`).join('')}
-      </div>
-      <div style="margin-top:8px; font-size:10.5px; color:var(--sub); text-align:center;">
-        총 비용 💰${fmt(totalCost)} · 누적 ${S.mbox.pulls}회
-        ${S.autoEquipDismantle && autoCount ? `<div style="margin-top:4px;color:#ffd166;">⚙️ 자동 분해 ${autoCount}개 · 영혼석 +${autoSs}${autoArtifact?` · 유물의 파편 +${autoArtifact}`:''}</div>` : S.autoEquipDismantle ? '<div style="margin-top:4px;color:#8bd7a5;">⚙️ 자동 분해: 해당 없음</div>' : ''}
-      </div>
-    </div>`;
-
-  const g = GRADES[best.grade];
-  document.getElementById('boxResultWrap').innerHTML = `
-    <div id="boxResult" style="text-align:center; padding:12px 0;">
-      <div style="font-size:38px;">${slotIcon(best.slot)}</div>
-      <div style="font-size:13px; font-weight:800; margin-top:4px; color:${g.color}">
-        최고 등급: ${best.item.name}
-      </div>
-    </div>`;
-
-  updateBoxCost();
-  renderAll();
-  saveGame();
-  toast(`🎁 1000회 뽑기 완료! 최고 등급: [${g.name}]`);
-}
 
 /* WEAPON SHOP */
-function renderWeaponShop(){
-  const pane = document.getElementById('weaponShopList');
-  let html = '';
-  const shopCosts = [400, 700, 1550];
-  for(let g = 0; g <= 2; g++){
-    const cost = shopCosts[g];
-    const gObj = GRADES[g];
-    const wName = WEAPON_WORDS[g];
-    html += `
-      <div class="shopItem">
-        <div>
-          <div class="si-name" style="color:${gObj.color}">[${gObj.name}] ${wName}</div>
-          <div class="si-desc">기초 추천 확정 무구</div>
-        </div>
-        <button onclick="buyFixedWeapon(${g}, ${cost})">💰 ${fmt(cost)} 구매</button>
-      </div>`;
-  }
-  pane.innerHTML = html;
-  pane.insertAdjacentHTML('afterbegin','<button class="enhBtn" style="width:100%;margin-bottom:8px;background:linear-gradient(135deg,#00bcd4,#536dfe)" onclick="doEnhanceContinuousAll()">⚡ 연속 강화 · 장착 장비를 초월 전까지 자동 강화</button>');
-}
 
-function buyFixedWeapon(grade, cost){
-  if(S.gold < cost){ toast('골드가 부족합니다!'); return; }
-  S.gold -= cost;
-  const item = makeEquip('weapon', grade, S.stage);
-  S.bagEquip.push(item);
-  renderAll(); saveGame();
-  toast(`🛒 [${GRADES[grade].name}] ${item.name} 구매 완료!`);
-}
+
+
+
+
 
 /* GOLD PASSIVE SHOP */
-function buyBreakProtectionTicket(){const cost=5000;if((S.soulStones||0)<cost){toast('💎 영혼석이 부족합니다! 필요: 5,000');return;}S.soulStones-=cost;S.breakProtectionTickets=Math.max(0,Number(S.breakProtectionTickets||0))+1;renderGoldShop();renderAll();saveGame();toast('🛡️ 파괴방지권 1개 구매 완료!');}
+
+
 function renderGoldShop(){
   const pane = document.getElementById('shopGoldPane');
   const atkCost = Math.floor(300 * Math.pow(1.3, S.research.atkLv));
@@ -4712,14 +3258,8 @@ function renderGoldShop(){
   `;
 }
 
-function upgradeResearch(type, cost){
-  if(S.gold < cost){ toast('골드가 부족합니다!'); return; }
-  S.gold -= cost;
-  S.research[type]++;
-  renderGoldShop();
-  renderAll(); saveGame();
-  toast('패시브 연구 완료!');
-}
+
+
 
 /* PET SYSTEM */
 
@@ -4743,435 +3283,49 @@ let currentEnhTab = 'power';
 let currentSynthType = 'weapon';
 let currentSynthTargetId = null;
 
-function switchEnhTab(tab){
-  currentEnhTab = tab;
-  const powerTab = document.getElementById('enhTabPower');
-  const synthTab = document.getElementById('enhTabSynth');
-  const awakenTab = document.getElementById('enhTabAwaken');
-  const enhList = document.getElementById('enhList');
-  const synthPanel = document.getElementById('synthPanel');
-  const awakenPanel = document.getElementById('awakenPanel');
-  if(!powerTab || !synthTab || !awakenTab || !enhList || !synthPanel || !awakenPanel) return;
-  powerTab.classList.toggle('active', tab==='power');
-  synthTab.classList.toggle('active', tab==='synth');
-  awakenTab.classList.toggle('active', tab==='awaken');
-  enhList.style.display = tab==='power' ? 'block' : 'none';
-  synthPanel.style.display = tab==='synth' ? 'block' : 'none';
-  awakenPanel.style.display = tab==='awaken' ? 'block' : 'none';
-  if(tab==='power') renderEnhance();
-  else if(tab==='synth') renderSynthesis();
-  else renderAwakening();
-}
 
-function renderAwakening(){
-  const panel=document.getElementById('awakenPanel'); if(!panel)return;
-  const rows=[];
-  ['weapon','helmet','armor','gloves','accessory'].forEach(k=>{
-    const it=S.equip[k]; if(!it)return;
-    const lv=Math.min(3,it.awakening||0); const awakeningCosts=[10000,50000,100000]; const cost=awakeningCosts[lv]||100000;
-    const power=it.grade>=15 ? ' · 고유 권능도 각성 단계에 따라 강화됩니다.' : '';
-    const disabled=(lv>=3||S.soulStones<cost)?'disabled':'';
-    const label=lv>=3?'최대 각성':'🌠 각성 · '+fmt(cost)+' 영혼석';
-    rows.push(`<div class="enhCard"><div class="er-top"><div class="er-name" style="color:${GRADES[it.grade].color}">${it.name}</div><div style="color:var(--gold)">각성 ${lv}/3</div></div><div style="font-size:9px;color:var(--sub);margin-top:4px;">각성 1단계마다 장비 자체 능력치가 크게 상승합니다.${power}</div><button class="enhBtn" ${disabled} onclick="awakenEquip('${k}',${cost})">${label}</button></div>`);
-  });
-  panel.innerHTML=rows.length?rows.join(''):'<div style="text-align:center;color:var(--sub);padding:25px;">장착된 장비가 없습니다.</div>';
-}
-function awakenEquip(slot,cost){
-  const it=S.equip[slot]; if(!it)return; const lv=it.awakening||0; if(lv>=3||S.soulStones<cost)return;
-  S.soulStones-=cost; it.awakening=lv+1; renderAwakening(); renderAll(); saveGame(); toast(`🌠 ${it.name} 각성 ${it.awakening}단계!`);
-}
 
-function switchSynthType(type){
-  currentSynthType = type;
-  currentSynthTargetId = null;
-  renderSynthesis();
-}
 
-function getSynthItems(type){
-  // 합성 재료는 가방에 있는 장비만 사용합니다.
-  return S.bagEquip.filter(it => it.kind === type);
-}
+
+
+
+
+
+
+
+
+
+
 
 function switchSynthType(type){
   currentSynthType = type;
   renderSynthesis();
 }
 
-function renderSynthesis(){
-  const panel = document.getElementById('synthPanel');
-  if(!panel) return;
 
-  const types = [
-    ['weapon','⚔️','무기'],
-    ['helmet','🪖','투구'],
-    ['armor','🛡️','갑옷'],
-    ['gloves','🥊','장갑'],
-    ['accessory','💍','장신구']
-  ];
 
-  const equipped = S.equip[currentSynthType];
-  const items = getSynthItems(currentSynthType);
 
-  let html = `
-    <div class="synthTypeTabs">
-      ${types.map(([key,ic,name])=>`
-        <button class="synthTypeTab ${key===currentSynthType?'active':''}" onclick="switchSynthType('${key}')">${ic} ${name}</button>
-      `).join('')}
-    </div>
-    <div style="font-size:10px;color:var(--sub);margin-bottom:8px;">
-      <b>현재 착용 중인 장비</b>와 같은 <b>종류 + 같은 등급</b>의 가방 장비 1개를 재료로 사용합니다.
-      합성할 때마다 해당 장비가 <b>약 10%</b> 강해집니다.
-    </div>
-  `;
 
-  if(!equipped){
-    html += `<div class="synthEmpty">현재 착용 중인 ${types.find(x=>x[0]===currentSynthType)[2]}가 없습니다.<br>장비를 먼저 착용하세요.</div>`;
-  }else{
-    const g = GRADES[equipped.grade] || GRADES[0];
-    const synthLv = equipped.synthLv || 0;
-    const material = items.find(it => it.id !== equipped.id && it.grade === equipped.grade);
 
-    const beforeValue = itemStatValue(equipped);
-    const preview = Object.assign({}, equipped, {synthLv:synthLv+1});
-    const afterValue = itemStatValue(preview);
-    const actualPct = beforeValue > 0 ? ((afterValue / beforeValue - 1) * 100) : 10;
-    const cost = Math.floor((equipped.grade + 1) * 100);
-    const can = !!material;
-
-    html += `
-      <div class="synthTarget" id="synthTargetBox">
-        <div class="synthTitle" style="color:${g.color}">${slotIcon(equipped)} ${equipped.name} +${equipped.enhance||0}</div>
-        <div style="font-size:10px;color:var(--sub);margin-top:3px;">
-          ${g.name} · 합성 ${synthLv}회 · 현재 장착 중
-        </div>
-        <div class="synthPreview">
-          <div class="synthStat">
-            현재
-            <b>${fmt(beforeValue)}</b>
-            <span style="font-size:9px;color:var(--sub)">장비 능력치</span>
-          </div>
-          <div class="synthArrow">➜</div>
-          <div class="synthStat">
-            합성 후
-            <b>${fmt(afterValue)}</b>
-            <span style="font-size:9px;color:#ffb347">+${actualPct.toFixed(1)}%</span>
-          </div>
-        </div>
-        <div class="synthMaterials">
-          <div class="synthMat"><div class="ic">${slotIcon(equipped)}</div><div>착용 장비</div></div>
-          <div style="align-self:center;font-size:20px;color:#ffb347">+</div>
-          <div class="synthMat"><div class="ic">${material ? slotIcon(material) : '❌'}</div><div>${material ? '재료 1개' : '재료 없음'}</div></div>
-        </div>
-        <div style="font-size:10px;color:var(--sub);">
-          소모: <b>착용 장비 + 같은 등급/종류 가방 장비 1개</b> · 비용 💎 ${fmt(cost)}
-        </div>
-        <button class="synthBtn" ${can?'':'disabled'} onclick="doSynthesisInPanel('${currentSynthType}',${cost})">
-          🔺 ${can ? `합성 강화 · 능력치 +${actualPct.toFixed(1)}% · 💎 ${fmt(cost)}` : '같은 등급·종류의 가방 장비가 필요합니다'}
-        </button>
-      </div>
-    `;
-
-    if(items.length){
-      html += `<div style="font-size:11px;font-weight:900;margin:10px 0 6px;">📦 사용 가능한 ${types.find(x=>x[0]===currentSynthType)[2]} 재료</div>`;
-      const mats = items.filter(it=>it.id!==equipped.id && it.grade===equipped.grade);
-      if(mats.length){
-        html += mats.map(it=>{
-          return `<div class="synthEquipCard">
-            <div class="ic">${slotIcon(it)}</div>
-            <div class="synthEquipMeta">
-              <div class="name" style="color:${g.color}">${it.name} +${it.enhance||0}</div>
-              <div class="sub">${g.name} · 합성 재료로 1개 소모</div>
-            </div>
-            <div style="font-size:10px;color:#ffb347">재료</div>
-          </div>`;
-        }).join('');
-      }else{
-        html += `<div class="synthEmpty">같은 등급의 ${types.find(x=>x[0]===currentSynthType)[2]} 재료가 없습니다.</div>`;
-      }
-    }
-  }
-
-  panel.innerHTML = html;
-}
-
-function doSynthesisInPanel(type, cost){
-  if(isEnhancing) return;
-
-  const target = S.equip[type];
-  if(!target){ toast('착용 중인 장비가 없습니다.'); return; }
-
-  const material = S.bagEquip.find(
-    x => x.kind === type && x.grade === target.grade && x.id !== target.id
-  );
-  if(!material){
-    toast('같은 종류·같은 등급의 가방 장비 1개가 필요합니다.');
-    return;
-  }
-  if(S.soulStones < cost){
-    toast(`💎 영혼석이 부족합니다! 필요: ${fmt(cost)}`);
-    return;
-  }
-
-  isEnhancing = true;
-  S.soulStones -= cost;
-
-  const materialId = material.id;
-  S.bagEquip = S.bagEquip.filter(x=>x.id !== materialId);
-
-  const beforeValue = itemStatValue(target);
-  const oldSynth = target.synthLv || 0;
-  const preview = Object.assign({}, target, {synthLv:oldSynth+1});
-  const afterValue = itemStatValue(preview);
-  const pct = beforeValue > 0 ? ((afterValue / beforeValue - 1) * 100) : 10;
-
-  const overlay = document.getElementById('enhAnimOverlay');
-  const animTxt = document.getElementById('animTxt');
-  if(overlay) overlay.classList.remove('show');
-  playForgeFx(slotIcon(target), '합성 강화!');
-
-  setTimeout(()=>{
-    target.synthLv = oldSynth + 1;
-
-    if(overlay) overlay.classList.remove('show');
-    isEnhancing = false;
-
-    renderSynthesis();
-    renderAll();
-    saveGame();
-
-    const box = document.getElementById('synthTargetBox');
-    if(box){
-      box.classList.remove('synthFlash');
-      void box.offsetWidth;
-      box.classList.add('synthFlash');
-    }
-
-    toast(`🔺 합성 성공! ${target.name} 능력치 ${fmt(beforeValue)} → ${fmt(afterValue)} (+${pct.toFixed(1)}%)`);
-    if(animTxt) animTxt.textContent = '초월 에너지 응축 중...';
-  }, 850);
-}
 
 /* ENHANCE SYSTEM */
-function renderEnhance(){
-  document.getElementById('enhSsVal').textContent = fmt(S.soulStones);
-  const pane = document.getElementById('enhList');
-  let html = '';
-  
-  const slots = [
-    {key:'weapon', name:'무기', ic:'⚔️'},
-    {key:'helmet', name:'투구', ic:'🪖'},
-    {key:'armor', name:'갑옷', ic:'🛡️'},
-    {key:'gloves', name:'장갑', ic:'🥊'},
-    {key:'accessory', name:'장신구', ic:'💍'}
-  ];
 
-  slots.forEach(s => {
-    const it = S.equip[s.key];
-    if(!it){
-      html += `<div class="enhCard"><div class="er-top"><span class="er-name">${s.ic} ${s.name}</span> <span style="font-size:11px; color:var(--sub)">장착 장비 없음</span></div></div>`;
-      return;
-    }
 
-    const g = GRADES[it.grade];
-    const isTranscend = it.enhance >= 20;
 
-    if(!isTranscend){
-      const cost = Math.floor((10 + Math.pow(it.enhance, 1.45) * 6) / 2);
-      html += `
-        <div class="enhCard">
-          <div class="er-top">
-            <span class="er-name" style="color:${g.color}">${s.ic} ${it.name} (+${it.enhance})</span>
-            <span style="font-size:11px; color:var(--gold)">스탯 +${it.enhance*6}%</span>
-          </div>
-          <button class="enhBtn" onclick="doEnhance('${s.key}', ${cost})">강화하기 (💎 ${fmt(cost)} 필요)</button>
-        </div>`;
-    } else {
-      const t = it.transcend || 0;
-      const tMax = 5;
-      if(t < tMax){
-        const cost = Math.floor((t + 1) * 350 / 2);
-        const transRates = [50, 38, 28, 18, 10];
-        const transRate = transRates[t] || 10;
-        html += `
-          <div class="enhCard" style="border-color:#00ffff;">
-            <div class="er-top">
-              <span class="er-name" style="color:#00ffff">${s.ic} ${it.name} [초월 ${t}단계]</span>
-              <span style="font-size:11px; color:#ff00ea">초월 보너스 +${t*50}%</span>
-            </div>
-            <button class="enhBtn trans-btn" onclick="doTranscend('${s.key}', ${cost})">⚡ 초월 돌파 ${t+1}단계 · 성공률 ${transRate}% (💎 ${fmt(cost)} 필요)</button>
-          </div>`;
-      } else {
-        const u = it.ultimate || 0;
-        const uMax = 10;
-        const ultimateRates = [50, 40, 30, 20, 15, 10, 7, 4, 2, 1];
-        const uRate = ultimateRates[u] || 1;
-        if(u < uMax){
-          const uCost = (u + 1) * 500;
-          html += `
-            <div class="enhCard" style="border-color:#ff8c00;">
-              <div class="er-top">
-                <span class="er-name" style="color:#ffb347">${s.ic} ${it.name} [극의 ${u}단계]</span><span style="font-size:11px;color:#7fffe0">🎫 ${Number(S.breakProtectionTickets||0)}개</span>
-                <span style="font-size:11px; color:#ffb347">극의 보너스 +${u*40}%</span>
-              </div>
-              <div style="font-size:10px;color:var(--sub);margin-top:5px;">초월 5단계 이후 해금 · 성공률 50% → 1% · 실패 시 일정 확률로 1단계 강등 · 🎫 보유 시 강등 방지</div>
-              <button class="enhBtn ultimate-btn" onclick="doUltimate('${s.key}', ${uCost})">🔥 극의 돌파 ${u+1}단계 · 성공률 ${uRate}% (💎 ${fmt(uCost)} 필요)</button>
-            </div>`;
-        }else{
-          html += `
-            <div class="enhCard" style="border-color:#ff8c00;">
-              <div class="er-top">
-                <span class="er-name" style="color:#ffb347">${s.ic} ${it.name} [극의 MAX]</span>
-                <span style="font-size:11px; color:#ffb347">+400% 극의</span>
-              </div>
-              <button class="enhBtn btn-disabled" disabled>최고 극의 단계 달성</button>
-            </div>`;
-        }
-      }
-    }
-  });
 
-  pane.innerHTML = html;
-}
 
-function doEnhance(slotKey, cost){
-  if(isEnhancing) return;
-  const it = S.equip[slotKey];
-  if(!it) return;
-  if(S.soulStones < cost){ toast('영혼석이 부족합니다!'); return; }
 
-  isEnhancing=true;
-  S.soulStones -= cost;
-  const overlay=document.getElementById('enhAnimOverlay');
-  if(overlay) overlay.classList.remove('show');
 
-  let wait=0;
-  try{
-    wait=Number(playForgeFx(slotKey==='weapon'?'⚔️':slotKey==='helmet'?'🪖':slotKey==='armor'?'🛡️':slotKey==='gloves'?'🥊':'💍','강화!'))||0;
-  }catch(e){ wait=0; }
 
-  setTimeout(()=>{
-    it.enhance=(it.enhance||0)+1;
-    isEnhancing=false;
-    if(overlay) overlay.classList.remove('show');
-    renderEnhance();
-    renderAll(); saveGame();
-    sfx('success');
-    toast(`✨ ${it.name} +${it.enhance} 강화 성공!`);
-  }, Math.min(900,Math.max(0,wait)));
-}
 
-function doEnhanceContinuousAll(){
-  if(isEnhancing)return;
-  let total=0,done=0;
-  ['weapon','helmet','armor','gloves','accessory'].forEach(slotKey=>{
-    const it=S.equip[slotKey];if(!it||it.enhance>=20)return;
-    while(it.enhance<20){
-      const cost=Math.floor((10+Math.pow(it.enhance,1.45)*6)/2);
-      if(S.soulStones<cost)break;
-      S.soulStones-=cost;total+=cost;it.enhance++;done++;
-    }
-  });
-  if(done===0){toast('💎 연속 강화에 필요한 영혼석이 부족합니다.');return;}
-  renderEnhance();renderAll();saveGame();toast('⚡ 연속 강화 완료! '+done+'회 · 💎-'+fmt(total));
-}
 
-function doTranscend(slotKey, cost){
-  if(isEnhancing) return;
-  const it = S.equip[slotKey];
-  if(!it) return;
-  if(S.soulStones < cost){ toast('영혼석이 부족합니다!'); return; }
 
-  isEnhancing = true;
-  S.soulStones -= cost;
-  
-  const overlay = document.getElementById('enhAnimOverlay');
-  const useTransFx=appSettings.transcendFx!==false;
-  if(useTransFx)overlay.classList.add('show');
 
-  setTimeout(() => {
-    const t = it.transcend || 0;
-    const transRates = [50, 38, 28, 18, 10];
-    const chance = transRates[t] || 10;
-    const success = Math.random() * 100 < chance;
 
-    overlay.classList.remove('show');
-    isEnhancing = false;
 
-    if(success){
-      it.transcend = t + 1;
-      renderEnhance();
-      renderAll(); saveGame();
-      toast(`⚡ ${it.name} 초월 ${it.transcend}단계 돌파 성공!`);
-    }else{
-      renderEnhance();
-      renderAll(); saveGame();
-      toast(`💥 초월 실패! ${it.name}은(는) 그대로 유지됩니다. (성공률 ${chance}%)`);
-    }
-  }, useTransFx ? 1200 : 0);
-}
 
-function spawnUltimateParticles(success){
-  const box=document.getElementById('ultimateParticles'); if(!box) return;
-  box.innerHTML='';
-  const count=success?70:48;
-  for(let i=0;i<count;i++){
-    const p=document.createElement('i'); p.className='ultimateParticle';
-    const angle=Math.random()*Math.PI*2, dist=(success?120:90)+Math.random()*Math.min(innerWidth,innerHeight)*.45;
-    p.style.left='50%'; p.style.top='47%'; p.style.setProperty('--dx',`${Math.cos(angle)*dist}px`); p.style.setProperty('--dy',`${Math.sin(angle)*dist}px`);
-    p.style.animationDelay=`${Math.random()*.18}s`;
-    p.style.color=success?(Math.random()>.35?'#ffd166':'#00eaff'):'#ff315a';
-    box.appendChild(p);
-  }
-}
 
-function doUltimate(slotKey, cost){
-  if(isEnhancing) return;
-  const it=S.equip[slotKey]; if(!it) return;
-  if((it.transcend||0)<5){toast('초월 5단계를 먼저 달성해야 합니다.');return;}
-  const u=it.ultimate||0; if(u>=10){toast('극의 강화가 최대 단계입니다.');return;}
-  if(S.soulStones<cost){toast(`💎 영혼석이 부족합니다! 극의 강화 필요: ${fmt(cost)}`);return;}
-  isEnhancing=true; S.soulStones-=cost;
-  const overlay=document.getElementById('ultimateFxOverlay');
-  const useUltimateFx=appSettings.ultimateFx!==false;
-  const txt=document.getElementById('ultimateFxText');
-  const result=document.getElementById('ultimateResult');
-  const chance=([50,40,30,20,15,10,7,4,2,1][u]||1);
-  if(useUltimateFx)overlay.className='show event-charge';
-  if(result) result.textContent='';
-  if(txt) txt.innerHTML=`🔥 극의 ${u+1}단계<small>${it.name} · 운명을 판정한다</small>`;
-  const svg=document.getElementById('stickmanSvg'); if(svg){svg.classList.add('ultimate-stage');}
-  setTimeout(()=>{
-    const success=Math.random()*100<chance;
-    if(useUltimateFx){overlay.classList.remove('event-charge');overlay.classList.add(success?'event-success':'event-fail');}
-    if(useUltimateFx)spawnUltimateParticles(success);
-    if(success){
-      it.ultimate=u+1;
-      if(txt) txt.innerHTML=`⚡ 극의 ${it.ultimate}단계<small>${it.name} · 한계를 초월한 흔적</small>`;
-      if(result) result.innerHTML=`극의 돌파<br><small style="font-size:12px;letter-spacing:1px">SUCCESS · ${chance}%</small>`;
-      toast(`🔥 ${it.name} 극의 ${it.ultimate}단계 돌파 성공! (성공률 ${chance}%)`);
-    }else{
-      const failShard=3+Math.floor(u/3);
-      S.artifactShards=(S.artifactShards||0)+failShard;
-      const wouldDowngrade=u>0 && Math.random()<0.30;
-      const protectedDowngrade=wouldDowngrade && Number(S.breakProtectionTickets||0)>0;
-      if(protectedDowngrade) S.breakProtectionTickets=Math.max(0,Number(S.breakProtectionTickets||0)-1);
-      const downgrade=wouldDowngrade && !protectedDowngrade;
-      if(downgrade) it.ultimate=u-1;
-      if(txt) txt.innerHTML=`💥 극의 붕괴<small>${it.name} · 한계가 거부했다</small>`;
-      if(result) result.innerHTML=downgrade?`극의 붕괴<br><small style="font-size:12px;letter-spacing:1px">${u} → ${it.ultimate} · 파편 +${failShard}</small>`:protectedDowngrade?`극의 실패 방어<br><small style="font-size:12px;letter-spacing:1px">등급 유지 · 🎫 파괴방지권 -1 · 파편 +${failShard}</small>`:`극의 실패<br><small style="font-size:12px;letter-spacing:1px">단계 유지 · 파편 +${failShard}</small>`;
-      if(useUltimateFx&&downgrade){overlay.classList.remove('event-fail');overlay.classList.add('event-collapse');}
-      if(downgrade) toast(`💥 극의 붕괴! ${it.name} ${u} → ${it.ultimate}단계 강등 · 🌌 유물 파편 +${failShard}`);
-      else if(protectedDowngrade) toast(`🛡️ 극의 붕괴 방지! ${it.name} ${u}단계 유지 · 🎫 파괴방지권 1개 소모 · 🌌 유물 파편 +${failShard}`);
-      else toast(`💥 극의 실패! 단계 유지 (${chance}%) · 🌌 유물 파편 +${failShard}`);
-    }
-    renderEnhance(); renderAll(); saveGame();
-    setTimeout(()=>{
-      if(useUltimateFx)overlay.className=''; if(txt) txt.innerHTML='🔥 극의의 문이 열린다<small>THE LIMIT AWAITS</small>'; if(result) result.textContent='';
-      const particles=document.getElementById('ultimateParticles'); if(particles) particles.innerHTML='';
-      isEnhancing=false;
-    },useUltimateFx ? 1900 : 0);
-  },useUltimateFx ? 1500 : 0);
-}
+
 
 /* ZERO_PET_RATE_VERIFIED: ZERO grade = 1% of pet summons */
 /* INIT */
@@ -5184,19 +3338,15 @@ renderSettings();
 </script>
 
 <script>
-function setActiveNav(tab){
-  document.querySelectorAll('#bottomNav button[data-tab]').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
-}
-function toggleMoreMenu(){
-  document.getElementById('moreMenu')?.classList.toggle('show');
-}
-function closeMoreMenu(){
-  document.getElementById('moreMenu')?.classList.remove('show');
-}function closeAllMenus(){ closeMoreMenu(); }
-function scrollToTopBattle(){
-  setActiveNav('shop');
-  openModal('shop');
-}
+
+
+
+
+
+
+
+
+
 document.addEventListener('click', function(e){
   const menu=document.getElementById('moreMenu');
   const nav=document.getElementById('bottomNav');
@@ -5226,30 +3376,17 @@ document.addEventListener('click', function(e){
     '.presetCard'
   ].join(',');
 
-  function isDisabled(el){
-    return !!el.disabled || el.getAttribute('aria-disabled') === 'true';
-  }
+  
 
-  function press(el){
-    if(!el || isDisabled(el)) return;
-    el.classList.add('is-pressing');
-  }
 
-  function release(el){
-    if(!el) return;
-    el.classList.remove('is-pressing');
-  }
+  
 
-  function ripple(el, x, y){
-    if(!el || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    const r=document.createElement('span');
-    r.className='buttonRipple';
-    const rect=el.getBoundingClientRect();
-    r.style.left=(x-rect.left)+'px';
-    r.style.top=(y-rect.top)+'px';
-    el.appendChild(r);
-    setTimeout(()=>r.remove(),460);
-  }
+
+  
+
+
+  
+
 
   document.addEventListener('pointerdown', function(e){
     const el=e.target.closest?.(SELECTOR);
@@ -5529,6 +3666,17 @@ document.addEventListener('click', function(e){
 .eqSetHighlight{margin:8px 0;padding:10px;border:1px solid rgba(255,209,102,.42);border-radius:12px;background:linear-gradient(135deg,rgba(255,209,102,.10),rgba(124,92,255,.08));box-shadow:0 0 12px rgba(255,209,102,.06)}
 .eqSetHead{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:1000;font-size:11px;color:#ffe66d}.eqSetCount{padding:3px 6px;border-radius:7px;background:rgba(255,209,102,.14);color:#ffe66d;font-size:8px}.eqSetEffect{margin-top:5px;padding:6px 7px;border-radius:8px;background:rgba(0,0,0,.18);font-size:9px;line-height:1.35;color:#cfd3e8}.eqSetEffect.active{border:1px solid rgba(0,234,255,.22);background:rgba(0,234,255,.07);color:#fff}.eqSetEffect b{color:#00eaff}.eqSetBookCard{margin-bottom:8px}.spouseAbilityBox{margin-top:7px;padding:7px 8px;border-radius:9px;background:rgba(0,234,255,.055);border:1px solid rgba(0,234,255,.18);font-size:9px;line-height:1.45}.spouseAbilityBox b{color:#7fffe0}.spouseAbilityBox.special{border-color:rgba(255,215,74,.24);background:rgba(255,215,74,.055)}.spouseAbilityBox.special b{color:#ffe66d}
 </style>
+  <script src="js/utils.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/artifacts.js"></script>
+  <script src="js/spouse.js"></script>
+  <script src="js/equipment.js"></script>
+  <script src="js/growth.js"></script>
+  <script src="js/focus.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/gacha.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/research.js"></script>
   <script src="js/pets.js"></script>
   <script src="js/damage.js"></script>
   <script src="js/battle.js"></script>

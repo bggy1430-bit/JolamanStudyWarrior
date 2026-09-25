@@ -4952,49 +4952,41 @@ function getItemById(id){
 }
 
 function openItemSheet(id){
-  const it = getItemById(id);
-  if(!it) return;
-  const isJunk = it.kind === 'junk';
-  const canDismantleEquip = !isJunk && (it.grade >= 6 || it.grade < maxGradeOwned(it.kind));
-  const sellVal = isJunk ? getJunkSellValue(it) : Math.round(150 * GRADES[it.grade].mult);
-  const ssVal = isJunk ? 0 : (it.grade+1)*3;
-  const artifactVal = !isJunk && it.grade>=6 ? 8 + (it.grade-6)*7 : 0;
-  const essenceVal = isJunk ? (it.grade+1)*2 : 0;
-  const g = GRADES[it.grade];
-  const synthMatches = !isJunk ? S.bagEquip.filter(x => x.id !== it.id && x.kind === it.kind && x.grade === it.grade).length : 0;
-  const synthCost = !isJunk ? Math.floor(Math.pow(it.grade + 1, 2) * 100) : 0;
-  const canSynthesize = !isJunk && it.enhance < 20 && synthMatches >= 2;
-
-  document.getElementById('itemSheet').innerHTML = `
+  const it=getItemById(id); if(!it)return;
+  const isJunk=it.kind==='junk';
+  const canDismantleEquip=!isJunk&&(it.grade>=6||it.grade<maxGradeOwned(it.kind));
+  const sellVal=isJunk?getJunkSellValue(it):Math.round(150*GRADES[it.grade].mult);
+  const ssVal=isJunk?0:(it.grade+1)*3;
+  const artifactVal=!isJunk&&it.grade>=6?8+(it.grade-6)*7:0;
+  const essenceVal=isJunk?(it.grade+1)*2:0;
+  const g=GRADES[it.grade];
+  const synthMatches=!isJunk?S.bagEquip.filter(x=>x.id!==it.id&&x.kind===it.kind&&x.grade===it.grade).length:0;
+  const synthCost=!isJunk?Math.floor(Math.pow(it.grade+1,2)*100):0;
+  const canSynthesize=!isJunk&&it.enhance<20&&synthMatches>=2;
+  document.getElementById('itemSheet').innerHTML=`
     <h4 style="color:${g.color}">${it.name}</h4>
     <div class="desc">${isJunk?'[잡템] 재료 아이템':(slotIcon(it)+' 장비 · 강화 +'+it.enhance)}</div>
-    ${!isJunk ? `<div class="desc" style="color:#ffd166;">장비 옵션 · 골드로 개별 변경</div>${renderOptionRows(it,'bag',it.id)}<div class="desc" style="color:#9aa0b5;">🛡️ 세트: ${getSetInfo(it)}</div>${it.grade>=15?`<div class="desc" style="color:#ffd166;">✦ 고유 권능: ${getGearPowerNameForGrade(it.grade)}</div>`:''}` : ''}
-    ${!isJunk ? `<button class="btn-equip" onclick="doEquip('${it.id}')">장착하기</button>` : ''}
-    ${!isJunk ? `<button class="btn-synth" ${canSynthesize?'':'disabled'} onclick="synthesizeEquip('${it.id}')">🔺 같은 등급·종류 3개 합성 강화 · +1 (💎 ${fmt(synthCost)})${canSynthesize?'':' · 재료 2개 필요 / +20까지'}</button>` : ''}
-    ${isJunk ? `<button class="btn-dismantle" onclick="doDismantleJunk('${it.id}')">분해하기 (🌿 생명의 정수 +${essenceVal})</button>` :
-    `<button class="${canDismantleEquip?'btn-dismantle':'btn-disabled'}" ${canDismantleEquip?'':'disabled'} onclick="doDismantle('${it.id}')">
-      분해하기 (💎 영혼석 +${ssVal}${artifactVal?` · 🌌 유물의 파편 +${artifactVal}`:''}) ${canDismantleEquip?'':'· 더 높은 등급 보유 시 가능'}
-    </button>`}
+    ${!isJunk?`<div class="eqSetHighlight"><div class="eqSetHead"><span>🛡️ 장비 세트</span></div><div class="eqSetEffect active">${getSetInfo(it).replace(/\\n/g,'<br>')}</div></div>`:''}
+    ${!isJunk?`<button class="btn-equip" onclick="doEquip('${it.id}')">장착하기</button>`:''}
+    ${!isJunk?`<button class="btn-synth" ${canSynthesize?'':'disabled'} onclick="synthesizeEquip('${it.id}')">🔺 같은 등급·종류 3개 합성 강화 · +1 (💎 ${fmt(synthCost)})${canSynthesize?'':' · 재료 2개 필요 / +20까지'}</button>`:''}
+    ${isJunk?`<button class="btn-dismantle" onclick="doDismantleJunk('${it.id}')">분해하기 (🌿 생명의 정수 +${essenceVal})</button>`:`
+    <button class="${canDismantleEquip?'btn-dismantle':'btn-disabled'}" ${canDismantleEquip?'':'disabled'} onclick="doDismantle('${it.id}')">분해하기 (💎 영혼석 +${ssVal}${artifactVal?` · 🌌 유물의 파편 +${artifactVal}`:''}) ${canDismantleEquip?'':'· 더 높은 등급 보유 시 가능'}</button>`}
     <button class="btn-sell" onclick="doSell('${it.id}')">판매하기 (💰 +${fmt(sellVal)})</button>
-    <button class="btn-cancel" onclick="closeItemSheet()">닫기</button>
-  `;
+    <button class="btn-cancel" onclick="closeItemSheet()">닫기</button>`;
   document.getElementById('itemSheetBg').classList.add('show');
 }
 
 function closeItemSheet(){ document.getElementById('itemSheetBg').classList.remove('show'); }
 
 function openEquippedSheet(slot){
-  const it = S.equip[slot];
-  if(!it){ toast('장착된 장비가 없습니다'); return; }
-  const g = GRADES[it.grade];
-  document.getElementById('itemSheet').innerHTML = `
+  const it=S.equip[slot]; if(!it){toast('장착된 장비가 없습니다');return;}
+  const g=GRADES[it.grade];
+  document.getElementById('itemSheet').innerHTML=`
     <h4 style="color:${g.color}">${it.name} ${it.enhance>0?('+'+it.enhance):''}</h4>
     <div class="desc">현재 장착 중인 장비입니다.</div>
-    <div class="desc" style="color:#ffd166;">장비 옵션 · 골드로 개별 변경</div>${renderOptionRows(it,'equip',slot)}
-    <div class="desc" style="color:#9aa0b5;">🛡️ 세트: ${getSetInfo(it)}</div>${it.grade>=15?`<div class="desc" style="color:#ffd166;">✦ 고유 권능: ${getGearPowerNameForGrade(it.grade)}</div>`:''}
+    <div class="eqSetHighlight"><div class="eqSetHead"><span>🛡️ 장비 세트</span></div><div class="eqSetEffect active">${getSetInfo(it).replace(/\\n/g,'<br>')}</div></div>
     <button class="btn-cancel" onclick="doUnequip('${slot}')">해제하기</button>
-    <button class="btn-cancel" onclick="closeItemSheet()">닫기</button>
-  `;
+    <button class="btn-cancel" onclick="closeItemSheet()">닫기</button>`;
   document.getElementById('itemSheetBg').classList.add('show');
 }
 

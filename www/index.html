@@ -1462,10 +1462,10 @@ body{touch-action:manipulation;}
 
 </style>
 
+  <!-- CORE MODULES: all helpers must load before state initialization -->
   <script src="js/utils.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/intro.js"></script>
-  <script src="js/state.js"></script>
   <script src="js/artifacts.js"></script>
   <script src="js/spouse.js"></script>
   <script src="js/equipment.js"></script>
@@ -1473,11 +1473,19 @@ body{touch-action:manipulation;}
   <script src="js/focus.js"></script>
   <script src="js/effects.js"></script>
   <script src="js/gacha.js"></script>
-  <script src="js/ui.js"></script>
   <script src="js/research.js"></script>
   <script src="js/pets.js"></script>
   <script src="js/damage.js"></script>
   <script src="js/battle.js"></script>
+  <script src="js/items.js"></script>
+  <script src="js/origin.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/presets.js"></script>
+  <script src="js/ui.js"></script>
+  <!-- state.js initializes the save and calls renderAll(), so it must be last -->
+  <script src="js/state.js"></script>
 </head>
 <body>
 
